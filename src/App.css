@@ -1,8 +1,35 @@
-.App {
-  text-align: center;
+@import '~antd/dist/antd.css';
+
+.ant-timeline {color: rgba(0, 0, 0, 0.85);}
+.ant-timeline-item-tail {border-left: 2px solid lightgrey;}
+.ant-timeline-item-pending .ant-timeline-item-head {background-color: transparent;}
+.ant-timeline-item-head {background-color: #fff;border: 2px solid transparent;border-radius: 100px;}
+.ant-timeline-item-head-blue {color: @primary-color;border-color: @primary-color;}
+.ant-timeline-item-head-red {color: #ff4d4f;border-color: #ff4d4f;}
+.ant-timeline-item-head-green {color: #52c41a;border-color: #52c41a;}
+.ant-timeline-item-head-gray {color: rgba(0, 0, 0, 0.25);border-color: rgba(0, 0, 0, 0.25);}
+.ant-timeline-item-head-custom {border: 0;border-radius: 0;}
+.ant-timeline.ant-timeline-pending .ant-timeline-item-last .ant-timeline-item-tail {border-left: 2px dotted #f0f0f0;}
+.ant-timeline.ant-timeline-reverse .ant-timeline-item-pending .ant-timeline-item-tail {border-left: 2px dotted #f0f0f0;}
+.ant-timeline-rtl .ant-timeline-item-tail {border-right: 2px solid red; border-left: none;}
+.ant-timeline-rtl.ant-timeline.ant-timeline-pending .ant-timeline-item-last .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
+.ant-timeline-rtl.ant-timeline.ant-timeline-reverse .ant-timeline-item-pending .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
+
+.ant-layout aside {
+  width: 'auto' !important;
 }
 
-.App-logo {
+.bigIcons {
+  font-size: large;
+  color: lightgray;
+  margin: 0;
+}
+
+/* .App {
+  text-align: center;
+} */
+
+/* .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
@@ -35,4 +62,4 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
