@@ -15,14 +15,40 @@
 .ant-timeline-rtl.ant-timeline.ant-timeline-pending .ant-timeline-item-last .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
 .ant-timeline-rtl.ant-timeline.ant-timeline-reverse .ant-timeline-item-pending .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
 
-.ant-layout aside {
-  width: 'auto' !important;
+.ant-layout-content {
+  margin: 10px 10px 0px 310px;
 }
 
 .bigIcons {
   font-size: large;
   color: lightgray;
   margin: 0;
+}
+
+.circleBackground {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background-color: #bfbfbf; */
+  border-radius: 100%;
+  width: 16px;
+  height: 16px;
+  /* margin: 0px 5px; */
+  font-weight: bold;
+  font-size: smaller;
+  color: white;
+  margin: 3px;
+}
+
+.tagContentHolder {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.productTagName {
+  display: inline;
 }
 
 /* .App {
