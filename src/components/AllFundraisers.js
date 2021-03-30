@@ -1,5 +1,5 @@
-import  React, { useState, useRef } from 'react';
-import { sortBy } from 'lodash';
+import  React, { useState, useRef, useContext } from 'react';
+import { sortBy, find, matchesProperty, update } from 'lodash';
 // import TimelineCard from './TimelineCard';
 // import Airtable from 'airtable';
 import { Table, Drawer, Input, Button, Space, Tag } from 'antd';
@@ -12,11 +12,18 @@ import H from '../images/icons_H.svg';
 import S from '../images/icons_S.svg';
 import T from '../images/icons_T.svg';
 import selectStatusColor from './selectStatusColor.js';
+import { RecordsContext } from '../App';
 // import { icons_B, icons_H, icons_S, icons_T } from '../images';
 
 // const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 
 const AllFundraisers = ({ fundraisers }) => {
+  const {
+    recordsDispatch, recordsState: {
+      focusedRecord,
+      hoveredID,
+    }
+  } = useContext(RecordsContext);
     // display a table of all fundraisers
     // fields: Organization | Status | Sales | FH Total | Org Total | D-Date | Products
     // Organization, Status, D-Date, & Products are filterable & orderable
@@ -24,25 +31,42 @@ const AllFundraisers = ({ fundraisers }) => {
     // Clicking anywhere on the record opens the FullRecord
 
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
+
+    const chooseRecord = (recordName) => {
+      const chosenRecord = find(fundraisers, matchesProperty('Organization', recordName));
+      console.log('chosenRecord: ', chosenRecord);
+      recordsDispatch({
+        type: 'chooseRecord',
+        payload: chosenRecord,
+      })
+    }
     
-    let updatedFundraisers = fundraisers.map(record => {
+    const updatedFundraisers = fundraisers.map(record => {
+        // console.log("isHovered: ", record["RecordID"] === hoveredID);
         return {
             ...record,
             "Delivery Date": convertedDate(record["Delivery Date"]),
             "Organization Proceeds": `$${Math.round(record["Organization Proceeds"])}`,
             "Total Revenue": `$${Math.round(record['Total Revenue'])}`,
             "Firehouse Fee": `$${Math.round(record['Firehouse Fee'])}`,
+            "isHovered": record["RecordID"] === hoveredID,
         }
     });
+
+
+    // const currentOrganization = updatedFundraisers;
+    // console.log("currentOrganization: ", currentOrganization)
     // console.log("updatedFundraisers: ", updatedFundraisers);
+
+    
 
     const dataSource = sortBy(updatedFundraisers, ['Priority', 'Delivery Date']);
     
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
+    // const [searchText, setSearchText] = useState('');
+    // const [searchedColumn, setSearchedColumn] = useState('');
     const [visible, setVisible] = useState(false);
     // const [hasBeenUpdated, setHasBeenUpdated] = useState(false);
-    const searchInput = useRef(null);
+    // const searchInput = useRef(null);
 
     // const getColumnSearchProps = (dataIndex) => ({
     //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -124,32 +148,33 @@ const AllFundraisers = ({ fundraisers }) => {
     
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
-    const showDrawer = () => {
-        setVisible(true);
-    };
-    const onClose = () => {
-        setVisible(false);
-    }
+    const isHovered = (id) => id === hoveredID;
+    // const showDrawer = () => {
+    //     setVisible(true);
+    // };
+    // const onClose = () => {
+    //     setVisible(false);
+    // }
     
     const chooseProduct = (product) => {
         switch(product) {
             case 'Boston Butts':
-                return <div className="tagContentHolder" onClick={showDrawer}>
+                return <div className="tagContentHolder">
                             <div className="circleBackground" style={{ backgroundColor: "#597ef7" }}>B</div>
                             <div className="productTagName" style={{ color: "#597ef7" }}>{product}</div>
                         </div>
             case 'Half Hams':
-                return <div className="tagContentHolder" onClick={showDrawer}>
+                return <div className="tagContentHolder">
                             <div className="circleBackground" style={{ backgroundColor: "#7cb305" }}>H</div>
                             <div className="productTagName" style={{ color: "#7cb305" }}>{product}</div>
                         </div>
             case 'Whole Turkeys':
-                return <div className="tagContentHolder" onClick={showDrawer}>
+                return <div className="tagContentHolder">
                             <div className="circleBackground" style={{ backgroundColor: "#13c2c2" }}>T</div>
                             <div className="productTagName" style={{ color: "#13c2c2" }}>{product}</div>
                         </div>
             case 'BBQ Sauce':
-                return <div className="tagContentHolder" onClick={showDrawer}>
+                return <div className="tagContentHolder">
                             <div className="circleBackground" style={{ backgroundColor: "#9254de" }}>S</div>
                             <div className="productTagName" style={{ color: "#9254de" }}>{product}</div>
                         </div>
@@ -168,7 +193,7 @@ const AllFundraisers = ({ fundraisers }) => {
           sorter: createSorter('Organization'),
           render: Organization => (
             <>
-                <div onClick={showDrawer}>{Organization}</div>
+                <div>{Organization}</div>
             </>
           ),
         //   fixed: 'left',
@@ -180,7 +205,7 @@ const AllFundraisers = ({ fundraisers }) => {
           key: 'Status',
           render: Status => (
             <>
-                  <Tag color={selectStatusColor(Status)} onClick={showDrawer} key={Status}>
+                  <Tag color={selectStatusColor(Status)} key={Status}>
                     {Status.toUpperCase()}
                   </Tag>
             </>
@@ -194,7 +219,7 @@ const AllFundraisers = ({ fundraisers }) => {
             sorter: (a, b) => a['Total Revenue'] - b['Total Revenue'],
             render: item => (
                 <>
-                    <div onClick={showDrawer}>{item}</div>
+                    <div>{item}</div>
                 </>
               ),
             // ...getColumnSearchProps('Total Revenue')
@@ -205,7 +230,7 @@ const AllFundraisers = ({ fundraisers }) => {
           key: 'Firehouse Fee',
           render: item => (
             <>
-                <div onClick={showDrawer}>{item}</div>
+                <div>{item}</div>
             </>
           ),
         //   ...getColumnSearchProps('Firehouse Fee')
@@ -216,7 +241,7 @@ const AllFundraisers = ({ fundraisers }) => {
           key: 'Organization Proceeds',
           render: item => (
             <>
-                <div onClick={showDrawer}>{item}</div>
+                <div>{item}</div>
             </>
           ),
         //   ...getColumnSearchProps('Organization Proceeds')
@@ -227,7 +252,7 @@ const AllFundraisers = ({ fundraisers }) => {
           key: 'Delivery Date',
           render: item => (
             <>
-                <div onClick={showDrawer}>{item}</div>
+                <div>{item}</div>
             </>
           ),
         //   ...getColumnSearchProps('Delivery Date')
@@ -320,13 +345,25 @@ const AllFundraisers = ({ fundraisers }) => {
     
     return (
         <div>
-            <Table dataSource={dataSource} columns={columns}  pagination={false} size="small" scroll={{ x: 700, y: 250 }} />
-            <Drawer
+            <Table 
+              dataSource={dataSource}
+              columns={columns} 
+              pagination={false}
+              size="small"
+              scroll={{ x: 700, y: 250 }} 
+              onRow={(record, rowIndex) => {
+                return {
+                  onClick: event => {chooseRecord(record.Organization)},
+                  className: isHovered(record.RecordID) ? "hovered" : "" // click row
+                };
+              }}
+            />
+            {/* <Drawer
                 title="Test Drawer"
                 placement="right"
                 closable={false}
                 onClose={onClose}
-                visible={visible}>Stuff Goes Here</Drawer>
+                visible={visible}>Stuff Goes Here</Drawer> */}
             {/* <input type="text" value={inputValue} placeholder="Try it" onChange={(e) => setInputValue(e.target.value)}/> */}
             {/* <div>New Value: {inputValue}</div> */}
             {/* <Button onClick={() => changeField('rec43VLzoUTfiQX13', 'Organization', inputValue)}>Set New Name</Button> */}
