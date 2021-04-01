@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/selljar/static/css/main.3b54b735.chunk.css",
+    "main.js": "/selljar/static/js/main.9efa22cc.chunk.js",
+    "main.js.map": "/selljar/static/js/main.9efa22cc.chunk.js.map",
+    "runtime-main.js": "/selljar/static/js/runtime-main.93f16e6a.js",
+    "runtime-main.js.map": "/selljar/static/js/runtime-main.93f16e6a.js.map",
+    "static/css/2.193b7359.chunk.css": "/selljar/static/css/2.193b7359.chunk.css",
+    "static/js/2.d113f095.chunk.js": "/selljar/static/js/2.d113f095.chunk.js",
+    "static/js/2.d113f095.chunk.js.map": "/selljar/static/js/2.d113f095.chunk.js.map",
+    "static/js/3.af87a3a3.chunk.js": "/selljar/static/js/3.af87a3a3.chunk.js",
+    "static/js/3.af87a3a3.chunk.js.map": "/selljar/static/js/3.af87a3a3.chunk.js.map",
+    "index.html": "/selljar/index.html",
+    "static/css/2.193b7359.chunk.css.map": "/selljar/static/css/2.193b7359.chunk.css.map",
+    "static/css/main.3b54b735.chunk.css.map": "/selljar/static/css/main.3b54b735.chunk.css.map",
+    "static/js/2.d113f095.chunk.js.LICENSE.txt": "/selljar/static/js/2.d113f095.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.93f16e6a.js",
+    "static/css/2.193b7359.chunk.css",
+    "static/js/2.d113f095.chunk.js",
+    "static/css/main.3b54b735.chunk.css",
+    "static/js/main.9efa22cc.chunk.js"
+  ]
+}
