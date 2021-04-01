@@ -13,11 +13,11 @@ const Alerts = () => {
     const [alertList, setAlertList] = useState([]);
 
     useEffect(() => {
-        console.log("New Alert!");
+        // console.log("New Alert!");
         setAlertList(alertList => [... alertList, alert]);
     }, [alert]);
     
-    console.log("alert: ", JSON.stringify(alert));
+    // console.log("alert: ", JSON.stringify(alert));
 
     return (
         <div

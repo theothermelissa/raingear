@@ -16,7 +16,6 @@ const EditFundraiser = () => {
     
     useEffect(() => {
         base('Fundraisers').find(recordToEdit, function (err, record) {
-            console.log("EditFundraiser found this record: ", record);
             setExistingValues(record["fields"]);
             if (err) {
                 console.error(err);
@@ -25,9 +24,9 @@ const EditFundraiser = () => {
         })
     }, []);
 
-    useEffect(() => {
-        form.setFieldsValue(existingValues)
-    }, [form, existingValues])
+    // useEffect(() => {
+    //     form.setFieldsValue(existingValues)
+    // }, [form, existingValues])
 
 
     // const {

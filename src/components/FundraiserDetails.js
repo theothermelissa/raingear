@@ -85,6 +85,12 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         payload: recordID,
     });
 
+    // function copyToClipboard() {
+    //     addressHolder.innerText = copytext.innerText;
+    //     Copied = addressHolder.createTextRange();
+    //     Copied.execCommand("Copy")
+    // };
+
     return (
         <div className="site-card-wrapper">
             <Card title={`${fundraiserName} (${status})`}
@@ -171,11 +177,13 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                             // actions={
                             //     [
                             //         <>
-                            //             <Button disabled>Get Directions</Button>
+                            //             <Button onClick={copyToClipboard}>Copy Address</Button>
                             //         </>
                             //     ]
                             // }
                         >
+                            {/* <textArea id="addresHolder" style={{display: none}}/> */}
+
                             {/* <Meta title={`DELIVERY SCHEDULED FOR: ${convertedDate(deliveryDate).toUpperCase()}`} /> */}
                             <Meta title={
                                 relativeDeliveryDate()

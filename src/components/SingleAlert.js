@@ -3,7 +3,7 @@ import { Alert } from 'antd';
 
 const SingleAlert = ({ message, type }) => {
     const [showAlert, setShowAlert] = useState(true)
-    console.log("message: ", message)
+    // console.log("message: ", message)
 
     useEffect(() => {
         
