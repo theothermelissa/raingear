@@ -1,12 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useForm } from 'react';
 import {RecordsContext, base} from '../App';
 import {Form, Input, InputNumber, Button, Select, Radio} from 'antd';
+import { get } from 'lodash';
 
 const EditFundraiser = () => {
     const {recordsDispatch, recordsState: {
-            recordToEdit
+            recordToEdit,
+            editDrawerVisible,
         }} = useContext(RecordsContext);
     const [existingValues, setExistingValues] = useState()
+    
+    
+    const [form] = Form.useForm();
     
     
     useEffect(() => {
@@ -18,9 +23,12 @@ const EditFundraiser = () => {
                 return;
             }
         })
-    }, [recordToEdit]);
+    }, []);
 
-    const [form] = Form.useForm();
+    useEffect(() => {
+        form.setFieldsValue(existingValues)
+    }, [form, existingValues])
+
 
     // const {
     //     fundraiserName,
@@ -123,6 +131,9 @@ const EditFundraiser = () => {
         closeEditDrawer();
     };
 
+    function getExistingValues() {
+        return existingValues;
+    }
     // console.log("existingValues: ", existingValues);
 
     // const existingValues = {"organization": "Orange Octagon", "buttPrice": 55}
@@ -136,7 +147,7 @@ const EditFundraiser = () => {
                 // {...layout}
                 form={form}
                 name="control-hooks"
-                initialValues={existingValues}
+                initialValues={getExistingValues()}
                 // initialValues={{
                 //     'organization': "This Is Not The Organization",
                 // }}

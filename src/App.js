@@ -230,9 +230,9 @@ function App() {
             {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
         </Layout>
       </Layout>
-          <Drawer width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
+          {recordsState["editDrawerVisible"] && <Drawer forceRender width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
             <EditFundraiser />
-          </Drawer>
+          </Drawer>}
     </RecordsContext.Provider>
     
   );
