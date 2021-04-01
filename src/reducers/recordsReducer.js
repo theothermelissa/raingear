@@ -3,45 +3,63 @@ const recordsReducer = (state, action) => {
      // get focused fundraiser
      // get focused fundraiser editor
      // submit fundraiser edits
-     console.log("action.payload: ", action.payload);
      switch (action.type) {
-          case 'chooseRecord':
-               console.log("chooseRecord payload: ", action.payload);
+          case 'setRecords':
+               // console.log("records: ", action.payload);
                return {
                     ...state,
-                    focusedRecord: action.payload,
+                    allRecords: action.payload,
+               }
+          case 'chooseRecord':
+               // console.log("select record: ", action.payload)
+               return {
+                    ...state,
+                    focusedRecordID: action.payload,
                     viewFocusedRecord: true,
                };
-          // case 'showRecordDetails':
-          //      console.log('showing record');
-          //      return {
-          //           ...state,
-          //           viewFocusedRecord: true,
-          //      };
-          case 'updateRecord':
+          case 'updateRecords':
+               console.log("Setting recordHasChanged: true.")
                return {
                     ...state,
-                    newRecord: true,
+                    recordHasChanged: true,
+               };
+          case 'doNotUpdate':
+               console.log("Let it be.")
+               return {
+                    ...state,
+                    recordHasChanged: false,
                };
           case 'setHovered':
                return {
                     ...state,
                     hoveredID: action.payload,
                };
-          // case 'newAlert':
-          //      return {
-          //           ...state,
-          //           alerts: alerts.push(action.payload),
-          //      };
-          default:
-               throw new Error('unknown action');
+          case 'showEditDrawer':
+               return {
+                    ...state,
+                    editDrawerVisible: true,
+                    recordToEdit: action.payload,
+               };
+          case 'closeEditDrawer':
+               return {
+                    ...state,
+                    editDrawerVisible: false,
+                    // recordToEdit: '',
+               }
+          case 'logSuccess':
+               return {
+                    ...state,
+                    alert: {"type": "success", "message": "Success!"},
+                    // recordToEdit: '',
+//     const alertList = [{type: "success", message: "Success!"},{type: "error", message: "Darn. Something went wrong."},{type: "info", message: "Something you should know ... is that there is a lengthy thing to say about whatever it is we were discussing. Which I'll remember soon. Honestly."}];
+               }
+          case 'logError':
+               return {
+                    ...state,
+                    alert: {"type": "error", "message": "Darn. Something went wrong."},
+               }
+          default: throw new Error('unknown action');
      }
 };
-
-// const initialState = {
-//      focusedRecord: null,
-//      alerts: [],
-//      newRecord: false,
-//    };
 
 export default recordsReducer;

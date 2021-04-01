@@ -1,8 +1,5 @@
-import React from 'react';
-
 const selectStatusColor = (status) => {
-    // console.log("Status: ", status);
-    switch(status) {
+    switch (status) {
         case 'Inquiry':
             return '#f50';
         case 'Active':

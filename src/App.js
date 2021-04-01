@@ -2,64 +2,118 @@ import  React, { useState, useEffect, useReducer } from 'react';
 import './App.scss';
 import FundraiserTimeline from './components/FundraiserTimeline';
 import AllFundraisers from './components/AllFundraisers';
+import EditFundraiser from './components/EditFundraiser';
 import Airtable from 'airtable';
-import { format, compareAsc } from 'date-fns';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { some, includes, filter, values, create, find, matchesProperty } from 'lodash';
+import { Layout, Menu, Drawer } from 'antd';
+import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
-
-const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
+import Alerts from './components/Alerts';
+import scrollIntoView from 'scroll-into-view';
 
 const { Header, Content, Sider } = Layout;
+export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
 const initialState = {
-  focusedRecord: null,
+  focusedRecordID: '',
   viewFocusedRecord: false,
-  alerts: [],
-  newRecord: false,
+  editDrawerVisible: false,
+  recordToEdit: '',
+  alert: '',
+  recordHasChanged: false,
   hoveredID: null,
 };
 
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
+  const [focusedFundraiser, setFocusedFundraiser] = useState('');
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-  // const [fundraiserState, fundraiserStateDispatch] = useReducer(recordsReducer, initialState);
+  // const [editDrawerVisible, setEditDrawerVisible] = useState(false);
 
-  useEffect( () => { base('Fundraisers').select({
-    view: "All Fields View",
-    }).eachPage(function page(records, fetchNextPage) {
-        // console.log("Fetching record")
-        setFundraisers(records.map(record => record.fields));
-        fetchNextPage();
-    }, function done(err) {
-        if (err) { console.error(err); return; }
-    });
-  }, []);
-
-  // const convertedDate = (date) => format(new Date(date), 'MMM dd');
-  
-  const dispatchFocusedRecord = (record) => recordsDispatch({
-    type: 'chooseRecord',
-    payload: record,
-    },
-    {
-      type: ''
+  useEffect( () => { 
+    // console.log("Hey! The record has changed!")
+    if (recordsState["recordHasChanged"]) {
+      base('Fundraisers').select({
+        view: "All Fields View",
+        }).eachPage(function page(records, fetchNextPage) {
+            setFundraisers(records.map(record => record.fields));
+            fetchNextPage();
+        }, function done(err) {
+            if (err) { console.error(err); return; }
+        });
+        recordsDispatch({
+          type: "logSuccess",
+        });
+        recordsDispatch({
+          type: "doNotUpdate",
+        });
+        setShowAlert(true);
+    } else if (!recordsState["focusedRecordID"]) {
+      base('Fundraisers').select({
+        view: "All Fields View",
+        }).eachPage(function page(records, fetchNextPage) {
+            setFundraisers(records.map(record => record.fields));
+            fetchNextPage();
+        }, function done(err) {
+            if (err) { console.error(err); return; }
+        });
+    } else {
+      return null;
     }
-  );
+  }, [recordsState]);
+  
+  useEffect( () => { 
+    setFocusedFundraiser(
+      find(fundraisers, matchesProperty('recordID', recordsState["focusedRecordID"])))
+  }, [recordsState, fundraisers]);
 
-  const setHovered = (id) => recordsDispatch({
-    type: 'setHovered',
-    payload: id,
-  });
-
-  // const chooseRecord = (record) => {
-  //   const chosenRecord = find(fundraisers, matchesProperty('Organization', record));
-  //   console.log('chosenRecord: ', chosenRecord);
-  //   dispatchFocusedRecord(record);
+  // const dispatchFocusedRecord = (record) => recordsDispatch({
+  //   type: 'chooseRecord',
+  //   payload: record,
+  //   }
+  // );
+  // const scrollParentToChild= (parent, child) => {
+  //   let parentRect = parent.getBoundingClientRect();
+  //     let parentHeight = parent.clientHeight;
+  //     let childRect = child.getBoundingClientRect();
+  //     let isViewable = (childRect.top >= parentRect.top) && (childRect.bottom <= parentRect.bottom);
+  //     console.log("parentHeight: ", parentHeight)
+  //     console.log("isViewable: ", isViewable)
+  //     if (!isViewable) {
+  //       parent.scrollTop = (child.top + parent.scrollTop) - parent.top
+  //     };
   // }
+
+    const scrollToRow = (scrollRow) => {
+      scrollIntoView((scrollRow), {
+        align: {
+          top: 0,
+          topOffset: 100,
+        },
+      });
+    }
+
+
+  const setHovered = (id) => {
+    let hoveredRecord;
+    // let fundraisersTable;
+    hoveredRecord = document.getElementById(`row${id}`);
+    // fundraisersTable = document.getElementById("fundraisersTable");
+    if (hoveredRecord) {
+      scrollToRow(hoveredRecord);
+    };
+    recordsDispatch({
+      type: 'setHovered',
+     payload: id,
+    })
+  };
+
+  const closeEditDrawer = () => recordsDispatch({
+    type: "closeEditDrawer",
+  });
 
   // function createFundraiserIndex(fundraiser) {
   //   fundraiser.values()
@@ -94,6 +148,7 @@ function App() {
 
   // console.log("recordsState: ", recordsState);
 
+
   return (
     <RecordsContext.Provider
       value={{
@@ -108,6 +163,7 @@ function App() {
             <Menu.Item key="2">Customers</Menu.Item>
             <Menu.Item key="3">Team</Menu.Item>
           </Menu>
+        {recordsState["alert"] && <Alerts />}
         </Header>
         <Layout>
           <Sider
@@ -117,9 +173,6 @@ function App() {
               position: 'fixed',
               left: 0,
               backgroundColor: '#d9d9d9',
-              // width: '900px', 
-              // maxWidth: '900px', 
-              // minWidth: 'auto', 
             }} 
             width="auto"
             className="site-layout-background"
@@ -131,13 +184,14 @@ function App() {
             <Header className="site-layout-background" style={{ padding: 0 }} />
             <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
               <AllFundraisers fundraisers={fundraisers} />
-              {/* {fundraisers[0] && <button onClick={() => chooseRecord("Orange Polynomial")}>Click to view Orange Polynomial</button>} */}
-              {/* {fundraisers[0] && <button onClick={() => chooseRecord("Nocturnal Potato")}>Click to view Nocturnal Potato</button>} */}
-              {/* {fundraisers[0] && <button onClick={() => createSearchFilter(fundraisers)}>Click to Run Filter</button>} */}
-              {recordsState.viewFocusedRecord && <FundraiserDetails />}
+              {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
             </Content>
+            {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
         </Layout>
       </Layout>
+          <Drawer width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
+            <EditFundraiser />
+          </Drawer>
     </RecordsContext.Provider>
     
   );
