@@ -101,6 +101,21 @@ const AllFundraisers = ({fundraisers}) => {
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
     const isHovered = (id) => id === hoveredID;
 
+    const getRowHeightAndSetTop = (data, value) => {
+        data && data.forEach((item, index) => {
+            if (item.id === value) {
+                setTableScrollTop(index);
+            }
+        })
+    }
+
+    const setTableScrollTop = (id, index) => {
+        if (index != 0 || index != -1){
+            let currentPosition = index *40;
+            document.getElementById(id).scrollTop(currentPosition);
+        }
+    }
+
     const chooseProduct = (product) => {
         switch (product) {
             case 'Boston Butts':

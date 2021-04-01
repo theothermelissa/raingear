@@ -75,36 +75,77 @@ function App() {
   //   payload: record,
   //   }
   // );
-  // const scrollParentToChild= (parent, child) => {
-  //   let parentRect = parent.getBoundingClientRect();
-  //     let parentHeight = parent.clientHeight;
-  //     let childRect = child.getBoundingClientRect();
-  //     let isViewable = (childRect.top >= parentRect.top) && (childRect.bottom <= parentRect.bottom);
-  //     console.log("parentHeight: ", parentHeight)
-  //     console.log("isViewable: ", isViewable)
-  //     if (!isViewable) {
-  //       parent.scrollTop = (child.top + parent.scrollTop) - parent.top
-  //     };
-  // }
+//   const scrollParentToChild = (parent, child) => {
+//     let parentRect = parent.getBoundingClientRect();
+//       let parentHeight = parent.clientHeight;
+//       let childRect = child.getBoundingClientRect();
+//       let isViewable = (childRect.top >= parentRect.top) && (childRect.bottom <= parentRect.bottom);
+//       console.log("parentHeight: ", parentHeight)
+//       console.log("isViewable: ", isViewable)
+//       if (!isViewable) {
+//         parent.scrollTop = (child.top + parent.scrollTop) - parent.top
+//       };
+//   }
 
-    const scrollToRow = (scrollRow) => {
-      scrollIntoView((scrollRow), {
-        align: {
-          top: 0,
-          topOffset: 100,
-        },
-      });
-    }
+//   const scrollElementWithinPage = (page, element) => {
+//     const pageBounding = page.getBoundingClientRect(),
+//       clientBounding = element.getBoundingClientRect()
+
+//     const pageBottom = pageBounding.bottom,
+//       pageTop = pageBounding.top,
+//       clientBottom = clientBounding.bottom,
+//       clientTop = clientBounding.top;
+    
+//     if (pageTop >= clientTop) {
+//       scrollTo(page, -(pageTop - clientTop), 300);
+//     } else if (clientBottom > pageBottom) {
+//       scrollTo(page, clientBottom - pageBottom, 300);
+//     }
+//   };
+
+//   function scrollTo(element, to, duration) {
+//     let start = element.scrollTop,
+//       currentTime = 0,
+//       increment = 20;
+//     let animateScroll = function() {
+//       currentTime += increment;
+//     let val = easeInOutQuad(currentTime, start, to, duration);
+//     element.scrollTop = val;
+//     if (currentTime < duration) {
+//         setTimeout(animateScroll, increment);
+//       }
+//     };
+//     animateScroll();
+//   }
+// // Function for smooth scroll animation with the time duration
+// function easeInOutQuad(time, startPos, endPos, duration) {
+//   time /= duration / 2;
+//   if (time < 1) return (endPos / 2) * time * time + startPos;
+// time--;
+//   return (-endPos / 2) * (time * (time - 2) - 1) + startPos;
+// }
+//   }
+
+    // const scrollToRow = (scrollRow) => {
+    //   scrollIntoView((scrollRow), {
+    //     align: {
+    //       top: 0,
+    //       topOffset: 100,
+    //     },
+    //   });
+    // }
+
+  
 
 
   const setHovered = (id) => {
-    let hoveredRecord;
+    // let hoveredRecord;
     // let fundraisersTable;
-    hoveredRecord = document.getElementById(`row${id}`);
+    // hoveredRecord = document.getElementById(`row${id}`);
     // fundraisersTable = document.getElementById("fundraisersTable");
-    if (hoveredRecord) {
-      scrollToRow(hoveredRecord);
-    };
+    // if (hoveredRecord) {
+    //   scrollToRow(hoveredRecord);
+    // };
     recordsDispatch({
       type: 'setHovered',
      payload: id,

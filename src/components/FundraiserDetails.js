@@ -168,13 +168,14 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                             {height: "100%"}
                     }>
                         <Card bordered={false}
-                            actions={
-                                [
-                                    <>
-                                        <Button disabled>Get Directions</Button>
-                                    </>
-                                ]
-                        }>
+                            // actions={
+                            //     [
+                            //         <>
+                            //             <Button disabled>Get Directions</Button>
+                            //         </>
+                            //     ]
+                            // }
+                        >
                             {/* <Meta title={`DELIVERY SCHEDULED FOR: ${convertedDate(deliveryDate).toUpperCase()}`} /> */}
                             <Meta title={
                                 relativeDeliveryDate()

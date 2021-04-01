@@ -30,7 +30,7 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
         {fundraisers.map(fundraiser => (
             <Timeline.Item 
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
-              onMouseLeave={() => setTimeout(() => setHovered(null), 3000)}
+              onMouseLeave={() => setHovered(null)}
               onClick={() => chooseRecord(fundraiser['organization'])}
               color={selectStatusColor(fundraiser["status"])}
               key={fundraiser["recordID"]}
