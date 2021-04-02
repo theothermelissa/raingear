@@ -218,13 +218,13 @@ function App() {
             width="auto"
             className="site-layout-background"
           >
-            <FundraiserTimeline setHovered={setHovered} fundraisers={fundraisers} />
+            {fundraisers[0] && <FundraiserTimeline setHovered={setHovered} fundraisers={fundraisers} />}
           </Sider>
         </Layout>
         <Layout className="site-layout" style={{ marginLeft: 0 }}>
             <Header className="site-layout-background" style={{ padding: 0 }} />
             <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-              <AllFundraisers fundraisers={fundraisers} />
+              {fundraisers[0] && <AllFundraisers fundraisers={fundraisers} />}
               {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
             </Content>
             {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}

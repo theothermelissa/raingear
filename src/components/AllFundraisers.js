@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {sortBy, find, matchesProperty} from 'lodash';
 import {
     Table,
@@ -17,6 +17,7 @@ const AllFundraisers = ({fundraisers}) => {
     } = useContext(RecordsContext);
 
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
+    const [updatedFundraisers, setUpdatedFundraisers] = useState('')
 
     const chooseRecord = (recordName) => {
         const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
@@ -24,23 +25,26 @@ const AllFundraisers = ({fundraisers}) => {
         recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
     }
 
-    const updatedFundraisers = fundraisers.map(record => {
-        return {
-            ...record,
-            'deliveryDate': convertedDate(record['deliveryDate']),
-            'organizationProceeds': `$${
-                Math.round(record['organizationProceeds'])
-            }`,
-            'totalRevenue': `$${
-                Math.round(record['totalRevenue'])
-            }`,
-            'firehouseFee': `$${
-                Math.round(record['firehouseFee'])
-            }`,
-            'isHovered': record['recordID'] === hoveredID,
-            'key': record["recordID"]
-        }
-    });
+    
+    useEffect(() => {
+        setUpdatedFundraisers(fundraisers.map(record => {
+            return {
+                ...record,
+                'deliveryDate': convertedDate(record['deliveryDate']),
+                'organizationProceeds': `$${
+                    Math.round(record['organizationProceeds'])
+                }`,
+                'totalRevenue': `$${
+                    Math.round(record['totalRevenue'])
+                }`,
+                'firehouseFee': `$${
+                    Math.round(record['firehouseFee'])
+                }`,
+                'isHovered': record['recordID'] === hoveredID,
+                'key': record["recordID"]
+            }
+        }))
+    }, []);
 
 
     // const {
@@ -96,25 +100,26 @@ const AllFundraisers = ({fundraisers}) => {
     // } = updatedFundraisers;
 
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
+    console.log('dataSource: ', dataSource);
 
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
     const isHovered = (id) => id === hoveredID;
 
-    const getRowHeightAndSetTop = (data, value) => {
-        data && data.forEach((item, index) => {
-            if (item.id === value) {
-                setTableScrollTop(index);
-            }
-        })
-    }
+    // const getRowHeightAndSetTop = (data, value) => {
+    //     data && data.forEach((item, index) => {
+    //         if (item.id === value) {
+    //             setTableScrollTop(index);
+    //         }
+    //     })
+    // }
 
-    const setTableScrollTop = (id, index) => {
-        if (index != 0 || index != -1){
-            let currentPosition = index *40;
-            document.getElementById(id).scrollTop(currentPosition);
-        }
-    }
+    // const setTableScrollTop = (id, index) => {
+    //     if (index != 0 || index != -1){
+    //         let currentPosition = index *40;
+    //         document.getElementById(id).scrollTop(currentPosition);
+    //     }
+    // }
 
     const chooseProduct = (product) => {
         switch (product) {
@@ -189,13 +194,13 @@ const AllFundraisers = ({fundraisers}) => {
             key: 'status',
             render: status => (
                 <>
-                    <Tag color={
+                    {status && <Tag color={
                             selectStatusColor(status)
                         }
                         key={status}>
                         {
                         status.toUpperCase()
-                    } </Tag>
+                    } </Tag>}
                 </>
             ),
             sorter: createSorter('status')
@@ -265,32 +270,34 @@ const AllFundraisers = ({fundraisers}) => {
     ];
 
     return (
-        <div>
-            <Table dataSource={dataSource}
-                columns={columns}
-                pagination={false}
-                size='small'
-                id='fundraisersTable'
-                scroll={
-                    {
-                        x: 700,
-                        y: 250
+        <>
+            {updatedFundraisers && <div>
+                <Table dataSource={dataSource}
+                    columns={columns}
+                    pagination={false}
+                    size='small'
+                    id='fundraisersTable'
+                    scroll={
+                        {
+                            x: 700,
+                            y: 250
+                        }
                     }
-                }
-                onRow={
-                    (record, rowIndex) => {
-                        return {
-                            onClick: event => {
-                                chooseRecord(record["organization"])
-                                // console.log("record org ", record["organization"]);
-                            },
-                            className: isHovered(record.recordID) ? 'hovered' : '', // click row
-                            id: `row${record.recordID}`,
-                            key: rowIndex,
-                        };
-                    }
-                }/>
-          </div>
+                    onRow={
+                        (record, rowIndex) => {
+                            return {
+                                onClick: event => {
+                                    chooseRecord(record["organization"])
+                                    // console.log("record org ", record["organization"]);
+                                },
+                                className: isHovered(record.recordID) ? 'hovered' : '', // click row
+                                id: `row${record.recordID}`,
+                                key: rowIndex,
+                            };
+                        }
+                    }/>
+            </div>}
+        </>
     );
 }
 
