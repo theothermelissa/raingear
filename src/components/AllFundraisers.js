@@ -25,6 +25,12 @@ const AllFundraisers = ({fundraisers}) => {
         recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
     }
 
+    const prefillStatus = (currentStatus) => {
+        return (
+            currentStatus ? currentStatus : "Inquiry"
+        )
+    };
+
     
     useEffect(() => {
         setUpdatedFundraisers(fundraisers.map(record => {
@@ -41,7 +47,8 @@ const AllFundraisers = ({fundraisers}) => {
                     Math.round(record['firehouseFee'])
                 }`,
                 'isHovered': record['recordID'] === hoveredID,
-                'key': record["recordID"]
+                'key': record["recordID"],
+                'status': `${prefillStatus(record["status"])}`
             }
         }))
     }, []);
@@ -100,7 +107,7 @@ const AllFundraisers = ({fundraisers}) => {
     // } = updatedFundraisers;
 
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
-    console.log('dataSource: ', dataSource);
+    // console.log('dataSource: ', dataSource);
 
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;

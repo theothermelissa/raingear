@@ -80,6 +80,12 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         return null;
     }
 
+    const prefillStatus = (currentStatus) => {
+        return (
+            currentStatus ? currentStatus : "Inquiry"
+        )
+    };
+
     const showEditDrawer = () => recordsDispatch({
         type: "showEditDrawer",
         payload: recordID,
@@ -93,9 +99,9 @@ const FundraiserDetails = ({ recordToDisplay }) => {
 
     return (
         <div className="site-card-wrapper">
-            <Card title={`${fundraiserName} (${status})`}
+            <Card title={`${fundraiserName} (${prefillStatus(status)})`}
                 className={
-                    status.toLowerCase()
+                    prefillStatus(status).toLowerCase()
                 }
                 style={
                     {
