@@ -1,4 +1,4 @@
-import  React, { useContext } from 'react';
+import  React, { useContext, useEffect, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import { Timeline } from 'antd';
 import selectStatusColor from './selectStatusColor';
@@ -11,7 +11,23 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
     const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
     recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
   }
+  const [updatedFundraisers, setUpdatedFundraisers] = useState('');
+
+  const prefillStatus = (currentStatus) => {
+    console.log("currentStatus: ", currentStatus);
+    return (
+        currentStatus ? currentStatus : "Inquiry"
+    )
+  };
   
+  // useEffect(()=> {
+  //   setUpdatedFundraisers({
+  //     "status": prefillStatus(fundraisers["status"]),
+  //     ...fundraisers,
+  //   })
+  // }, [])
+  
+
   const {
     recordsDispatch
   } = useContext(RecordsContext);
@@ -32,7 +48,7 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
               onMouseLeave={() => setHovered(null)}
               onClick={() => chooseRecord(fundraiser['organization'])}
-              color={selectStatusColor(fundraiser["status"])}
+              color={selectStatusColor(prefillStatus(fundraiser["status"]))}
               key={fundraiser["recordID"]}
             >
               <TimelineCard fundraiser={fundraiser} />
