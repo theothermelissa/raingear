@@ -8,6 +8,12 @@ const SingleAlert = ({ message, type }) => {
     useEffect(() => {
         
     }, []);
+
+    // notification.open({
+    //     message: 'Notification Title',
+    //     description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+    // });
+
         
     return (
        <>

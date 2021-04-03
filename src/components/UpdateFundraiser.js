@@ -30,7 +30,7 @@ const UpdateFundraiser = ({ fundraisers }) => {
                 console.log("Error: ", err);
                 return;
             } 
-            console.log("Retrieved fundraiser #: 'rec43VLzoUTfiQX13'")
+            // console.log("Retrieved fundraiser #: 'rec43VLzoUTfiQX13'")
             setActiveFundraiser(record);
             setHasBeenUpdated(false);
         });

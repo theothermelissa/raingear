@@ -14,7 +14,7 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
   const [updatedFundraisers, setUpdatedFundraisers] = useState('');
 
   const prefillStatus = (currentStatus) => {
-    console.log("currentStatus: ", currentStatus);
+    // console.log("currentStatus: ", currentStatus);
     return (
         currentStatus ? currentStatus : "Inquiry"
     )

@@ -4,7 +4,7 @@ import FundraiserTimeline from './components/FundraiserTimeline';
 import AllFundraisers from './components/AllFundraisers';
 import EditFundraiser from './components/EditFundraiser';
 import Airtable from 'airtable';
-import { Layout, Menu, Drawer } from 'antd';
+import { Layout, Menu, Drawer, notification } from 'antd';
 import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
@@ -28,7 +28,7 @@ const initialState = {
 
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
-  const [showAlert, setShowAlert] = useState(false);
+  // const [showAlert, setShowAlert] = useState(false);
   const [focusedFundraiser, setFocusedFundraiser] = useState('');
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
   // const [editDrawerVisible, setEditDrawerVisible] = useState(false);
@@ -42,15 +42,34 @@ function App() {
             setFundraisers(records.map(record => record.fields));
             fetchNextPage();
         }, function done(err) {
-            if (err) { console.error(err); return; }
-        });
+            if (err) {
+              console.error(err);
+              notification["error"]({
+                message: 'Uh oh...',
+                description: `Something went wrong :( \n ${err}`,
+                placement: 'topLeft',
+                duration: 0,
+              });
+              return;
+            }
+            notification["success"]({
+              message: 'Success!',
+              description: 'Saved the record',
+              placement: 'topLeft',
+              duration: 2,
+            });
+            // console.log("Records: ");
+          });
+        // recordsDispatch({
+        //   type: "doNotUpdate",
+        // });
+        // recordsDispatch({
+        //   type: "logSuccess",
+        // });
         recordsDispatch({
-          type: "logSuccess",
-        });
-        recordsDispatch({
-          type: "doNotUpdate",
-        });
-        setShowAlert(true);
+          type: "recordChangeComplete",
+        })
+        // setShowAlert(true);
     } else if (!recordsState["focusedRecordID"]) {
       base('Fundraisers').select({
         view: "All Fields View",
@@ -60,8 +79,6 @@ function App() {
         }, function done(err) {
             if (err) { console.error(err); return; }
         });
-    } else {
-      return null;
     }
   }, [recordsState]);
   
@@ -204,7 +221,7 @@ function App() {
             <Menu.Item key="2">Customers</Menu.Item>
             <Menu.Item key="3">Team</Menu.Item>
           </Menu>
-        {recordsState["alert"] && <Alerts />}
+        {/* {recordsState["alert"] && <Alerts />} */}
         </Header>
         <Layout>
           <Sider

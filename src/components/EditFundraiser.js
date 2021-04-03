@@ -182,7 +182,7 @@ const EditFundraiser = () => {
       });
     
     const onFinish = (values) => {
-        console.log(values);
+        // console.log(values);
     };
 
     const onReset = () => {
@@ -190,6 +190,8 @@ const EditFundraiser = () => {
     };
 
     const submitRecordChanges = (values) => {
+        console.log("values: ", values);
+        console.log("recordToEdit: ", recordToEdit);
         base('Fundraisers').update([
             {
                 "id": recordToEdit,
