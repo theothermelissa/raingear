@@ -51,7 +51,7 @@ const AllFundraisers = ({fundraisers}) => {
                 'status': `${prefillStatus(record["status"])}`
             }
         }))
-    }, []);
+    }, [fundraisers]);
 
 
     // const {
