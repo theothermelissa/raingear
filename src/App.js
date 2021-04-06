@@ -1,4 +1,11 @@
 import  React, { useState, useEffect, useReducer } from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  NavLink
+  } from "react-router-dom";
 import './App.scss';
 import FundraiserTimeline from './components/FundraiserTimeline';
 import AllFundraisers from './components/AllFundraisers';
@@ -9,6 +16,8 @@ import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
 import FirehouseCalendar from './components/FirehouseCalendar';
+import Customers from './components/Customers';
+import Team from './components/Team';
 import Alerts from './components/Alerts';
 import scrollIntoView from 'scroll-into-view';
 
@@ -215,44 +224,67 @@ function App() {
         recordsDispatch,
       }}
     >
-      <Layout>
-        <Header style={{ position: "fixed", zIndex: 1000, width: '100%' }}>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[2]}>
-            <Menu.Item key="1">Fundraisers</Menu.Item>
-            <Menu.Item key="2">Customers</Menu.Item>
-            <Menu.Item key="3">Team</Menu.Item>
-          </Menu>
-        {/* {recordsState["alert"] && <Alerts />} */}
-        </Header>
+      <Router>
         <Layout>
-          <Sider
-            style={{
-              overflow: 'auto',
-              height: '100vh',
-              position: 'fixed',
-              left: 0,
-              backgroundColor: '#d9d9d9',
-            }} 
-            width="auto"
-            className="site-layout-background"
-          >
-            {fundraisers[0] && <FundraiserTimeline setHovered={setHovered} fundraisers={fundraisers} />}
-          </Sider>
+          <Header style={{ position: "fixed", zIndex: 1000, width: '100%' }}>
+            <Menu theme="dark" mode="horizontal">
+                <Menu.Item key="1">
+                  <NavLink to="/">
+                    Home
+                  </NavLink>
+                </Menu.Item>
+                <Menu.Item key="2">
+                  <NavLink to="/Customers">
+                    Customers
+                  </NavLink>
+                </Menu.Item>
+                <Menu.Item key="3">
+                  <NavLink to="/calendar">
+                    Calendar
+                  </NavLink>
+                </Menu.Item>
+            </Menu>
+          </Header>
         </Layout>
-        <Layout className="site-layout" style={{ marginLeft: 0 }}>
-            <Header className="site-layout-background" style={{ padding: 0 }} />
-            <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-              {fundraisers[0] && <AllFundraisers fundraisers={fundraisers} />}
-              {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
-              <span style={{ height: "100px" }}/>
-              {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}
-            </Content>
-            {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
-        </Layout>
-      </Layout>
-          {recordsState["editDrawerVisible"] && <Drawer forceRender width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
-            <EditFundraiser />
-          </Drawer>}
+        <Switch>
+          <Route path="/" exact={true}>
+            <Layout>
+              <Sider
+                style={{
+                  overflow: 'auto',
+                  height: '100vh',
+                  position: 'fixed',
+                  left: 0,
+                  backgroundColor: '#d9d9d9',
+                }} 
+                width="auto"
+                className="site-layout-background"
+              >
+                {fundraisers[0] && <FundraiserTimeline setHovered={setHovered} fundraisers={fundraisers} />}
+              </Sider>
+            </Layout>
+            <Layout className="site-layout" style={{ marginLeft: 0 }}>
+                <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
+                  {fundraisers[0] && <AllFundraisers fundraisers={fundraisers} />}
+                  {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
+                  <span style={{ height: "100px" }}/>
+                </Content>
+                {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
+            </Layout>
+            {recordsState["editDrawerVisible"] && <Drawer forceRender width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
+              <EditFundraiser />
+            </Drawer>}
+          </Route>
+          <Route path="/customers">
+            <Layout className="site-layout">
+              <Customers style={{marginTop: "200px", }} />
+            </Layout>
+          </Route>
+          <Route path="/calendar">
+            {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}
+          </Route>
+        </Switch>
+      </Router>
     </RecordsContext.Provider>
     
   );
