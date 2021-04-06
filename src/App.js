@@ -8,6 +8,7 @@ import { Layout, Menu, Drawer, notification } from 'antd';
 import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
+import FirehouseCalendar from './components/FirehouseCalendar';
 import Alerts from './components/Alerts';
 import scrollIntoView from 'scroll-into-view';
 
@@ -243,6 +244,8 @@ function App() {
             <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
               {fundraisers[0] && <AllFundraisers fundraisers={fundraisers} />}
               {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
+              <span style={{ height: "100px" }}/>
+              {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}
             </Content>
             {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
         </Layout>
