@@ -34,17 +34,26 @@ const recordsReducer = (state, action) => {
                     ...state,
                     hoveredID: action.payload,
                };
-          case 'showEditDrawer':
+          case 'showDrawer':
                return {
                     ...state,
-                    editDrawerVisible: true,
-                    recordToEdit: action.payload,
+                    drawerVisible: true,
                };
-          case 'closeEditDrawer':
+          case 'selectDate':
                return {
                     ...state,
-                    editDrawerVisible: false,
-                    // recordToEdit: '',
+                    selectedDate: action.payload,
+               };
+          case 'editRecord':
+               return {
+                    ...state,
+                    recordToEdit: action.payload,
+               }
+          case 'closeDrawer':
+               return {
+                    ...state,
+                    drawerVisible: false,
+                    recordToEdit: '',
                }
           case 'recordChangeComplete':
                return {

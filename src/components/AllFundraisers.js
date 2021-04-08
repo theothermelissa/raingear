@@ -21,7 +21,6 @@ const AllFundraisers = ({fundraisers}) => {
 
     const chooseRecord = (recordName) => {
         const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
-        console.log("This is a new edit!");
         recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
     }
 

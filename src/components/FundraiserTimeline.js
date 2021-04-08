@@ -39,7 +39,7 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
           mode="left"
           style={{
             marginLeft: "20px",
-            padding: "100px 40px 0px 0px",
+            padding: "30px 40px 0px 0px",
             maxWidth: '500px'
           }}
         >

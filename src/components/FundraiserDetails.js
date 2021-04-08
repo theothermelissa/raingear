@@ -86,8 +86,8 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         )
     };
 
-    const showEditDrawer = () => recordsDispatch({
-        type: "showEditDrawer",
+    const showDrawer = () => recordsDispatch({
+        type: "showDrawer",
         payload: recordID,
     });
 
@@ -112,7 +112,7 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                 }
                 extra={
                     <>
-                <Button onClick={() => showEditDrawer()}>Edit</Button></>
+                <Button onClick={() => showDrawer()}>Edit</Button></>
             }>
                 <Row type="flex"
                     gutter={16}>
