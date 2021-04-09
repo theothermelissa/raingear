@@ -8,7 +8,7 @@ import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
 import {RecordsContext} from '../App';
 
-const AllFundraisers = ({fundraisers}) => {
+const AllFundraisers = ({ fundraisers }) => {
     const {
         recordsDispatch,
         recordsState: {
@@ -270,7 +270,9 @@ const AllFundraisers = ({fundraisers}) => {
             ],
             onFilter: createFilter('products'),
             render: text => {
-                return(text.map((item) => chooseProduct(item)))
+                if (text) {
+                    return(text.map((item) => chooseProduct(item)))
+                }
             }
         },
     ];

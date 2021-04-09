@@ -1,20 +1,26 @@
 import React, { useContext, useState, useEffect, useForm } from 'react';
 import { RecordsContext, base } from '../App';
-import FundraiserForm from './FundraiserForm';
+import InquiryForm from './InquiryForm';
 import { Form } from 'antd';
 import { set } from 'lodash';
 import moment from 'moment';
 
-const CreateFundraiser = (date) => {
+const CreateFundraiserInquiry = ({ fundraisers }) => {
     const { recordsDispatch, recordsState: {
         selectedDate
     } } = useContext(RecordsContext);
-    // const [selectedDate, setSelectedDate] = useState('');
     const [fieldsToSave, setFieldsToSave] = useState('');
     const [readyToSubmit, setReadyToSubmit] = useState(false);
+    const [showEmailLink, setShowEmailLink] = useState(false);
 
-    console.log("selectedDate: ", selectedDate);
-    // const tomorrow = moment();
+    //user has clicked a date in the calendar
+    //drawer opens with 'create inquiry' form
+    //user submits form
+    //drawer displays confirmation message
+    //lead is emailed with link to complete their registration
+
+    const displaySuccessMessage = () => setShowEmailLink(true);
+    
     useEffect(() => {
         if (readyToSubmit) {
             base('Fundraisers').create([
@@ -31,21 +37,22 @@ const CreateFundraiser = (date) => {
                 });
             });
             recordsDispatch({
+                type: "updateRecords",
+            });
+            recordsDispatch({
                 type: "closeDrawer",
             })
         }
-    }, ([readyToSubmit, fieldsToSave]))
+    }, ([readyToSubmit, fieldsToSave]));
 
-//     var object = { 'a': [{ 'b': { 'c': 3 } }] };
- 
-//      _.set(object, 'a[0].b.c', 4);
+    // useEffect(() => {
+    //     if()
+    // }, [])
 
     const saveFields = (fields) => {
         const formInputs = fields;
         const formattedDate = moment(fields["deliveryDate"]).toISOString();
-        // console.log("formattedDate: ", formattedDate);
         set(formInputs, 'deliveryDate', formattedDate);
-        console.log("formInputs: ", formInputs);
         setFieldsToSave(formInputs);
         setReadyToSubmit(true);
     };
@@ -53,7 +60,7 @@ const CreateFundraiser = (date) => {
     const [form] = Form.useForm();
     
     return (
-        <FundraiserForm 
+        <InquiryForm 
             initialValues={{
                 // "organization": "This Is a Test",
                 "status": "Inquiry",
@@ -65,4 +72,4 @@ const CreateFundraiser = (date) => {
 
 };
 
-export default CreateFundraiser;
+export default CreateFundraiserInquiry;

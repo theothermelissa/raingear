@@ -10,7 +10,7 @@ import './App.scss';
 import FundraiserTimeline from './components/FundraiserTimeline';
 import AllFundraisers from './components/AllFundraisers';
 import EditFundraiser from './components/EditFundraiser';
-import CreateFundraiser from './components/CreateFundraiser';
+import CreateFundraiserInquiry from './components/CreateFundraiserInquiry';
 import Airtable from 'airtable';
 import { Layout, Menu, Drawer, notification } from 'antd';
 import { find, matchesProperty } from 'lodash';
@@ -143,7 +143,7 @@ function App() {
               {recordsState["recordToEdit"] ?
                 <EditFundraiser />
                 :
-                <CreateFundraiser />
+                <CreateFundraiserInquiry fundraisers={fundraisers} />
               }
             </Drawer>
           }

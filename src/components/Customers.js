@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { RecordsContext } from '../App';
-import CreateFundraiser from './CreateFundraiser';
+import CreateFundraiserInquiry from './CreateFundraiserInquiry';
 import moment from 'moment';
 
 const Customers = () => {
@@ -14,7 +14,7 @@ const Customers = () => {
         <>
             <div style={{ height: "100vh" }}>This is a list of customers.</div>
             <button onClick={showDrawer}></button>
-            <CreateFundraiser date={moment()} />
+            <CreateFundraiserInquiry date={moment()} />
         </>
     )
 };
