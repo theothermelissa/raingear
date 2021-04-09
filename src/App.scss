@@ -16,7 +16,11 @@
 // .ant-timeline-rtl.ant-timeline.ant-timeline-reverse .ant-timeline-item-pending .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
 
 .ant-layout-content {
-  margin: 10px 10px 0px 310px;
+  margin: 30px 10px 0px 310px;
+}
+
+.ant-table-wrapper {
+  position: fixed;
 }
 
 .ant-table-row {
@@ -73,6 +77,10 @@
 .ant-card-meta {
   padding: 10px 0px;
 }
+
+// .ant-avatar {
+//   margin: 3px;
+// }
 
 /* .containerCard .ant-card-body {
   padding: 0px;
