@@ -1,9 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import {sortBy, find, matchesProperty} from 'lodash';
-import {
-    Table,
-    Tag,
-} from 'antd';
+import { Table, Tag } from 'antd';
 import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
 import {RecordsContext} from '../App';
@@ -30,7 +27,6 @@ const AllFundraisers = ({ fundraisers }) => {
         )
     };
 
-    
     useEffect(() => {
         setUpdatedFundraisers(fundraisers.map(record => {
             return {
@@ -52,80 +48,11 @@ const AllFundraisers = ({ fundraisers }) => {
         }))
     }, [fundraisers]);
 
-
-    // const {
-    //   fundraiserName,
-    //   deliveryDate,
-    //   daysUntilDelivery,
-    //   deliveryAddress,
-    //   deliveryCity,
-    //   deliveryState,
-    //   deliveryZip,
-    //   deliveryNotes,
-    //   products,
-    //   customerButtPrice,
-    //   customerHamPrice,
-    //   customerTurkeyPrice,
-    //   customerSaucePrice,
-    //   firehouseButtPrice,
-    //   firehouseHamPrice,
-    //   firehouseTurkeyPrice,
-    //   firehouseSaucePrice,
-    //   buttCount,
-    //   hamCount,
-    //   turkeyCount,
-    //   sauceCount,
-    //   status,
-    //   priority,
-    //   orders,
-    //   orderTotals,
-    //   totalRevenue,
-    //   organization,
-    //   contactFirstName,
-    //   contactLastName,
-    //   contactFullName,
-    //   contactEmail,
-    //   contactPhone,
-    //   contactPreferredMethod,
-    //   contactAddress,
-    //   contactAddressLine2,
-    //   contactCity,
-    //   contactState,
-    //   contactZip,
-    //   contactIsBilling,
-    //   billingContactFullName,
-    //   billingEmail,
-    //   billingPhone,
-    //   recordID,
-    //   sellers,
-    //   allOrders,
-    //   orderCount,
-    //   firehouseFee,
-    //   ccFees,
-    //   organizatinProceeds
-    // } = updatedFundraisers;
-
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
-    // console.log('dataSource: ', dataSource);
 
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
     const isHovered = (id) => id === hoveredID;
-
-    // const getRowHeightAndSetTop = (data, value) => {
-    //     data && data.forEach((item, index) => {
-    //         if (item.id === value) {
-    //             setTableScrollTop(index);
-    //         }
-    //     })
-    // }
-
-    // const setTableScrollTop = (id, index) => {
-    //     if (index != 0 || index != -1){
-    //         let currentPosition = index *40;
-    //         document.getElementById(id).scrollTop(currentPosition);
-    //     }
-    // }
 
     const chooseProduct = (product) => {
         switch (product) {
@@ -296,7 +223,6 @@ const AllFundraisers = ({ fundraisers }) => {
                             return {
                                 onClick: event => {
                                     chooseRecord(record["organization"])
-                                    // console.log("record org ", record["organization"]);
                                 },
                                 className: isHovered(record.recordID) ? 'hovered' : '', // click row
                                 id: `row${record.recordID}`,

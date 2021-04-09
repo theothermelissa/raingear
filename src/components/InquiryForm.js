@@ -1,27 +1,21 @@
-import React, { useContext, useState, useEffect, useForm } from 'react';
-import { RecordsContext, base } from '../App';
-import { Form, Input, InputNumber, Button, Select, Radio, DatePicker, Space } from 'antd';
+import React from 'react';
+import { Form, Input, Button, Radio, DatePicker, Space } from 'antd';
 import moment from 'moment';
-// import { get } from 'lodash';
 
-const InquiryForm = ({ initialValues, onFinish, defaultDate }) => {
-    const {recordsDispatch, recordsState: {
-        recordToEdit,
-        drawerVisible,
-    }} = useContext(RecordsContext);    
-    
+const InquiryForm = ({ initialValues, onFinish }) => {  
+
     const [form] = Form.useForm();
 
-    function onChange(value, dateString) {
-        console.log('Selected Time: ', value);
-        console.log('Formatted Selected Time: ', dateString);
-    }
+    // function onChange(value, dateString, form) {
+    //     console.log('Selected Time: ', value);
+    //     console.log('Formatted Selected Time: ', dateString);
+    //     console.log('Form: ', form);
+    // }
 
-    function onOk(value) {
-        console.log('onOk: ', value);
-    }
+    // function onOk(value) {
+    //     console.log('onOk: ', value);
+    // }
 
-    // const {Option} = Select;
     const layout = {
         labelCol: {
             span: 8
@@ -37,19 +31,11 @@ const InquiryForm = ({ initialValues, onFinish, defaultDate }) => {
         }
     };
 
-    // const closeDrawer = () => recordsDispatch({
-    //     type: "closeDrawer",
-    // });
-
-    // console.log("moment formula: ", moment().add(1, 'days').hours(11).startOf('hour'))
-
     function disabledHours() {
         return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22, 23]
     };
 
     const selectedDateTimeFormat = 'ddd, MMM Do hh:mm';
-
-    // console.log("Displaying the form")
 
     return (
         <div>
@@ -60,7 +46,10 @@ const InquiryForm = ({ initialValues, onFinish, defaultDate }) => {
                 initialValues={initialValues}
                 onFinish={onFinish}
             >
-                <Form.Item name="status" label="Status">
+                <Form.Item
+                    name="status"
+                    label="Status"
+                >
                     <Radio.Group>
                         <Radio value="Inquiry">Inquiry</Radio>
                         <Radio value="Active">Active</Radio>
@@ -69,41 +58,73 @@ const InquiryForm = ({ initialValues, onFinish, defaultDate }) => {
                         <Radio value="Cancelled">Cancelled</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item name="deliveryDate" label="Delivery Date">
-                    <Space direction="vertical" size={12}>
+                <Form.Item
+                    name="deliveryDate"
+                    label="Delivery Date"
+                    // rules={[{ 
+                    //     required: false,
+                    //     type: 'object',
+                    // }]}
+                >
+                    {/* <Space direction="vertical" size={12}> */}
                         <DatePicker
                             showTime
                             format={selectedDateTimeFormat}
-                            onChange={onChange}
-                            onOk={onOk} 
+                            // onChange={(value, dateString) => onChange(value, dateString, form)}
+                            // onOk={onOk} 
                             disabledHours={disabledHours}
-                            defaultValue={defaultDate}
+                            // defaultValue={moment('04-10-2021')}
                         />
-                    </Space>
+                    {/* </Space> */}
                 </Form.Item>
                 <Form.Item 
                     name="organization"
-                    label="Organization">
+                    label="Organization"
+                    rules={[{ 
+                        required: true,
+                        message: 'Please add an Organization name' 
+                    }]}
+                >
                     <Input />
                 </Form.Item>
                 <Form.Item 
                     name="contactFirstName"
-                    label="Primary Contact First Name">
+                    label="Primary Contact First Name"
+                    rules={[{ 
+                        required: true,
+                        message: 'Primary Contact is required' 
+                    }]}
+                >
                     <Input />
                 </Form.Item>
                 <Form.Item 
                     name="contactLastName"
-                    label="Primary Contact Last Name">
+                    label="Primary Contact Last Name"
+                    rules={[{ 
+                        required: true,
+                        message: 'Last name is required' 
+                    }]}
+                >
                     <Input />
                 </Form.Item>
                 <Form.Item 
                     name="contactEmail"
-                    label="Primary Contact Email">
+                    label="Primary Contact Email"
+                    rules={[{ 
+                        required: true,
+                        message: 'Email is required' 
+                    }]}
+                >
                     <Input />
                 </Form.Item>
                 <Form.Item 
                     name="contactPhone"
-                    label="Primary Contact Phone">
+                    label="Primary Contact Phone"
+                    rules={[{ 
+                        required: true,
+                        message: 'Phone number is required' 
+                    }]}
+                >
                     <Input />
                 </Form.Item>
                 <Form.Item {...tailLayout}>

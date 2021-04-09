@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   NavLink
   } from "react-router-dom";
 import './App.scss';
@@ -17,10 +16,6 @@ import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
 import FirehouseCalendar from './components/FirehouseCalendar';
-import Customers from './components/Customers';
-import Team from './components/Team';
-import Alerts from './components/Alerts';
-import scrollIntoView from 'scroll-into-view';
 
 const { Header, Content, Sider } = Layout;
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
@@ -119,11 +114,6 @@ function App() {
                     Home
                   </NavLink>
                 </Menu.Item>
-                <Menu.Item key="2">
-                  <NavLink to="/Customers">
-                    Customers
-                  </NavLink>
-                </Menu.Item>
                 <Menu.Item key="3">
                   <NavLink to="/calendar">
                     Calendar
@@ -143,7 +133,7 @@ function App() {
               {recordsState["recordToEdit"] ?
                 <EditFundraiser />
                 :
-                <CreateFundraiserInquiry fundraisers={fundraisers} />
+                <CreateFundraiserInquiry />
               }
             </Drawer>
           }
@@ -183,18 +173,12 @@ function App() {
                 </Content>
             </Layout>
           </Route>
-          <Route path="/customers">
-            <Layout className="site-layout">
-              <Customers style={{marginTop: "200px", }} />
-            </Layout>
-          </Route>
           <Route path="/calendar">
             {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}
           </Route>
         </Switch>
       </Router>
     </RecordsContext.Provider>
-    
   );
 }
 

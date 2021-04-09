@@ -5,21 +5,12 @@ import { Form } from 'antd';
 import { set } from 'lodash';
 import moment from 'moment';
 
-const CreateFundraiserInquiry = ({ fundraisers }) => {
+const CreateFundraiserInquiry = () => {
     const { recordsDispatch, recordsState: {
         selectedDate
     } } = useContext(RecordsContext);
     const [fieldsToSave, setFieldsToSave] = useState('');
     const [readyToSubmit, setReadyToSubmit] = useState(false);
-    const [showEmailLink, setShowEmailLink] = useState(false);
-
-    //user has clicked a date in the calendar
-    //drawer opens with 'create inquiry' form
-    //user submits form
-    //drawer displays confirmation message
-    //lead is emailed with link to complete their registration
-
-    const displaySuccessMessage = () => setShowEmailLink(true);
     
     useEffect(() => {
         if (readyToSubmit) {
@@ -33,7 +24,6 @@ const CreateFundraiserInquiry = ({ fundraisers }) => {
                 return;
                 }
                 records.forEach(function (record) {
-                console.log("Saved record: ", record.getId());
                 });
             });
             recordsDispatch({
@@ -45,12 +35,9 @@ const CreateFundraiserInquiry = ({ fundraisers }) => {
         }
     }, ([readyToSubmit, fieldsToSave]));
 
-    // useEffect(() => {
-    //     if()
-    // }, [])
-
     const saveFields = (fields) => {
         const formInputs = fields;
+        console.log("fields: ", fields);
         const formattedDate = moment(fields["deliveryDate"]).toISOString();
         set(formInputs, 'deliveryDate', formattedDate);
         setFieldsToSave(formInputs);
@@ -64,8 +51,9 @@ const CreateFundraiserInquiry = ({ fundraisers }) => {
             initialValues={{
                 // "organization": "This Is a Test",
                 "status": "Inquiry",
+                "deliveryDate": selectedDate,
             }}
-            defaultDate={selectedDate}
+            // defaultDate={selectedDate}
             onFinish={saveFields}
         />
     );

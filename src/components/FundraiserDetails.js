@@ -88,16 +88,15 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         )
     };
 
-    const showDrawer = () => recordsDispatch({
-        type: "showDrawer",
-        payload: recordID,
-    });
-
-    // function copyToClipboard() {
-    //     addressHolder.innerText = copytext.innerText;
-    //     Copied = addressHolder.createTextRange();
-    //     Copied.execCommand("Copy")
-    // };
+    const showDrawer = () => {
+        recordsDispatch({
+            type: "showDrawer",
+        })
+        recordsDispatch({
+            type: "editRecord",
+            payload: recordID,
+        })
+    };
 
     return (
         <div className="site-card-wrapper">
@@ -221,7 +220,6 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                     </>
                                 ]
                         }>
-                            {/* <Meta title={`DELIVERY SCHEDULED FOR: ${convertedDate(deliveryDate).toUpperCase()}`} /> */}
                             <Meta title={
                                 (contactFirstName && contactLastName)
                                     ? `${
@@ -232,7 +230,6 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                     : "No primary contact yet"
                             }/>
                             <Descriptions 
-                                // layout={"vertical"}
                                 column={1}>
                                 <Descriptions.Item label="Phone">
                                     {
@@ -249,9 +246,6 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                         ${contactCity}, ${contactState} ${contactZip}`
                                         : ""
                                     }
-                                    {/* {contactAddress}{contactAddressLine2}
-                                    <br/>{contactCity}, {contactState}
-                                    {contactZip} */}
                                 </Descriptions.Item>
                             </Descriptions>
                         </Card>

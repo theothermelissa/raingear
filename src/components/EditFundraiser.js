@@ -1,14 +1,11 @@
-import React, { useContext, useState, useEffect, useForm } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {RecordsContext, base} from '../App';
-// import {Form, Input, InputNumber, Button, Select, Radio} from 'antd';
-// import { get } from 'lodash';
 import FundraiserForm from './FundraiserForm';
 import moment from 'moment';
 
 const EditFundraiser = () => {
     const {recordsDispatch, recordsState: {
             recordToEdit,
-            drawerVisible,
         }} = useContext(RecordsContext);
     const [existingValues, setExistingValues] = useState("")
     

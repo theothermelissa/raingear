@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect, useForm } from 'react';
 import { RecordsContext, base } from '../App';
 import { Form, Input, InputNumber, Button, Select, Radio, DatePicker, Space } from 'antd';
 import moment from 'moment';
-// import { get } from 'lodash';
 
 const FundraiserForm = ({ initialValues, onFinish, defaultDate }) => {
     const {recordsDispatch, recordsState: {
@@ -42,15 +41,11 @@ const FundraiserForm = ({ initialValues, onFinish, defaultDate }) => {
         type: "closeDrawer",
     });
 
-    // console.log("moment formula: ", moment().add(1, 'days').hours(11).startOf('hour'))
-
     function disabledHours() {
         return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22, 23]
     };
 
     const selectedDateTimeFormat = 'ddd, MMM Do hh:mm';
-
-    // console.log("Displaying the form")
 
     return (
         <div>
@@ -78,7 +73,7 @@ const FundraiserForm = ({ initialValues, onFinish, defaultDate }) => {
                             onChange={onChange}
                             onOk={onOk} 
                             disabledHours={disabledHours}
-                            defaultValue={defaultDate}
+                            value={defaultDate}
                         />
                     </Space>
                 </Form.Item>

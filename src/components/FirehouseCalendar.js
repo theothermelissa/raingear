@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Calendar, Avatar, Badge } from 'antd';
 import { includes, sortBy, find, matchesProperty } from 'lodash';
-import {format} from 'date-fns';
 import moment from 'moment';
-import selectStatusColor from './selectStatusColor';
 import {RecordsContext} from '../App';
 
 
@@ -79,9 +77,6 @@ const FirehouseCalendar = ({ fundraisers }) => {
         );
     }
     
-    const monthlyDataToDisplay = "firehouseFee";
-    
-
     function monthCellRender(value) {
         const monthIsMatch = (object) => moment(object["deliveryDate"]).isSame(value, 'month');
         const monthsFundraisers = sortBy(fundraiserData.filter(monthIsMatch), ['deliveryDate']);
@@ -112,7 +107,14 @@ const FirehouseCalendar = ({ fundraisers }) => {
 
     return (
         <div>
-            {fundraisers[0] && <Calendar onSelect={showDrawer} dateCellRender={dateCellRender} monthCellRender={monthCellRender} />}
+            {
+                fundraisers[0] && 
+                <Calendar
+                    onSelect={showDrawer}
+                    dateCellRender={dateCellRender}
+                    monthCellRender={monthCellRender}
+                />
+            }
         </div>
     );
 };
