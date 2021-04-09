@@ -100,7 +100,7 @@ function App() {
         recordsDispatch,
       }}
     >
-      <Router>
+      <Router basename={'/raingear'}>
           <Header 
             style={{ 
               position: "fixed",
