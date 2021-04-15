@@ -28,7 +28,7 @@ const AllFundraisers = ({ fundraisers }) => {
     };
 
     useEffect(() => {
-        if (fundraisers) {
+        if (fundraisers[0]) {
             setUpdatedFundraisers(fundraisers.map(record => {
                 return {
                     ...record,

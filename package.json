@@ -26,7 +26,7 @@
   },
   "scripts": {
     "predeploy": "yarn run build",
-    "deploy": "yarn run build && surge ./build/ selljar.surge.sh",
+    "deploy": "yarn run build && mv build/index.html build/200.html && surge build selljar.surge.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

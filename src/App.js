@@ -16,6 +16,7 @@ import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
 import FundraiserDetails from './components/FundraiserDetails';
 import FirehouseCalendar from './components/FirehouseCalendar';
+import NavBar from './components/NavBar';
 
 const { Header, Content, Sider } = Layout;
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
@@ -101,28 +102,7 @@ function App() {
       }}
     >
       <Router basename={'/'}>
-          <Header 
-            style={{ 
-              position: "fixed",
-              zIndex: 1000,
-              width: '100%' 
-            }}
-          >
-            <Menu theme="dark" mode="horizontal">
-                <Menu.Item key="1">
-                  <NavLink to="/">
-                    Home
-                  </NavLink>
-                </Menu.Item>
-                <Menu.Item key="3">
-                  <NavLink to="/calendar">
-                    Calendar
-                  </NavLink>
-                </Menu.Item>
-            </Menu>
-          </Header>
-          <div style={{ height: "64px" }}>
-          </div>
+        <NavBar />
           {recordsState["drawerVisible"] && 
             <Drawer 
               forceRender
