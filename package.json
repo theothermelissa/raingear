@@ -1,5 +1,5 @@
 {
-  "homepage": "http://theothermelissa.github.io/raingear",
+  "homepage": "http://selljar.surge.sh",
   "name": "selljar",
   "version": "0.1.0",
   "private": true,
@@ -21,11 +21,12 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "scroll-into-view": "^1.15.0",
+    "surge": "^0.23.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build && cp 404.html build/404.html",
+    "deploy": "yarn run build && surge ./build/ selljar.surge.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

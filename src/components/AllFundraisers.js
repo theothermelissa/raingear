@@ -28,24 +28,26 @@ const AllFundraisers = ({ fundraisers }) => {
     };
 
     useEffect(() => {
-        setUpdatedFundraisers(fundraisers.map(record => {
-            return {
-                ...record,
-                'deliveryDate': convertedDate(record['deliveryDate']),
-                'organizationProceeds': `$${
-                    Math.round(record['organizationProceeds'])
-                }`,
-                'totalRevenue': `$${
-                    Math.round(record['totalRevenue'])
-                }`,
-                'firehouseFee': `$${
-                    Math.round(record['firehouseFee'])
-                }`,
-                'isHovered': record['recordID'] === hoveredID,
-                'key': record["recordID"],
-                'status': `${prefillStatus(record["status"])}`
-            }
-        }))
+        if (fundraisers) {
+            setUpdatedFundraisers(fundraisers.map(record => {
+                return {
+                    ...record,
+                    'deliveryDate': convertedDate(record['deliveryDate']),
+                    'organizationProceeds': `$${
+                        Math.round(record['organizationProceeds'])
+                    }`,
+                    'totalRevenue': `$${
+                        Math.round(record['totalRevenue'])
+                    }`,
+                    'firehouseFee': `$${
+                        Math.round(record['firehouseFee'])
+                    }`,
+                    'isHovered': record['recordID'] === hoveredID,
+                    'key': record["recordID"],
+                    'status': `${prefillStatus(record["status"])}`
+                }
+            }))
+        }
     }, [fundraisers]);
 
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
