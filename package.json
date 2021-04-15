@@ -25,7 +25,7 @@
   },
   "scripts": {
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build && cp 404.html build/404.html",
+    "deploy": "gh-pages -d build && mv build/index.html build/200.html && cp 404.html build/404.html",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
