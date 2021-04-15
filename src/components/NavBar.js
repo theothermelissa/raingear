@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { Layout, Menu } from 'antd/lib';
 
 const{ Header } = Layout
-console.log("Header: ", Header)
 
 const NavBar = () => {
     return (
@@ -18,7 +17,7 @@ const NavBar = () => {
             <Menu theme="dark" mode="horizontal">
                 <Menu.Item key="1">
                   <NavLink to="/">
-                    Home
+                    Fundraisers
                   </NavLink>
                 </Menu.Item>
                 <Menu.Item key="3">

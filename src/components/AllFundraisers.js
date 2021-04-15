@@ -1,17 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {sortBy, find, matchesProperty} from 'lodash';
-import { Table, Tag } from 'antd';
+import {Table, Tag} from 'antd';
 import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
 import {RecordsContext} from '../App';
 
-const AllFundraisers = ({ fundraisers }) => {
-    const {
-        recordsDispatch,
-        recordsState: {
+const AllFundraisers = ({fundraisers}) => {
+    const {recordsDispatch, recordsState: {
             hoveredID
-        }
-    } = useContext(RecordsContext);
+        }} = useContext(RecordsContext);
 
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
     const [updatedFundraisers, setUpdatedFundraisers] = useState('')
@@ -22,9 +19,7 @@ const AllFundraisers = ({ fundraisers }) => {
     }
 
     const prefillStatus = (currentStatus) => {
-        return (
-            currentStatus ? currentStatus : "Inquiry"
-        )
+        return(currentStatus ? currentStatus : "Inquiry")
     };
 
     useEffect(() => {
@@ -44,11 +39,13 @@ const AllFundraisers = ({ fundraisers }) => {
                     }`,
                     'isHovered': record['recordID'] === hoveredID,
                     'key': record["recordID"],
-                    'status': `${prefillStatus(record["status"])}`
+                    'status': `${
+                        prefillStatus(record["status"])
+                    }`
                 }
             }))
         }
-    }, [fundraisers]);
+    }, [fundraisers, hoveredID]);
 
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
 
@@ -59,7 +56,8 @@ const AllFundraisers = ({ fundraisers }) => {
     const chooseProduct = (product) => {
         switch (product) {
             case 'Boston Butts':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={product}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#597ef7'}
@@ -71,7 +69,8 @@ const AllFundraisers = ({ fundraisers }) => {
                         {product}</div>
                 </div>
             case 'Half Hams':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={product}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#7cb305'}
@@ -83,7 +82,8 @@ const AllFundraisers = ({ fundraisers }) => {
                         {product}</div>
                 </div>
             case 'Whole Turkeys':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={product}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#13c2c2'}
@@ -95,7 +95,8 @@ const AllFundraisers = ({ fundraisers }) => {
                         {product}</div>
                 </div>
             case 'BBQ Sauce':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={product}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#9254de'}
@@ -128,15 +129,15 @@ const AllFundraisers = ({ fundraisers }) => {
             dataIndex: 'status',
             key: 'status',
             render: status => (
-                <>
-                    {status && <Tag color={
+                <> {
+                    status && <Tag color={
                             selectStatusColor(status)
                         }
                         key={status}>
                         {
                         status.toUpperCase()
-                    } </Tag>}
-                </>
+                    } </Tag>
+                } </>
             ),
             sorter: createSorter('status')
         },
@@ -207,8 +208,8 @@ const AllFundraisers = ({ fundraisers }) => {
     ];
 
     return (
-        <>
-            {updatedFundraisers && <div>
+        <> {
+            updatedFundraisers && <div>
                 <Table dataSource={dataSource}
                     columns={columns}
                     pagination={false}
@@ -227,13 +228,15 @@ const AllFundraisers = ({ fundraisers }) => {
                                     chooseRecord(record["organization"])
                                 },
                                 className: isHovered(record.recordID) ? 'hovered' : '', // click row
-                                id: `row${record.recordID}`,
-                                key: rowIndex,
+                                id: `row${
+                                    record.recordID
+                                }`,
+                                key: rowIndex
                             };
                         }
                     }/>
-            </div>}
-        </>
+            </div>
+        } </>
     );
 }
 

@@ -1,24 +1,18 @@
 import  React, { useState, useEffect, useReducer } from 'react';
+import Airtable from 'airtable';
+import { notification } from 'antd';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  NavLink
   } from "react-router-dom";
 import './App.scss';
-import FundraiserTimeline from './components/FundraiserTimeline';
-import AllFundraisers from './components/AllFundraisers';
-import EditFundraiser from './components/EditFundraiser';
-import CreateFundraiserInquiry from './components/CreateFundraiserInquiry';
-import Airtable from 'airtable';
-import { Layout, Menu, Drawer, notification } from 'antd';
-import { find, matchesProperty } from 'lodash';
 import recordsReducer from './reducers/recordsReducer';
-import FundraiserDetails from './components/FundraiserDetails';
+import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
+import FundraisersPage from './components/FundraisersPage';
 
-const { Header, Content, Sider } = Layout;
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
@@ -35,7 +29,6 @@ const initialState = {
 
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
-  const [focusedFundraiser, setFocusedFundraiser] = useState('');
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
 
   useEffect( () => { 
@@ -77,22 +70,6 @@ function App() {
         });
     }
   }, [recordsState]);
-  
-  useEffect( () => { 
-    setFocusedFundraiser(
-      find(fundraisers, matchesProperty('recordID', recordsState["focusedRecordID"])))
-  }, [recordsState, fundraisers]);
-
-  const setHovered = (id) => {
-    recordsDispatch({
-      type: 'setHovered',
-     payload: id,
-    })
-  };
-
-  const closeDrawer = () => recordsDispatch({
-    type: "closeDrawer",
-  });
 
   return (
     <RecordsContext.Provider
@@ -104,54 +81,11 @@ function App() {
       <Router basename={'/'}>
         <NavBar />
           {recordsState["drawerVisible"] && 
-            <Drawer 
-              forceRender
-              width={"80vw"}
-              visible={recordsState["drawerVisible"]}
-              onClose={closeDrawer}
-            >
-              {recordsState["recordToEdit"] ?
-                <EditFundraiser />
-                :
-                <CreateFundraiserInquiry />
-              }
-            </Drawer>
+            <EditDrawer />
           }
         <Switch>
           <Route path="/" exact>
-            <Layout>
-              <Sider
-                style={{
-                  overflow: 'auto',
-                  height: '100vh',
-                  position: 'fixed',
-                  left: 0,
-                  backgroundColor: '#d9d9d9',
-                }} 
-                width="auto"
-                className="site-layout-background"
-              >
-                {fundraisers[0] && 
-                  <FundraiserTimeline
-                    setHovered={setHovered}
-                    fundraisers={fundraisers}
-                  />
-                }
-              </Sider>
-            </Layout>
-            <Layout className="site-layout" style={{ marginLeft: 0 }}>
-                <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-                  {fundraisers[0] && 
-                    <>
-                      <AllFundraisers fundraisers={fundraisers} />
-                      <div style={{ height: "300px" }}>
-                      </div>
-                    </>
-                  }
-                  {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
-                  <span style={{ height: "100px" }}/>
-                </Content>
-            </Layout>
+            <FundraisersPage fundraisers={fundraisers}/>
           </Route>
           <Route path="/calendar">
             {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}

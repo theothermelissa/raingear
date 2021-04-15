@@ -70,7 +70,7 @@ const FirehouseCalendar = ({ fundraisers }) => {
                                 </Avatar.Group>
                             </div>
                         )
-                    }
+                    } else return null;
                 })
                 }
             </div>

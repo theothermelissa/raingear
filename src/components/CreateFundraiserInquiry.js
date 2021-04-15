@@ -1,61 +1,50 @@
-import React, { useContext, useState, useEffect, useForm } from 'react';
-import { RecordsContext, base } from '../App';
+import React, {useContext, useState, useEffect} from 'react';
+import {RecordsContext, base} from '../App';
 import InquiryForm from './InquiryForm';
-import { Form } from 'antd';
-import { set } from 'lodash';
+import {set} from 'lodash';
 import moment from 'moment';
 
 const CreateFundraiserInquiry = () => {
-    const { recordsDispatch, recordsState: {
-        selectedDate
-    } } = useContext(RecordsContext);
+    const {recordsDispatch, recordsState: {
+            selectedDate
+        }} = useContext(RecordsContext);
     const [fieldsToSave, setFieldsToSave] = useState('');
     const [readyToSubmit, setReadyToSubmit] = useState(false);
-    
+
     useEffect(() => {
         if (readyToSubmit) {
             base('Fundraisers').create([
                 {
-                "fields": fieldsToSave
+                    "fields": fieldsToSave
                 },
-            ], function(err, records) {
+            ], function (err, records) {
                 if (err) {
-                console.error(err);
-                return;
+                    console.error(err);
+                    return;
                 }
-                records.forEach(function (record) {
-                });
+                records.forEach(function (record) {});
             });
-            recordsDispatch({
-                type: "updateRecords",
-            });
-            recordsDispatch({
-                type: "closeDrawer",
-            })
+            recordsDispatch({type: "updateRecords"});
+            recordsDispatch({type: "closeDrawer"})
         }
-    }, ([readyToSubmit, fieldsToSave]));
+    }, ([readyToSubmit, fieldsToSave, recordsDispatch]));
 
     const saveFields = (fields) => {
         const formInputs = fields;
-        console.log("fields: ", fields);
         const formattedDate = moment(fields["deliveryDate"]).toISOString();
         set(formInputs, 'deliveryDate', formattedDate);
         setFieldsToSave(formInputs);
         setReadyToSubmit(true);
     };
 
-    const [form] = Form.useForm();
-    
     return (
-        <InquiryForm 
-            initialValues={{
-                // "organization": "This Is a Test",
-                "status": "Inquiry",
-                "deliveryDate": selectedDate,
-            }}
-            // defaultDate={selectedDate}
-            onFinish={saveFields}
-        />
+        <InquiryForm initialValues={
+                {
+                    "status": "Inquiry",
+                    "deliveryDate": selectedDate
+                }
+            }
+            onFinish={saveFields}/>
     );
 
 };

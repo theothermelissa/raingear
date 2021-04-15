@@ -1,8 +1,8 @@
-import  React, { useContext, useState } from 'react';
+import  React, { useContext } from 'react';
 import TimelineCard from './TimelineCard';
 import { Timeline } from 'antd';
 import selectStatusColor from './selectStatusColor';
-import { find, matchesProperty } from 'lodash';
+import { find, matchesProperty, sortBy } from 'lodash';
 import {RecordsContext} from '../App';
 
 
@@ -33,7 +33,7 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
             maxWidth: '500px'
           }}
         >
-        {fundraisers.map(fundraiser => (
+        {sortBy(fundraisers, ['deliveryDate']).map(fundraiser => (
             <Timeline.Item 
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
               onMouseLeave={() => setHovered(null)}

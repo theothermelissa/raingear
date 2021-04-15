@@ -1,21 +1,21 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {RecordsContext, base} from '../App';
 import FundraiserForm from './FundraiserForm';
 import moment from 'moment';
 
 const EditFundraiser = () => {
     const {recordsDispatch, recordsState: {
-            recordToEdit,
+            recordToEdit
         }} = useContext(RecordsContext);
     const [existingValues, setExistingValues] = useState("")
-    
+
     useEffect(() => {
         if (recordToEdit) {
-        base('Fundraisers').find(recordToEdit, function (err, record) {
-            if (record["fields"]["status"]) {
-                setExistingValues(record["fields"]);
-            } else {
-                const {
+            base('Fundraisers').find(recordToEdit, function (err, record) {
+                if (record["fields"]["status"]) {
+                    setExistingValues(record["fields"]);
+                } else {
+                    const {
                         fundraiserName,
                         organization,
                         products,
@@ -36,7 +36,6 @@ const EditFundraiser = () => {
                         contactZip,
                         contactPreferredMethod,
                         contactEmail,
-                        status,
                         buttCount,
                         hamCount,
                         turkeyCount,
@@ -50,75 +49,71 @@ const EditFundraiser = () => {
                         totalRevenue,
                         sellerRecords,
                         organizationProceeds,
-                        recordID,
+                        recordID
                     } = record["fields"];
-                setExistingValues({
-                    "fundraiserName": fundraiserName,
-                    "organization": organization,
-                    "products": products,
-                    "deliveryCity": deliveryCity,
-                    "deliveryAddress": deliveryAddress,
-                    "deliveryState": deliveryState,
-                    "deliveryZip": deliveryZip,
-                    "deliveryNotes": deliveryNotes,
-                    "deliveryDate": deliveryDate,
-                    "daysUntilDelivery": daysUntilDelivery,
-                    "contactFirstName": contactFirstName,
-                    "contactPhone": contactPhone,
-                    "contactLastName": contactLastName,
-                    "contactAddress": contactAddress,
-                    "contactAddressLine2": contactAddressLine2,
-                    "contactCity": contactCity,
-                    "contactState": contactState,
-                    "contactZip": contactZip,
-                    "contactPreferredMethod": contactPreferredMethod,
-                    "contactEmail": contactEmail,
-                    "status": "Inquiry",
-                    "buttCount": buttCount,
-                    "hamCount": hamCount,
-                    "turkeyCount": turkeyCount,
-                    "sauceCount": sauceCount,
-                    "customerButtPrice": customerButtPrice,
-                    "customerHamPrice": customerHamPrice,
-                    "customerTurkeyPrice": customerTurkeyPrice,
-                    "customerSaucePrice": customerSaucePrice,
-                    "firehouseFee": firehouseFee,
-                    "orderTotals": orderTotals,
-                    "totalRevenue": totalRevenue,
-                    "sellerRecords": sellerRecords,
-                    "organizationProceeds": organizationProceeds,
-                    "recordID": recordID,
-                })
-            }
-            if (err) {
-                console.error(err);
-                return;
+                    setExistingValues({
+                        "fundraiserName": fundraiserName,
+                        "organization": organization,
+                        "products": products,
+                        "deliveryCity": deliveryCity,
+                        "deliveryAddress": deliveryAddress,
+                        "deliveryState": deliveryState,
+                        "deliveryZip": deliveryZip,
+                        "deliveryNotes": deliveryNotes,
+                        "deliveryDate": deliveryDate,
+                        "daysUntilDelivery": daysUntilDelivery,
+                        "contactFirstName": contactFirstName,
+                        "contactPhone": contactPhone,
+                        "contactLastName": contactLastName,
+                        "contactAddress": contactAddress,
+                        "contactAddressLine2": contactAddressLine2,
+                        "contactCity": contactCity,
+                        "contactState": contactState,
+                        "contactZip": contactZip,
+                        "contactPreferredMethod": contactPreferredMethod,
+                        "contactEmail": contactEmail,
+                        "status": "Inquiry",
+                        "buttCount": buttCount,
+                        "hamCount": hamCount,
+                        "turkeyCount": turkeyCount,
+                        "sauceCount": sauceCount,
+                        "customerButtPrice": customerButtPrice,
+                        "customerHamPrice": customerHamPrice,
+                        "customerTurkeyPrice": customerTurkeyPrice,
+                        "customerSaucePrice": customerSaucePrice,
+                        "firehouseFee": firehouseFee,
+                        "orderTotals": orderTotals,
+                        "totalRevenue": totalRevenue,
+                        "sellerRecords": sellerRecords,
+                        "organizationProceeds": organizationProceeds,
+                        "recordID": recordID
+                    })
+                }
+                if (err) {
+                    console.error(err);
+                    return;
                 }
             })
         }
-    }, []);
+    }, [recordToEdit]);
 
-    const closeDrawer = () => recordsDispatch({
-        type: "closeDrawer",
-      });
-    
+    const closeDrawer = () => recordsDispatch({type: "closeDrawer"});
+
     const submitRecordChanges = (values) => {
         console.log("values: ", values);
         console.log("recordToEdit: ", recordToEdit);
         base('Fundraisers').update([
             {
                 "id": recordToEdit,
-                "fields": values,
+                "fields": values
             }
-        ], function(err, records) {
+        ], function (err, records) {
             if (err) {
                 console.log("Error: ", err);
                 return;
             }
         });
-        recordsDispatch({
-            type: "updateRecords",
-        });
+        recordsDispatch({type: "updateRecords"});
         closeDrawer();
     };
 
@@ -128,15 +123,15 @@ const EditFundraiser = () => {
     }
 
     return (
-        <>
-            {existingValues &&
-                <FundraiserForm 
-                    initialValues={getExistingValues()}
-                    onFinish={submitRecordChanges}
-                    defaultDate={moment(existingValues["deliveryDate"])}
-                />
-            }
-        </>
+        <> {
+            existingValues && <FundraiserForm initialValues={
+                    getExistingValues()
+                }
+                onFinish={submitRecordChanges}
+                defaultDate={
+                    moment(existingValues["deliveryDate"])
+                }/>
+        } </>
     )
 };
 

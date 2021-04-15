@@ -18,14 +18,11 @@ const FundraiserDetails = ({ recordToDisplay }) => {
 
     const {
         fundraiserName,
-        organization,
-        products,
         deliveryCity,
         deliveryAddress,
         deliveryState,
         deliveryZip,
         deliveryNotes,
-        deliveryDate,
         daysUntilDelivery,
         contactFirstName,
         contactPhone,
@@ -48,8 +45,6 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         customerSaucePrice,
         firehouseFee,
         orderTotals,
-        totalRevenue,
-        sellerRecords,
         organizationProceeds,
         recordID,
     } = recordToDisplay;
@@ -58,10 +53,6 @@ const FundraiserDetails = ({ recordToDisplay }) => {
     if (orderTotals) {
         orderTotals.map((total) => orders.push(total));
     }
-    let sellers = 0;
-    if (sellerRecords) {
-        sellers = sellerRecords.length
-    };
 
     const relativeDeliveryDate = () => {
         if (daysUntilDelivery > 0) {
