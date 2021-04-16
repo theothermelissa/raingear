@@ -5,8 +5,10 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  withRouter,
   } from "react-router-dom";
 import './App.scss';
+import Auth from './auth/Auth';
 import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
@@ -27,7 +29,8 @@ const initialState = {
   hoveredID: null,
 };
 
-function App() {
+function App({history}) {
+  const auth = new Auth(history);
   const [fundraisers, setFundraisers] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
 
@@ -79,21 +82,17 @@ function App() {
       }}
     >
       <Router basename={'/'}>
-        <NavBar />
+        <NavBar auth={auth} />
           {recordsState["drawerVisible"] && 
             <EditDrawer />
           }
         <Switch>
-          <Route path="/" exact>
-            <FundraisersPage fundraisers={fundraisers}/>
-          </Route>
-          <Route path="/calendar">
-            {fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}
-          </Route>
+          <Route exact path="/" render={() => <FundraisersPage fundraisers={fundraisers}/>} />
+          <Route path="/calendar" render={() => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}/>
         </Switch>
       </Router>
     </RecordsContext.Provider>
   );
 }
 
-export default App;
+export default withRouter(App);
