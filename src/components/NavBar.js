@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Layout, Menu, Row, Col, Button } from 'antd/lib';
+import { Layout, Menu, Row, Col } from 'antd/lib';
+import LoginButton from './LoginButton';
 
-const{ Header } = Layout
+const{ Header } = Layout;
 
-const NavBar = ({auth}) => {
-  console.log("auth.login: ", auth.login);
+const NavBar = () => {
+  // console.log("auth.login: ", auth.login);
     return (
         <>
           <Row justify="end">
@@ -33,8 +34,10 @@ const NavBar = ({auth}) => {
               </Col>
               <Col flex={1}>
                 <Menu theme="dark" mode="horizontal">
-                  <Menu.Item style={{ float: "right" }} key="4">
-                    <Button onClick={auth.login}>Login</Button>
+                  <Menu.Item 
+                    style={{ float: "right" }}
+                    key="4">
+                    <LoginButton />
                   </Menu.Item>
                 </Menu>
               </Col>

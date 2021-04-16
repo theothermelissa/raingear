@@ -1,4 +1,4 @@
-import  React, { useState, useEffect, useReducer } from 'react';
+import  React, { useState, useEffect, useReducer, useContext } from 'react';
 import Airtable from 'airtable';
 import { notification } from 'antd';
 import {
@@ -7,8 +7,9 @@ import {
   Route,
   withRouter,
   } from "react-router-dom";
+import  { Auth0Context } from './contexts/auth0-context';
 import './App.scss';
-import Auth from './auth/Auth';
+// import Auth from './auth/Auth';
 import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
@@ -30,9 +31,11 @@ const initialState = {
 };
 
 function App({history}) {
-  const auth = new Auth(history);
   const [fundraisers, setFundraisers] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
+  const auth0 = useContext(Auth0Context);
+
+  console.log('auth0.message: ', auth0.message);
 
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
@@ -82,13 +85,15 @@ function App({history}) {
       }}
     >
       <Router basename={'/'}>
-        <NavBar auth={auth} />
+        <NavBar
+          // auth={auth}
+        />
           {recordsState["drawerVisible"] && 
             <EditDrawer />
           }
         <Switch>
-          <Route exact path="/" render={() => <FundraisersPage fundraisers={fundraisers}/>} />
-          <Route path="/calendar" render={() => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} />}/>
+          <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
+          <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
         </Switch>
       </Router>
     </RecordsContext.Provider>
