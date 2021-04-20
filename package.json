@@ -5,14 +5,12 @@
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^1.4.0",
-    "@auth0/auth0-spa-js": "^1.14.0",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "airtable": "^0.10.1",
     "antd": "^4.14.1",
-    "auth0-js": "^9.15.0",
     "axios": "^0.21.1",
     "date-fns": "^2.19.0",
     "install": "^0.13.0",
@@ -30,7 +28,7 @@
   "scripts": {
     "predeploy": "yarn run build",
     "deploy": "yarn run build && mv build/index.html build/200.html && surge build selljar.surge.sh",
-    "start": "react-scripts start",
+    "start": "HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -6,7 +6,6 @@ import LoginButton from './LoginButton';
 const{ Header } = Layout;
 
 const NavBar = () => {
-  // console.log("auth.login: ", auth.login);
     return (
         <>
           <Row justify="end">

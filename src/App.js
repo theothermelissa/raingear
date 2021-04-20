@@ -1,4 +1,4 @@
-import  React, { useState, useEffect, useReducer, useContext } from 'react';
+import  React, { useState, useEffect, useReducer } from 'react';
 import Airtable from 'airtable';
 import { notification } from 'antd';
 import {
@@ -7,18 +7,18 @@ import {
   Route,
   withRouter,
   } from "react-router-dom";
-import  { Auth0Context } from './contexts/auth0-context';
 import './App.scss';
-// import Auth from './auth/Auth';
 import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
 import FundraisersPage from './components/FundraisersPage';
+import Profile from './components/Profile';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
+
 
 const initialState = {
   focusedRecordID: '',
@@ -30,12 +30,11 @@ const initialState = {
   hoveredID: null,
 };
 
-function App({history}) {
+
+
+function App() {
   const [fundraisers, setFundraisers] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-  const auth0 = useContext(Auth0Context);
-
-  console.log('auth0.message: ', auth0.message);
 
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
@@ -83,10 +82,9 @@ function App({history}) {
         recordsState,
         recordsDispatch,
       }}
-    >
+    > 
       <Router basename={'/'}>
         <NavBar
-          // auth={auth}
         />
           {recordsState["drawerVisible"] && 
             <EditDrawer />
@@ -94,6 +92,7 @@ function App({history}) {
         <Switch>
           <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
           <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
+          <Route path="/profile" render={props =><Profile {...props} />}/>
         </Switch>
       </Router>
     </RecordsContext.Provider>

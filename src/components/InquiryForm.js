@@ -5,7 +5,6 @@ import {
     Button,
     Radio,
     DatePicker,
-    Space
 } from 'antd';
 
 const InquiryForm = ({initialValues, onFinish}) => {
