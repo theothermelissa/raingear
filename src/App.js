@@ -32,9 +32,11 @@ const initialState = {
 
 
 
-function App() {
+function App({ state }) {
   const [fundraisers, setFundraisers] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
+
+  console.log('state: ', state);
 
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
@@ -89,6 +91,7 @@ function App() {
           {recordsState["drawerVisible"] && 
             <EditDrawer />
           }
+        <div>Hello, {state.name}</div>
         <Switch>
           <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
           <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
