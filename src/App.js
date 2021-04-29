@@ -14,6 +14,7 @@ import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
 import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
+import ProtectedRoute from './auth/protected-route';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
@@ -32,11 +33,9 @@ const initialState = {
 
 
 
-function App({ state }) {
+function App() {
   const [fundraisers, setFundraisers] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-
-  console.log('state: ', state);
 
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
@@ -91,11 +90,11 @@ function App({ state }) {
           {recordsState["drawerVisible"] && 
             <EditDrawer />
           }
-        <div>Hello, {state.name}</div>
+        {/* <div>Hello, {state.name}</div> */}
         <Switch>
           <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
           <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
-          <Route path="/profile" render={props =><Profile {...props} />}/>
+          <ProtectedRoute path="/profile" component={Profile} />
         </Switch>
       </Router>
     </RecordsContext.Provider>

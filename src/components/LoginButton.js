@@ -8,7 +8,7 @@ const LoginButton = () => {
     if (isLoading) {
         return <div>Loading ...</div>
     } if (!isAuthenticated) {
-        return <Button onClick={() => loginWithRedirect()}>Login</Button>
+        return <Button onClick={() => loginWithRedirect({ appState: { targetUrl: "/profile" } })}>Login</Button>
     } if (isAuthenticated) {
         return <Button onClick={() => logout({ returnTo: window.location.origin })}>Logout</Button>
     }
