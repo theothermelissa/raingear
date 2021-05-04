@@ -1,30 +1,28 @@
 const recordsReducer = (state, action) => {
-     // get fundraiser data
-     // get focused fundraiser
-     // get focused fundraiser editor
-     // submit fundraiser edits
      switch (action.type) {
           case 'setRecords':
-               // console.log("records: ", action.payload);
                return {
                     ...state,
                     allRecords: action.payload,
+               };
+          case 'setUser': 
+               console.log("This user is: ", action.payload);
+               return {
+                    ...state,
+                    userEmail: action.payload,
                }
           case 'chooseRecord':
-               // console.log("select record: ", action.payload)
                return {
                     ...state,
                     focusedRecordID: action.payload,
                     viewFocusedRecord: true,
                };
           case 'updateRecords':
-               // console.log("Setting recordHasChanged: true.")
                return {
                     ...state,
                     recordHasChanged: true,
                };
           case 'doNotUpdate':
-               // console.log("Let it be.")
                return {
                     ...state,
                     recordHasChanged: false,
@@ -60,8 +58,6 @@ const recordsReducer = (state, action) => {
                     ...state,
                     alert: {"type": "success", "message": "Success!"},
                     recordHasChanged: false,
-                    // recordToEdit: '',
-//     const alertList = [{type: "success", message: "Success!"},{type: "error", message: "Darn. Something went wrong."},{type: "info", message: "Something you should know ... is that there is a lengthy thing to say about whatever it is we were discussing. Which I'll remember soon. Honestly."}];
                }
           case 'logError':
                return {

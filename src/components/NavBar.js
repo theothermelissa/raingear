@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
 import LoginButton from './LoginButton';
+import firehouseLogo from '../images/firehouseLogo.png';
 
 const{ Header } = Layout;
 
@@ -17,6 +18,7 @@ const NavBar = () => {
                 width: '100%' 
                 }}
             >
+              <img className="headerLogo" src={firehouseLogo} alt="Firehouse Logo" style={{ height: "50px", width: "auto" }} />
               <Col flex={6} >
                 <Menu theme="dark" mode="horizontal">
                     <Menu.Item style={{ float: "left" }} key="1">

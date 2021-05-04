@@ -14,6 +14,7 @@ import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
 import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
+import OrganizerView from './components/OrganizerView';
 import ProtectedRoute from './auth/protected-route';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
@@ -29,16 +30,29 @@ const initialState = {
   alert: '',
   recordHasChanged: false,
   hoveredID: null,
+  userEmail: '',
 };
 
 
 
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
+  const [usersAuthorizedRecords, setUsersAuthorizedRecords] = useState({
+    fundraisers: [],
+    
+  });
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
 
+  useEffect( () => {
+    if(recordsState["userEmail"]) {
+      //get record for that user
+      //if user has "organizer" record
+    }
+  }, [])
+  
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
+
       base('Fundraisers').select({
         view: "All Fields View",
         }).eachPage(function page(records, fetchNextPage) {
@@ -90,11 +104,11 @@ function App() {
           {recordsState["drawerVisible"] && 
             <EditDrawer />
           }
-        {/* <div>Hello, {state.name}</div> */}
         <Switch>
           <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
           <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
           <ProtectedRoute path="/profile" component={Profile} />
+          <ProtectedRoute path="/orgView" component={OrganizerView} />
         </Switch>
       </Router>
     </RecordsContext.Provider>
