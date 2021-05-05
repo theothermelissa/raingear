@@ -16,6 +16,7 @@ import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
 import OrganizerView from './components/OrganizerView';
 import ProtectedRoute from './auth/protected-route';
+import fetchTableData from './components/fetchTableData';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
@@ -37,22 +38,24 @@ const initialState = {
 
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
-  const [usersAuthorizedRecords, setUsersAuthorizedRecords] = useState({
-    fundraisers: [],
-    
-  });
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
 
-  useEffect( () => {
-    if(recordsState["userEmail"]) {
-      //get record for that user
-      //if user has "organizer" record
-    }
-  }, [])
+  // login page
+  // is registered user?
+    // no -- "denied" page
+    // yes -- find record in Users table. use linked fields to determine whether they have more than one role
+      // no -- add role-specific data to app state and display it on their "user home" page
+      // yes -- add role-specific data for all roles to app state, and redirect user to "choose fundraiser" page
+        // for provider user, displayed records are fundraisers
+        // for organizer, displayed records are orders and sellers and fundraiser details
+        // for seller guardians, displayed records are guardian's seller(s) and their orders and fundraiser details
+        // for sellers, displayed records are their own orders and fundraiser details
+  // display calendar view with role-specific data in /calendar route
+
+  fetchTableData("Users");
   
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
-
       base('Fundraisers').select({
         view: "All Fields View",
         }).eachPage(function page(records, fetchNextPage) {

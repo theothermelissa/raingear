@@ -6,11 +6,15 @@ const recordsReducer = (state, action) => {
                     allRecords: action.payload,
                };
           case 'setUser': 
-               console.log("This user is: ", action.payload);
                return {
                     ...state,
                     userEmail: action.payload,
-               }
+               };
+          case 'removeUser': 
+               return {
+                    ...state,
+                    userEmail: '',
+               };
           case 'chooseRecord':
                return {
                     ...state,

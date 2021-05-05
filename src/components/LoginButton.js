@@ -9,16 +9,22 @@ const LoginButton = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
+            console.log("It's authenticated!")
             recordsDispatch({type: 'setUser', payload: user.email})
         }
-    }, [isAuthenticated, user]);
+    }, []);
+
+    const logOutUser = () => {
+        recordsDispatch({type: 'removeUser'})
+        logout({ returnTo: window.location.origin })
+    }
 
     if (isLoading) {
         return <div>Loading ...</div>
     } if (!isAuthenticated) {
         return <Button onClick={() => loginWithRedirect({ appState: { targetUrl: "/profile" } })}>Login</Button>
     } if (isAuthenticated) {
-        return <Button onClick={() => logout({ returnTo: window.location.origin })}>Logout</Button>
+        return <Button onClick={logOutUser}>Logout</Button>
     }
 };
 

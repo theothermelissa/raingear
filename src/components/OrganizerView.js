@@ -22,6 +22,7 @@ const OrganizerView = () => {
         totalPrice: "totalPrice",
         status: "status",
         date: "date",
+        recordID: 1
     },{
         supporterName: "supporterName2",
         supporterPhone: "supporterPhone2",
@@ -35,6 +36,7 @@ const OrganizerView = () => {
         totalPrice: "totalPrice2",
         status: "status2",
         date: "date2",
+        recordID: 2
     }];
 
     const setHovered = (id) => {

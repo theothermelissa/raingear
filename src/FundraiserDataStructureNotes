@@ -1,0 +1,52 @@
+fundraiserDetails: [
+    {
+        - role
+        - fundraiserID
+        - organization
+        - organizerPhoneNumber
+        - organizerEmail
+        - organizerFirstName
+        - organizerLastName
+        - products
+        - allSellersTotalRaised
+        - deliveryDate
+        - deliveryAddress
+        - sellerDetails: [
+            {
+                - sellerID
+                - guardianID
+                - sellersOrders
+                - totalOrderCount
+                - sellerTotalSalesVolume
+                - supporters
+                - orderFormLink
+                - userName
+                - orders: [
+                    {
+                        - orderID
+                        - date
+                        - supporterFirstName
+                        - supporterLastName
+                        - supporterEmail
+                        - supporterPhone
+                        - buttQty
+                        - hamQty
+                        - turkeyQty
+                        - sauceQty
+                        - buttPrice
+                        - hamPrice
+                        - turkeyPrice
+                        - saucePrice
+                        - totalPrice
+                        - status
+                        - supporterAddress
+                        - supporterCity
+                        - supporterState
+                        - supporterZip
+                    }
+                ]
+            }
+        ]
+        
+    }
+]
