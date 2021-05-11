@@ -3,7 +3,7 @@ const recordsReducer = (state, action) => {
           case 'setRecords':
                return {
                     ...state,
-                    allRecords: action.payload,
+                    records: action.payload,
                };
           case 'setUser': 
                return {
