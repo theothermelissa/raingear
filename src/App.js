@@ -19,7 +19,9 @@ import ProtectedRoute from './auth/protected-route';
 import { useAuth0 } from '@auth0/auth0-react';
 import userEvent from '@testing-library/user-event';
 
-export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
+export const base = new Airtable({
+  apiKey: process.env.REACT_APP_AIRTABLE_API_KEY
+}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
@@ -36,29 +38,13 @@ const initialState = {
   records: [],
 };
 
-
-
 function App() {
   const [fundraisers, setFundraisers] = useState([]);
   const [userData, setUserData] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-  const [usersFundraisers, setUsersFundraisers] = useState('');
+  const [usersFundraisers, setUsersFundraisers] = useState([]);
 
   const {user, isAuthenticated} = useAuth0();
-
-  // login page
-  // is registered user?
-    // no -- "denied" page
-    // yes -- find record in Users table. use linked fields to determine whether they have more than one role
-      // no -- add role-specific data to app state and display it on their "user home" page
-      // yes -- add role-specific data for all roles to app state, and redirect user to "choose fundraiser" page
-        // for provider user, displayed records are fundraisers
-        // for organizer, displayed records are orders and sellers and fundraiser details
-        // for seller guardians, displayed records are guardian's seller(s) and their orders and fundraiser details
-        // for sellers, displayed records are their own orders and fundraiser details
-  // display calendar view with role-specific data in /calendar route
-  
-  // if (isAuthenticated) {console.log("user['email']: ", user['email'])};
 
   useEffect( () => { 
     if (recordsState["recordHasChanged"]) {
@@ -120,25 +106,40 @@ function App() {
       getFundraiserData(userData);
     }
   }, [userData]);
+  
+  useEffect(() => {
+    if(usersFundraisers[0]) {
+      getDataToDisplay(usersFundraisers);
+    }
+  }, [usersFundraisers]);
 
-
-
+  const getDataToDisplay = (fundraisers ) => {
+    //loop through list of fundraisers
+    //for each 'organizer' one, do organizer-like things
+    //for each 'seller' one, do seller-like things
+    //for each 'guardian' one, do guardian-like things
+    //for each 'provider' one, do provider-like things
+  }
+  
   const getFundraiserData = (user) => {
-    // takes in user's record data
-    // let usersFundraisers = [{role: 'userRole', id: 'fundraiserID'}, {role: 'userRole', id: 'fundraiserID'}]
     // func getUserSpecificFields = (recordID, role) => switch (role) { case role: theStuffYouNeedForThatRole }
-    // 
     // let userRolesInFundraisers = [];
+    let workingFundraiserList = [];
+    
     const addElementToArray = (array, element) => {
-      let newArray = [...array, element]
-      console.log('newArray: ', newArray);
-      return newArray;
+      workingFundraiserList = [...array, element]
+      console.log('array: ', array);
+      console.log('workingFundraiserList: ', workingFundraiserList);
+      return workingFundraiserList;
     };
+
     const getRecordsList = (record, field) => record.get(field);
+
     const createRoleRecord = (role, id) => {
       let roleRecord = {"role": role, "id": id}
       return roleRecord;
     };
+    
     const getUserSpecificData = (role) => {
       switch (role) {
         case 'seller':
@@ -150,87 +151,30 @@ function App() {
       }
     }
     let sellerFundraiserRecords = getRecordsList(user, 'RecordID (from Fundraiser) (from sellerRecords)');
-    // let sellerFundraiserRecords = user.get('RecordID (from Fundraiser) (from sellerRecords)');
     console.log("sellerFundraiserRecords: ", sellerFundraiserRecords);
-    sellerFundraiserRecords.forEach((id) => {
-      let recordToAdd = createRoleRecord("seller", id);
-      console.log("recordToAdd: ", recordToAdd);
-      setUsersFundraisers(addElementToArray(usersFundraisers, recordToAdd));
-      // getUserSpecificData('organizer');
-      // base('Fundraisers').find(id, function(err, record) {
-      //   if (err) { console.error(err); return; }
-      //   let sellerTailoredFields = {
-      //     "role": "seller",
-      //     "fundraiserID": id,
-      //     "organization": record.fields.organization,
-      //     "organizerPhoneNumber": record.fields.contactPhoneNumber,
-      //     "organizerEmail": record.fields.contactEmail,
-      //     "organizerFirstName": record.fields.contactFirstName,
-      //     "organizerLastName": record.fields.contactLastName,
-      //     "products": record.fields.products,
-      //     "allSellersTotalRaised": record.fields.organizationProceeds,
-      //     "deliveryDate": record.fields.deliveryDate,
-      //     "deliveryAddress": record.fields.deliveryAddress,
-      //     "sellerDetails": [{
-      //       "sellerID": user.id,
-      //       "guardianID": userData.fields.sellerGuardian,
-      //       "totalOrderCount": userData.fields["Total Orders"],
-      //       "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
-      //       "supporters": userData.fields.Supporters,
-      //       "orderFormLink": userData.fields["Link to Order from This Seller"],
-      //       "userName": userData.fields.Nickname,
-      //       "orders": userData.fields.Orders
-      //     }],
-      //   }
-      //   console.log("sellerTailoredFields: ", sellerTailoredFields);
-      //   setUsersFundraisers(addElementToArray(usersFundraisers, sellerTailoredFields))
-      //   // result.push(sellerTailoredFields);
-      //   // console.log('array complete')
-      // });
-    });
-    // let organizerRecords = user.get('organizerRecords');
-    // console.log("organizerRecords: ", organizerRecords);
-    // organizerRecords.forEach((id) => {
-    //   base('Fundraisers').find(id, function(err, record) {
-    //     if (err) { console.error(err); return; }
-    //     let organizerTailoredFields = {
-    //       "role": "organizer",
-    //       "fundraiserID": id,
-    //       "organization": record.fields.organization,
-    //       "organizerPhoneNumber": record.fields.contactPhoneNumber,
-    //       "organizerEmail": record.fields.contactEmail,
-    //       "organizerFirstName": record.fields.contactFirstName,
-    //       "organizerLastName": record.fields.contactLastName,
-    //       "products": record.fields.products,
-    //       "allSellersTotalRaised": record.fields.organizationProceeds,
-    //       "deliveryDate": record.fields.deliveryDate,
-    //       "deliveryAddress": record.fields.deliveryAddress,
-    //       // "sellerDetails": getSellerRecords();
-    //       // "sellerDetails": [{
-    //       //   "sellerID": user.id,
-    //       //   "guardianID": userData.fields.sellerGuardian,
-    //       //   "totalOrderCount": userData.fields["Total Orders"],
-    //       //   "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
-    //       //   "supporters": userData.fields.Supporters,
-    //       //   "orderFormLink": userData.fields["Link to Order from This Seller"],
-    //       //   "userName": userData.fields.Nickname,
-    //       //   "orders": userData.fields.Orders
-    //       // }],
-    //     }
-    //     console.log("organizerTailoredFields: ", organizerTailoredFields);
-    //     setUsersFundraisers(addElementToArray(usersFundraisers, organizerTailoredFields))
-    //     // result.push(sellerTailoredFields);
-    //     // console.log('array complete')
-    //   });
-    // });
-    // console.log('usersFundraisers: ', usersFundraisers);
+    if (sellerFundraiserRecords) {
+      sellerFundraiserRecords.forEach((id) => {
+        let recordToAdd = createRoleRecord("seller", id);
+        console.log("seller recordToAdd: ", recordToAdd);
+        addElementToArray(workingFundraiserList, recordToAdd);
+        
+      });}
+    let organizerRecords = getRecordsList(user, 'organizerRecords');
+    console.log('organizerRecords: ', organizerRecords);
+    if (organizerRecords) {
+    organizerRecords.forEach((id) => {
+      let recordToAdd = createRoleRecord("organizer", id);
+      console.log("organizer recordToAdd: ", recordToAdd);
+      addElementToArray(workingFundraiserList, recordToAdd);
+    
+      });
+    }
+    setUsersFundraisers(workingFundraiserList);
   }
 
-    // SellerFundraiser? ? add SellerFundraiser, fundraiser details, orders : don't
-    // GuardianFundraiser ? add SellerGuardianFundraiser, fundraiser details, seller w/ orders, other sellers w/ orthers : don't
-    // OrganizerFundraiser ? add OrganizerFundraiser, all sellers, all orders : don't
-    //
-  // };
+  
+
+
 
 
   return (
@@ -260,3 +204,87 @@ function App() {
 }
 
 export default withRouter(App);
+
+  // login page
+  // is registered user?
+    // no -- "denied" page
+    // yes -- find record in Users table. use linked fields to determine whether they have more than one role
+      // no -- add role-specific data to app state and display it on their "user home" page
+      // yes -- add role-specific data for all roles to app state, and redirect user to "choose fundraiser" page
+        // for provider user, displayed records are fundraisers
+        // for organizer, displayed records are orders and sellers and fundraiser details
+        // for seller guardians, displayed records are guardian's seller(s) and their orders and fundraiser details
+        // for sellers, displayed records are their own orders and fundraiser details
+  // display calendar view with role-specific data in /calendar route
+
+      // SellerFundraiser? ? add SellerFundraiser, fundraiser details, orders : don't
+    // GuardianFundraiser ? add SellerGuardianFundraiser, fundraiser details, seller w/ orders, other sellers w/ orthers : don't
+    // OrganizerFundraiser ? add OrganizerFundraiser, all sellers, all orders : don't
+    //
+  // };
+  
+  // if (isAuthenticated) {console.log("user['email']: ", user['email'])};
+
+// getUserSpecificData('organizer');
+        // base('Fundraisers').find(id, function(err, record) {
+        //   if (err) { console.error(err); return; }
+        //   let sellerTailoredFields = {
+        //     "role": "seller",
+        //     "fundraiserID": id,
+        //     "organization": record.fields.organization,
+        //     "organizerPhoneNumber": record.fields.contactPhoneNumber,
+        //     "organizerEmail": record.fields.contactEmail,
+        //     "organizerFirstName": record.fields.contactFirstName,
+        //     "organizerLastName": record.fields.contactLastName,
+        //     "products": record.fields.products,
+        //     "allSellersTotalRaised": record.fields.organizationProceeds,
+        //     "deliveryDate": record.fields.deliveryDate,
+        //     "deliveryAddress": record.fields.deliveryAddress,
+        //     "sellerDetails": [{
+        //       "sellerID": user.id,
+        //       "guardianID": userData.fields.sellerGuardian,
+        //       "totalOrderCount": userData.fields["Total Orders"],
+        //       "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
+        //       "supporters": userData.fields.Supporters,
+        //       "orderFormLink": userData.fields["Link to Order from This Seller"],
+        //       "userName": userData.fields.Nickname,
+        //       "orders": userData.fields.Orders
+        //     }],
+        //   }
+        //   console.log("sellerTailoredFields: ", sellerTailoredFields);
+        //   setUsersFundraisers(addElementToArray(usersFundraisers, sellerTailoredFields))
+        //   // result.push(sellerTailoredFields);
+        //   // console.log('array complete')
+        // });
+
+        //   base('Fundraisers').find(id, function(err, record) {
+        //     if (err) { console.error(err); return; }
+        //     let organizerTailoredFields = {
+        //       "role": "organizer",
+        //       "fundraiserID": id,
+        //       "organization": record.fields.organization,
+        //       "organizerPhoneNumber": record.fields.contactPhoneNumber,
+        //       "organizerEmail": record.fields.contactEmail,
+        //       "organizerFirstName": record.fields.contactFirstName,
+        //       "organizerLastName": record.fields.contactLastName,
+        //       "products": record.fields.products,
+        //       "allSellersTotalRaised": record.fields.organizationProceeds,
+        //       "deliveryDate": record.fields.deliveryDate,
+        //       "deliveryAddress": record.fields.deliveryAddress,
+        //       // "sellerDetails": getSellerRecords();
+        //       // "sellerDetails": [{
+        //       //   "sellerID": user.id,
+        //       //   "guardianID": userData.fields.sellerGuardian,
+        //       //   "totalOrderCount": userData.fields["Total Orders"],
+        //       //   "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
+        //       //   "supporters": userData.fields.Supporters,
+        //       //   "orderFormLink": userData.fields["Link to Order from This Seller"],
+        //       //   "userName": userData.fields.Nickname,
+        //       //   "orders": userData.fields.Orders
+        //       // }],
+        //     }
+        //     console.log("organizerTailoredFields: ", organizerTailoredFields);
+        //     setUsersFundraisers(addElementToArray(usersFundraisers, organizerTailoredFields))
+        //     // result.push(sellerTailoredFields);
+        //     // console.log('array complete')
+        //   });
