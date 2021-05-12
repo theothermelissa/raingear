@@ -42,7 +42,8 @@ function App() {
   const [fundraisers, setFundraisers] = useState([]);
   const [userData, setUserData] = useState([]);
   const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-  const [usersFundraisers, setUsersFundraisers] = useState([]);
+  const [usersFundraisersIndex, setUsersFundraisersIndex] = useState([]);
+  const [recordsToDisplay, setRecordsToDisplay] = useState([]);
 
   const {user, isAuthenticated} = useAuth0();
 
@@ -108,10 +109,10 @@ function App() {
   }, [userData]);
   
   useEffect(() => {
-    if(usersFundraisers[0]) {
-      getDataToDisplay(usersFundraisers);
+    if(usersFundraisersIndex[0]) {
+      getDataToDisplay(usersFundraisersIndex);
     }
-  }, [usersFundraisers]);
+  }, [usersFundraisersIndex]);
 
   const getDataToDisplay = (fundraisers ) => {
     //loop through list of fundraisers
@@ -140,10 +141,38 @@ function App() {
       return roleRecord;
     };
     
-    const getUserSpecificData = (role) => {
+    const getUserSpecificData = (role, id) => {
       switch (role) {
         case 'seller':
-          console.log("seller");
+          base('Fundraisers').find(id, function(err, record) {
+            if (err) { console.error(err); return; }
+            let sellerTailoredFields = {
+              "role": "seller",
+              "fundraiserID": id,
+              "organization": record.fields.organization,
+              "organizerPhoneNumber": record.fields.contactPhoneNumber,
+              "organizerEmail": record.fields.contactEmail,
+              "organizerFirstName": record.fields.contactFirstName,
+              "organizerLastName": record.fields.contactLastName,
+              "products": record.fields.products,
+              "allSellersTotalRaised": record.fields.organizationProceeds,
+              "deliveryDate": record.fields.deliveryDate,
+              "deliveryAddress": record.fields.deliveryAddress,
+              "sellerDetails": [{
+                "sellerID": user.id,
+                "guardianID": userData.fields.sellerGuardian,
+                "totalOrderCount": userData.fields["Total Orders"],
+                "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
+                "supporters": userData.fields.Supporters,
+                "orderFormLink": userData.fields["Link to Order from This Seller"],
+                "userName": userData.fields.Nickname,
+                "orders": userData.fields.Orders
+              }],
+            }
+            console.log("sellerTailoredFields: ", sellerTailoredFields);
+            // result.push(sellerTailoredFields);
+            // console.log('array complete')
+          });
         case 'organizer':
           console.log("organizer");
         case 'supplier':
@@ -157,7 +186,7 @@ function App() {
         let recordToAdd = createRoleRecord("seller", id);
         console.log("seller recordToAdd: ", recordToAdd);
         addElementToArray(workingFundraiserList, recordToAdd);
-        
+        getUserSpecificData("seller", id);
       });}
     let organizerRecords = getRecordsList(user, 'organizerRecords');
     console.log('organizerRecords: ', organizerRecords);
@@ -169,7 +198,7 @@ function App() {
     
       });
     }
-    setUsersFundraisers(workingFundraiserList);
+    setUsersFundraisersIndex(workingFundraiserList);
   }
 
   
@@ -197,7 +226,7 @@ function App() {
           <ProtectedRoute path="/orgView" component={OrganizerView} />
         </Switch> */}
         {/* {userData.id && <div>Here is the data: {JSON.stringify(userData)}</div>} */}
-        {usersFundraisers && <div>Here is the data: {JSON.stringify(usersFundraisers)}</div>}
+        {usersFundraisersIndex && <div>Here is the data: {JSON.stringify(usersFundraisersIndex)}</div>}
       </Router>
     </RecordsContext.Provider>
   );
@@ -226,36 +255,7 @@ export default withRouter(App);
   // if (isAuthenticated) {console.log("user['email']: ", user['email'])};
 
 // getUserSpecificData('organizer');
-        // base('Fundraisers').find(id, function(err, record) {
-        //   if (err) { console.error(err); return; }
-        //   let sellerTailoredFields = {
-        //     "role": "seller",
-        //     "fundraiserID": id,
-        //     "organization": record.fields.organization,
-        //     "organizerPhoneNumber": record.fields.contactPhoneNumber,
-        //     "organizerEmail": record.fields.contactEmail,
-        //     "organizerFirstName": record.fields.contactFirstName,
-        //     "organizerLastName": record.fields.contactLastName,
-        //     "products": record.fields.products,
-        //     "allSellersTotalRaised": record.fields.organizationProceeds,
-        //     "deliveryDate": record.fields.deliveryDate,
-        //     "deliveryAddress": record.fields.deliveryAddress,
-        //     "sellerDetails": [{
-        //       "sellerID": user.id,
-        //       "guardianID": userData.fields.sellerGuardian,
-        //       "totalOrderCount": userData.fields["Total Orders"],
-        //       "sellerTotalSalesVolume": userData.fields["Total Sales Volume"],
-        //       "supporters": userData.fields.Supporters,
-        //       "orderFormLink": userData.fields["Link to Order from This Seller"],
-        //       "userName": userData.fields.Nickname,
-        //       "orders": userData.fields.Orders
-        //     }],
-        //   }
-        //   console.log("sellerTailoredFields: ", sellerTailoredFields);
-        //   setUsersFundraisers(addElementToArray(usersFundraisers, sellerTailoredFields))
-        //   // result.push(sellerTailoredFields);
-        //   // console.log('array complete')
-        // });
+        
 
         //   base('Fundraisers').find(id, function(err, record) {
         //     if (err) { console.error(err); return; }
@@ -284,7 +284,7 @@ export default withRouter(App);
         //       // }],
         //     }
         //     console.log("organizerTailoredFields: ", organizerTailoredFields);
-        //     setUsersFundraisers(addElementToArray(usersFundraisers, organizerTailoredFields))
+        //     setUsersFundraisersIndex(addElementToArray(usersFundraisersIndex, organizerTailoredFields))
         //     // result.push(sellerTailoredFields);
         //     // console.log('array complete')
         //   });
