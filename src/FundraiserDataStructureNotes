@@ -13,7 +13,7 @@ fundraiserDetails: [
         - deliveryAddress
         - sellerDetails: [
             {
-                - sellerID
+                - recordID
                 - guardianID
                 - sellersOrders
                 - totalOrderCount
