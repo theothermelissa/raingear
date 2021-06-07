@@ -13,7 +13,7 @@ import OrganizerView from './components/OrganizerView';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
 import userEvent from '@testing-library/user-event';
-import {getFundraiserFields} from './components/getRecordsFunctions';
+import {getFundraiserFields, getRoleSpecificOrderFields, getRoleSpecificSellerFields} from './components/getRecordsFunctions';
 import {addRecordToArray} from './components/getRecordsFunctions';
 import {chooseTable} from './components/getRecordsFunctions';
 import {getRecordType} from './components/getRecordsFunctions';
@@ -54,7 +54,7 @@ function App() {
 
     const {user, isAuthenticated} = useAuth0();
     
-    // gets & save user's userRecord based on their email
+    // gets & save user's userRecord with fundraiserIDs using their email
     useEffect(() => {
         if (isAuthenticated && !userRecord) {
             base('Users').select({
@@ -63,11 +63,15 @@ function App() {
                 }"`
             }).eachPage(function page(records, fetchNextPage) {
                 records.forEach(function (record) {
-                    let roleList = arrayify(record.fields["userRoles"]);
-                    let roleInfo = roleList.map((role) => ({"role": role, "fundraiserID": "pending"}));
+                    let fundraiserList = arrayify(record.fields.allFundraisers)
+                    let roleInfo = fundraiserList.map((role) => ({
+                        "role": "pending",
+                        "fundraiserID": "pending",
+                        "fundraiserName": role
+                    }));
                     setUserRecord({
                         ... record.fields,
-                        "userRoles": roleList,
+                        // "userRoles": roleList,
                         "roleInfo": roleInfo,
                     });
                     // console.log("record.fields: ", record.fields);
@@ -84,44 +88,29 @@ function App() {
     }, [isAuthenticated])
 
 
-    // if they are a provider, retrieve and display all fundraisers in the Provider View
-
-    //sets fundraisersToDisplay
+    //fleshes out userRecord's fundraisers with info from sellers & orders
     useEffect(() => {
-        if (userRecord.Email) {
+        // fetches fundraisers from fundraisers table, updates fundraiserID & role
+        if (userRecord.Email && !whichDataIsLoaded) {
             const fundraisersToGet = arrayify(userRecord.allFundraisers);
-            let createFilterFormula = (recordsList) => {
-                let stringToReturn;
-                let stringOpen = 'OR({fundraiserName}="';
-                let stringClose = '")';
-                let orSequence = recordsList.join('", {fundraiserName}="');
-                stringToReturn = stringOpen + orSequence + stringClose;
-                return stringToReturn;
-            }
             base("Fundraisers")
             .select({
-                filterByFormula: createFilterFormula(fundraisersToGet, "recordID"),
+                filterByFormula: createFilterFormula(fundraisersToGet, "fundraiserName"),
                 fields: getFundraiserFields(),
             })
             .eachPage(function page(records, fetchNextPage) {
-                //     // loop through user's fundraisers, save all data =>
-                    // let dataToReturn;
-                    records.map((record) => {
-                        const { fields: { recordID: id } } = record;
-                        let allFundraiserFields = record.fields;
+                    records.map((fundraiser) => {
+                        const { id, fields: { fundraiserName } } = fundraiser;
+                        let allFundraiserFields = fundraiser.fields;
                         let usersRoleInThisFundraiser = getRecordType(id, userRecord);
-                        // console.log("usersRoleInThisFundraiser: ", usersRoleInThisFundraiser);
-                        // let updatedRoleInfo = userRecord.roleInfo;
-                        let indexOfThisFundraiserInUserRecordRoleInfo = () => userRecord.roleInfo.findIndex((fundraiser) => fundraiser.fundraiserID === id);
-                        console.log("indexOfThisFundraiserInUserRecordRoleInfo(): ", indexOfThisFundraiserInUserRecordRoleInfo());
-                        let indexOfThisFundraiserRole = () => userRecord.roleInfo.findIndex((record) => record.role === usersRoleInThisFundraiser);
-                        userRecord.roleInfo.splice(indexOfThisFundraiserRole(), 1, ({
-                            ...userRecord.roleInfo[indexOfThisFundraiserRole()],
-                            "fundraiserID": record.fields.recordID,
+                        let updatedRoleInfo = userRecord.roleInfo;
+                        let indexOfThisFundraiserInUserRecordRoleInfo = () => userRecord.roleInfo.findIndex((fundraiser) => fundraiser["fundraiserName"] === fundraiserName);
+                        updatedRoleInfo.splice(indexOfThisFundraiserInUserRecordRoleInfo(), 1, ({
+                            ...updatedRoleInfo[indexOfThisFundraiserInUserRecordRoleInfo()],
+                            "fundraiserID": id,
+                            "role": usersRoleInThisFundraiser,
                             "fields": allFundraiserFields,
                         }));
-                        // setUserRecord(updatedRoleInfo);
-                        // return dataToReturn;
                     })
                     fetchNextPage();
                 }, function done(err) {
@@ -130,215 +119,109 @@ function App() {
                     }
                     setWhichDataIsLoaded("fundraisers");
                 });
-        } 
-    }, [userRecord]);
-
-    useEffect(() => {
-        if (userRecord.roleInfo) {
-            if (whichDataIsLoaded === "fundraisers") {
-                userRecord.roleInfo.map((fundraiser) => {
-                    //
-
-                    // if user is a seller, get this seller's seller record
-                    // if user is an organizer, get all sellers' records
-                    const { role, fundraiserID: id, fields: { sellers: allSellersInThisFundraiser} } = fundraiser;
-                    const { organizerRecords, sellerRecords: thisUsersSellerRecords } = userRecord;
+        } else if (whichDataIsLoaded === "fundraisers") {
+            userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
+                const { role } = fundraiser;
+                // gets seller records
+                if (role !== "pending") {
+                    const { fields: { sellerGuardians, sellers: allSellersInThisFundraiser } } = fundraiser;
+                    const allUsersSellerIDs = userRecord["sellerRecords"];
+                    console.log("sellerGuardians: ", sellerGuardians);
                     const sellersToGet = () => {
-                        let result;
-                        switch (role ) {
-                            case "organizer": result = allSellersInThisFundraiser;
-                                break;
-                            case "seller": result = thisUsersSellerRecords;
-                                break;
-                            default: result = ("");
+                        if (role === "seller" && allUsersSellerIDs) {
+                                return createFilterFormula(allUsersSellerIDs, "recordID");
+                        } else if (role === "organizer" && allSellersInThisFundraiser) {
+                            return createFilterFormula(allSellersInThisFundraiser, "recordID");
+                        } else if (role === "organizer" && !allSellersInThisFundraiser) {
+                            return `IF({recordID} != "")`
+                        } else {
+                            return `IF({recordID} = "")`;
                         };
-                        return result;
-                    }
-                    const filterFormula = createFilterFormula(sellersToGet(), "recordID");
-                    base("Sellers").select({
-                        filterByFormula: filterFormula
+                    };
+                    console.log("sellersToGet(): ", sellersToGet());
+                    base("Sellers")
+                    .select({
+                        filterByFormula: sellersToGet(),
+                        fields: getRoleSpecificSellerFields(role),
                     })
-                    .eachPage(function page(records, fetchNextPage) {
-                        records.forEach((record) => {
-                            let allFields = record.fields;
-                            console.log("allFields: ", allFields);
-                            // let indexOfThisFundraiserRole = () => userRecord.roleInfo.findIndex((record) => record.role)
-                        })
+                    .eachPage(function page(sellerRecords, fetchNextPage) {
+                            sellerRecords.forEach((seller, sellerIndex) => {
+                                let updatedUserRecord = userRecord;
+                                const { id, fields } = seller;
+                                updatedUserRecord.roleInfo[fundraiserIndex]["fields"]["sellers"].splice(sellerIndex, 1, (
+                                    {
+                                        "id": id,
+                                        "fields": fields,
+                                    }
+                                ))
+                                setUserRecord({...updatedUserRecord});
+                            })
                         fetchNextPage();
                     }, function done(err) {
                         if (err) {
-                            console.error(err); return;
+                            console.error(err); return
                         }
-                        // setWhichDataIsLoaded("sellers");
-                    })
-                })
-            }
-        }
-    }, [whichDataIsLoaded, userRecord]);
-
-    // useEffect(() => {
-    //     if (userRecord.fields) {
-    //         // console.log("whichDataIsLoaded: ", whichDataIsLoaded);
-    //         if (!whichDataIsLoaded) {
-    //             const fundraisersToGet = arrayify(userRecord.fields.allFundraisers);
-    //             let createFilterFormula = (recordsList) => {
-    //                 let stringToReturn;
-    //                 let stringOpen = 'OR({fundraiserName}="';
-    //                 let stringClose = '")';
-    //                 let orSequence = recordsList.join('", {fundraiserName}="');
-    //                 stringToReturn = stringOpen + orSequence + stringClose;
-    //                 return stringToReturn;
-    //             }
-    //             let userRoleList = [];
-    //             base("Fundraisers")
-    //                 .select({
-    //                     filterByFormula: createFilterFormula(fundraisersToGet),
-    //                     // fields: getFundraiserFields(role),
-    //                 })
-    //                 .eachPage(function page(records, fetchNextPage) {
-    //                     setFundraisers(records.map((record) => {
-    //                         let fieldsToReturn;
-    //                         let allFields = record.fields;
-    //                         let role = getRecordType(record.fields.recordID, userRecord.fields);
-    //                         userRoleList = addRecordToArray({"role": role, "fundraiser": allFields.recordID, }, userRoleList);
-    //                         if (role === "organizer") {
-    //                             fieldsToReturn = {
-    //                                 "role": role,
-    //                                 "fundraiserName": allFields.fundraiserName,
-    //                                 "status": allFields.status,
-    //                                 "organization": allFields.organization,
-    //                                 "deliveryDate": allFields.deliveryDate,
-    //                                 "deliveryAddress": allFields.deliveryAddress,
-    //                                 "deliveryCity": allFields.deliveryCity,
-    //                                 "deliveryState": allFields.deliveryState,
-    //                                 "deliveryZip": allFields.deliveryZip,
-    //                                 "deliveryNotes": allFields.deliveryNotes,
-    //                                 "products": allFields.products,
-    //                                 "customerButtPrice": allFields.customerButtPrice,
-    //                                 "customerHamPrice": allFields.customerHamPrice,
-    //                                 "customerTurkeyPrice": allFields.customerTurkeyPrice,
-    //                                 "customerSaucePrice": allFields.customerSaucePrice,
-    //                                 "orders": allFields.orders,
-    //                                 "contactFirstName": allFields.contactFirstName,
-    //                                 "contactLastName": allFields.contactLastName,
-    //                                 "contactEmail": allFields.contactEmail,
-    //                                 "contactPhone": allFields.contactPhone,
-    //                                 "recordID": allFields.recordID,
-    //                                 "sellers": allFields.sellers,
-    //                                 "orderCount": allFields.orderCount,
-    //                                 "inviteSellersURL": allFields.inviteSellersURL,
-    //                                 "sellerGuardians": allFields.sellerGuardians,
-    //                                 "buttCount": allFields.buttCount,
-    //                                 "hamCount": allFields.hamCount,
-    //                                 "turkeyCount": allFields.turkeyCount,
-    //                                 "sauceCount": allFields.sauceCount,
-    //                                 "organizationProceeds": allFields.organizationProceeds,
-    //                             };
-    //                         } if (role === "seller") {
-    //                             fieldsToReturn = {
-    //                                 "role": role,
-    //                                 "fundraiserName": allFields.fundraiserName,
-    //                                 "organization": allFields.organization,
-    //                                 "deliveryDate": allFields.deliveryDate,
-    //                                 "deliveryAddress": allFields.deliveryAddress,
-    //                                 "deliveryCity": allFields.deliveryCity,
-    //                                 "deliveryState": allFields.deliveryState,
-    //                                 "deliveryZip": allFields.deliveryZip,
-    //                                 "deliveryNotes": allFields.deliveryNotes,
-    //                                 "products": allFields.products,
-    //                                 "customerButtPrice": allFields.customerButtPrice,
-    //                                 "customerHamPrice": allFields.customerHamPrice,
-    //                                 "customerTurkeyPrice": allFields.customerTurkeyPrice,
-    //                                 "customerSaucePrice": allFields.customerSaucePrice,
-    //                                 "orders": allFields.orders,
-    //                                 "contactFirstName": allFields.contactFirstName,
-    //                                 "contactLastName": allFields.contactLastName,
-    //                                 "contactEmail": allFields.contactEmail,
-    //                                 "contactPhone": allFields.contactPhone,
-    //                                 "recordID": allFields.recordID,
-    //                                 "sellers": allFields.sellers,
-    //                                 "orderCount": allFields.orderCount,
-    //                                 "inviteSellersURL": allFields.inviteSellersURL,
-    //                                 "sellerGuardians": allFields.sellerGuardians,
-    //                                 "buttCount": allFields.buttCount,
-    //                                 "hamCount": allFields.hamCount,
-    //                                 "turkeyCount": allFields.turkeyCount,
-    //                                 "sauceCount": allFields.sauceCount,
-    //                                 "organizationProceeds": allFields.organizationProceeds,
-    //                             };
-    //                         }
-    //                         return fieldsToReturn;
-    //                     }));
-    //                     fetchNextPage();
-    //                 }, function done(err) {
-    //                     if (err) {
-    //                         console.error(err); return
-    //                     }
-    //                     setUserRoles(userRoleList);
-    //                     setWhichDataIsLoaded("fundraisers");
-    //                 });
-    //         } 
+                        setWhichDataIsLoaded("sellers");
+                    });
+                }
+            })
             
-    //         // if (whichDataIsLoaded === 'fundraisers') {
-    //             // console.log("userRoles: ", userRoles);
-    //             // let createFilterFormula = (recordsList) => {
-    //             //     let stringToReturn;
-    //             //     let stringOpen = 'OR({recordID}="';
-    //             //     let stringClose = '")';
-    //             //     let orSequence = recordsList.join('", {recordID}="');
-    //             //     stringToReturn = stringOpen + orSequence + stringClose;
-    //             //     return stringToReturn;
-    //             // }
-    //             // userRoles.map((fundraiser) => {
-    //             //     const { role, fundraiser: id } = fundraiser;
-    //             //     //if they are a seller in this fundraiser
-    //             //     if (role === "seller") {
-    //             //         if (whichDataIsLoaded === "fundraisers") {
-    //             //             const sellersToGet = [... userRecord.fields["sellerRecords"]];
-    //             //             base("Sellers")
-    //             //                 .select({
-    //             //                     filterByFormula: createFilterFormula(sellersToGet, "recordID"),
-    //             //                 })
-    //             //                 .eachPage(function page(records, fetchNextPage) {
-    //             //                     records.forEach(function (record) {
-    //             //                         let allFields = record.fields;
-    //             //                         const thisFundraisersIndex = () => fundraisers.findIndex((fundraiser) => fundraiser.recordID === id);
-    //             //                         let sellersIndex = fundraisers[thisFundraisersIndex()]["sellers"].indexOf(anyOfThese(sellersToGet));
-    //             //                         let fundraiserToReplace = fundraisers[thisFundraisersIndex()];
-    //             //                         let replaceFundraiserSellerData = () => {
-    //             //                             let updatedSellerList = fundraiserToReplace["sellers"];
-    //             //                             updatedSellerList.splice(sellersIndex, 1, allFields);
-    //             //                             let newFundraiser = fundraiserToReplace;
-    //             //                             newFundraiser["sellers"] = updatedSellerList;
-    //             //                             return newFundraiser;
-    //             //                         };
-    //             //                         let replaceFundraiser = () => {
-    //             //                             let newFundraiserList = fundraisers;
-    //             //                             newFundraiserList.splice(thisFundraisersIndex, 1, replaceFundraiserSellerData());
-    //             //                             return newFundraiserList;
-    //             //                         };
-    //             //                         setFundraisers(replaceFundraiser());
-    //             //                     })
-    //             //                     fetchNextPage();
-    //             //                 }, function done(err) {
-    //             //                     if (err) {
-    //             //                         console.error(err); return
-    //             //                     }
-    //             //                     setWhichDataIsLoaded("sellers");
-    //             //                 })
-    //             //         } 
-    //             //         if (whichDataIsLoaded === "sellers") {
-    //             //             const ordersToGet = userRecord.fields;
-    //             //             console.log("ordersToGet: ", ordersToGet);
-    //             //         }
-    //             //     }
-    //             //     // if (role === "organizer") {
-    //             //     //     console.log("This person works too hard.")
-    //             //     // }
-    //             // });
-    //         // } 
-    //     }
-    // }, [userRecord, whichDataIsLoaded, userRoles]);
+        } else if (whichDataIsLoaded === "sellers") {
+            userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
+                const { role, fields: fundraiserFields } = fundraiser;
+                if (role !== "pending") {
+                    const { sellers } = fundraiserFields;
+                    if (sellers) {
+                        sellers.map((seller, sellerIndex)=> {
+                            const { fields: sellerFields } = seller;
+                            if (sellerFields) {
+                                const { Orders: ordersToGet } = sellerFields;
+                                const orderFilters = createFilterFormula(ordersToGet, "Order ID");
+                                base("Orders")
+                                    .select({
+                                        filterByFormula: orderFilters,
+                                        fields: getRoleSpecificOrderFields(role),
+                                    })
+                                    .eachPage(function page(orderRecords, fetchNextPage) {
+                                        orderRecords.forEach((order, orderIndex) => {
+                                            let updatedUserRecord = userRecord;
+                                            const { id, fields } = order;
+                                            updatedUserRecord
+                                                .roleInfo
+                                                [fundraiserIndex]
+                                                ["fields"]
+                                                ["sellers"]
+                                                [sellerIndex]
+                                                ["fields"]
+                                                ["Orders"]
+                                                    .splice(orderIndex, 1, (
+                                                        {
+                                                            "id": id,
+                                                            "fields": fields,
+                                                        }
+                                                    ))
+                                                setUserRecord({...updatedUserRecord});
+                                        })
+                                        fetchNextPage();
+                                    }, function done(err) {
+                                        if (err) {
+                                            console.error(err); return
+                                        }
+                                        setWhichDataIsLoaded("orders");
+                                    });
+                            }
+                        });
+                    }
+                }
+            })
+        }
+    }, [userRecord, whichDataIsLoaded]);
+
+    useEffect(() => {
+        if (whichDataIsLoaded === "orders") {
+            
+        }
+    }, [whichDataIsLoaded])
 
     return (<RecordsContext.Provider value={
         {recordsState, recordsDispatch}
@@ -356,7 +239,7 @@ function App() {
             {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
             {
             userRecord.roleInfo && <div>Here is the data: {
-                JSON.stringify(userRecord)
+                JSON.stringify(userRecord.roleInfo)
             }</div>
         } </Router>
     </RecordsContext.Provider>);

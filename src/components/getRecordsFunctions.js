@@ -87,31 +87,31 @@ export const getRoleSpecificSellerFields = (role) => {
     let result;
     switch (role) {
         case "organizer": result = [
-                "email",
+                "Email",
                 "Nickname",
                 "recordID",
-                "phone",
-                "orders",
-                "sellerGuardian",
+                "Phone",
+                "Orders",
+                "SellerGuardian",
                 "Total Orders",
                 "Total Sales Volume",
             ];
             break;
         case "guardian": result = [
-                "email",
+                "Email",
                 "Nickname",
                 "recordID",
-                "orders",
-                "sellerGuardian",
+                "Orders",
+                "SellerGuardian",
                 "Total Orders",
                 "Total Sales Volume",
             ];
             break;
         case "seller": result = [
-                "email",
+                "Email",
                 "Nickname",
                 "recordID",
-                "orders",
+                "Orders",
                 "Total Orders",
                 "Total Sales Volume",
             ];
@@ -167,7 +167,7 @@ export const addRecordToArray = (record, array) => {
 
 export const arrayify = (string) => {
     let first = string.split(', ');
-    let result = first.filter((element) => element != false);
+    let result = first.filter((element) => element !== false);
     return result;
 };
 
