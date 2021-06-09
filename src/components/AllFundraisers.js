@@ -14,7 +14,7 @@ const AllFundraisers = ({fundraisers}) => {
     const [updatedFundraisers, setUpdatedFundraisers] = useState('')
 
     const chooseRecord = (recordName) => {
-        const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
+        const chosenRecord = find(fundraisers, { fields: "status"}, matchesProperty('organization', recordName));
         recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
     }
 

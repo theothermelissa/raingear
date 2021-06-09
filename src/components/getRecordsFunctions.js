@@ -1,4 +1,4 @@
-import { base } from "../App";
+export const defaultGuardianRecord = "recuI6t9TkoTtniBs";
 
 export const getRoleSpecificOrderFields = (role) => {
     let result;
@@ -142,10 +142,11 @@ export const getFundraiserFields = () => {
         "contactEmail",
         "contactPhone",
         "recordID",
-        "sellers",
+        // "sellers",
         "orderCount",
         "inviteSellersURL",
         "sellerGuardians",
+        "status",
         "buttCount",
         "hamCount",
         "turkeyCount",
@@ -167,7 +168,7 @@ export const addRecordToArray = (record, array) => {
 
 export const arrayify = (string) => {
     let first = string.split(', ');
-    let result = first.filter((element) => element !== false);
+    let result = first.filter((element) => element !== null && element !== '');
     return result;
 };
 
@@ -177,7 +178,7 @@ export const getRecordType = (id, data) => {
         organizerRecords,
         "Fundraiser (from sellerRecords)": sellerRecords,
         "Active Fundraiser (from guardianRecords)": guardianRecords,
-        // providerRecords,
+        providerRecords,
     } = data;
     
     if (organizerRecords && organizerRecords.includes(id)) {
@@ -189,12 +190,12 @@ export const getRecordType = (id, data) => {
     if (guardianRecords && guardianRecords.includes(id)) {
         result = "guardian";
     };
-    // if (providerRecords && providerRecords.includes(id)) {
-    //     result = {
-        // "role": "provider",
-        // "id": id
-    // };
-    // };
+    if (providerRecords && providerRecords.includes(id)) {
+        result = {
+            "role": "provider",
+            "id": id
+        };
+    };
     return result;
 };
 
@@ -215,7 +216,12 @@ export const chooseTable = (recordType) => {
 };
 
 export const anyOfThese = (list) => {
-    let stringToReturn = list.join(" || ");
+    let stringToReturn;
+    if (list.length > 1 ) {
+        stringToReturn = list.join(" || ");
+    } else {
+        return list[0];
+    }
     return stringToReturn;
 }
 

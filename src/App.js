@@ -7,6 +7,7 @@ import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
+import {sortBy, find, matches, filter} from 'lodash';
 import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
 import OrganizerView from './components/OrganizerView';
@@ -20,7 +21,8 @@ import {getRecordType} from './components/getRecordsFunctions';
 import {arrayify} from './components/getRecordsFunctions';
 import {anyOfThese} from './components/getRecordsFunctions';
 import {createFilterFormula} from './components/getRecordsFunctions';
-import { indexOf, update } from 'lodash';
+import {defaultGuardianRecord} from './components/getRecordsFunctions';
+import { create, indexOf, update } from 'lodash';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
@@ -34,27 +36,21 @@ const initialState = {
     alert: '',
     recordHasChanged: false,
     hoveredID: null,
-    userEmail: '',
+    user: '',
     fundraiserToDisplay: '',
     userRole: ''
 };
 
 function App() {
     
-    const [fundraisers, setFundraisers] = useState({
-        "organizerFundraisers": [],
-        "sellerFundraisers": [],
-        "guardianFundraisers": [],
-        "providerFundraisers": [],
-    });
+    const {user, isAuthenticated} = useAuth0();
+    
     const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
     const [userRecord, setUserRecord] = useState('');
     const [whichDataIsLoaded, setWhichDataIsLoaded] = useState('');
-    // const [userRoles, setUserRoles] = useState([]);
-
-    const {user, isAuthenticated} = useAuth0();
+    const [fundraisers, setFundraisers] = useState('');
     
-    // gets & save user's userRecord with fundraiserIDs using their email
+    // get & save user's userRecord with fundraiserIDs using their email
     useEffect(() => {
         if (isAuthenticated && !userRecord) {
             base('Users').select({
@@ -74,8 +70,6 @@ function App() {
                         // "userRoles": roleList,
                         "roleInfo": roleInfo,
                     });
-                    // console.log("record.fields: ", record.fields);
-                    // console.log("roleInfo: ", roleInfo);
                 });
                 fetchNextPage();
             }, function done(err) {
@@ -85,164 +79,280 @@ function App() {
                 }
             })
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, userRecord])
 
 
-    //fleshes out userRecord's fundraisers with info from sellers & orders
+    //fetch fundraiser data for this user
     useEffect(() => {
-        // fetches fundraisers from fundraisers table, updates fundraiserID & role
-        if (userRecord.Email && !whichDataIsLoaded) {
-            const fundraisersToGet = arrayify(userRecord.allFundraisers);
-            base("Fundraisers")
-            .select({
-                filterByFormula: createFilterFormula(fundraisersToGet, "fundraiserName"),
-                fields: getFundraiserFields(),
-            })
-            .eachPage(function page(records, fetchNextPage) {
-                    records.map((fundraiser) => {
-                        const { id, fields: { fundraiserName } } = fundraiser;
-                        let allFundraiserFields = fundraiser.fields;
-                        let usersRoleInThisFundraiser = getRecordType(id, userRecord);
-                        let updatedRoleInfo = userRecord.roleInfo;
-                        let indexOfThisFundraiserInUserRecordRoleInfo = () => userRecord.roleInfo.findIndex((fundraiser) => fundraiser["fundraiserName"] === fundraiserName);
-                        updatedRoleInfo.splice(indexOfThisFundraiserInUserRecordRoleInfo(), 1, ({
-                            ...updatedRoleInfo[indexOfThisFundraiserInUserRecordRoleInfo()],
-                            "fundraiserID": id,
-                            "role": usersRoleInThisFundraiser,
-                            "fields": allFundraiserFields,
-                        }));
-                    })
-                    fetchNextPage();
-                }, function done(err) {
-                    if (err) {
-                        console.error(err); return
-                    }
-                    setWhichDataIsLoaded("fundraisers");
-                });
-        } else if (whichDataIsLoaded === "fundraisers") {
-            userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
-                const { role } = fundraiser;
-                // gets seller records
-                if (role !== "pending") {
-                    const { fields: { sellerGuardians, sellers: allSellersInThisFundraiser } } = fundraiser;
-                    const allUsersSellerIDs = userRecord["sellerRecords"];
-                    console.log("sellerGuardians: ", sellerGuardians);
-                    const sellersToGet = () => {
-                        if (role === "seller" && allUsersSellerIDs) {
-                                return createFilterFormula(allUsersSellerIDs, "recordID");
-                        } else if (role === "organizer" && allSellersInThisFundraiser) {
-                            return createFilterFormula(allSellersInThisFundraiser, "recordID");
-                        } else if (role === "organizer" && !allSellersInThisFundraiser) {
-                            return `IF({recordID} != "")`
-                        } else {
-                            return `IF({recordID} = "")`;
-                        };
-                    };
-                    console.log("sellersToGet(): ", sellersToGet());
-                    base("Sellers")
-                    .select({
-                        filterByFormula: sellersToGet(),
-                        fields: getRoleSpecificSellerFields(role),
-                    })
-                    .eachPage(function page(sellerRecords, fetchNextPage) {
-                            sellerRecords.forEach((seller, sellerIndex) => {
-                                let updatedUserRecord = userRecord;
-                                const { id, fields } = seller;
-                                updatedUserRecord.roleInfo[fundraiserIndex]["fields"]["sellers"].splice(sellerIndex, 1, (
-                                    {
-                                        "id": id,
-                                        "fields": fields,
-                                    }
-                                ))
-                                setUserRecord({...updatedUserRecord});
-                            })
+        let cancelled = false;
+        if (whichDataIsLoaded === "all") {
+            return;
+        } else if (userRecord.Email) {
+            const {
+                sellerRecords: usersSellerRecords,
+                guardianRecords: usersGuardianRecords,
+                organizerRecords: usersOrganizerRecords,
+                providerRecords: usersProviderRecords,
+                allFundraisers,
+            } = userRecord;
+            // fetches fundraiser data from Fundraisers table, saves to userRecord
+            if (cancelled) {
+                console.log("cancelled");
+                return;
+            };
+            if (!whichDataIsLoaded) {
+                const fundraisersToGet = arrayify(allFundraisers);
+                base("Fundraisers")
+                .select({
+                    filterByFormula: createFilterFormula(fundraisersToGet, "fundraiserName"),
+                    fields: getFundraiserFields(),
+                })
+                .eachPage(function page(records, fetchNextPage) {
+                        records.map((fundraiser) => {
+                            const { id, fields, fields: { fundraiserName: fundraiserNameToMatch } } = fundraiser;
+                            let usersRoleInThisFundraiser = getRecordType(id, userRecord);
+                            let updatedRoleInfo = userRecord.roleInfo;
+                            let indexOfThisFundraiserInUserRecordRoleInfo = () => {
+                                return userRecord.roleInfo.findIndex((fundraiser) => {
+                                    return fundraiser["fundraiserName"] === fundraiserNameToMatch;
+                                })
+                            };
+                            updatedRoleInfo.splice(indexOfThisFundraiserInUserRecordRoleInfo(), 1, ({
+                                ...updatedRoleInfo[indexOfThisFundraiserInUserRecordRoleInfo()],
+                                "fundraiserID": id,
+                                "role": usersRoleInThisFundraiser,
+                                "fields": fields,
+                            }));
+                        })
                         fetchNextPage();
                     }, function done(err) {
                         if (err) {
                             console.error(err); return
                         }
-                        setWhichDataIsLoaded("sellers");
+                        setWhichDataIsLoaded("fundraisers");
                     });
-                }
-            })
-            
-        } else if (whichDataIsLoaded === "sellers") {
-            userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
-                const { role, fields: fundraiserFields } = fundraiser;
-                if (role !== "pending") {
-                    const { sellers } = fundraiserFields;
-                    if (sellers) {
-                        sellers.map((seller, sellerIndex)=> {
-                            const { fields: sellerFields } = seller;
-                            if (sellerFields) {
-                                const { Orders: ordersToGet } = sellerFields;
-                                const orderFilters = createFilterFormula(ordersToGet, "Order ID");
-                                base("Orders")
-                                    .select({
-                                        filterByFormula: orderFilters,
-                                        fields: getRoleSpecificOrderFields(role),
-                                    })
-                                    .eachPage(function page(orderRecords, fetchNextPage) {
-                                        orderRecords.forEach((order, orderIndex) => {
+            } else if (whichDataIsLoaded === "fundraisers") {
+                userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
+                    if (fundraiser.fields) {
+                        const { role, fields: { sellerGuardians: fundraisersSellerGuardians }} = fundraiser;
+                        // gets guardian records from fundraisersSellerGuardians table, saves it to userRecord
+                        if (role !== "pending") {
+                            let guardiansToGet;
+                            if (usersGuardianRecords && fundraisersSellerGuardians.includes(anyOfThese(usersGuardianRecords))) {
+                                guardiansToGet = createFilterFormula(usersGuardianRecords, "GuardianID")
+                            } else {
+                                guardiansToGet = createFilterFormula(fundraisersSellerGuardians, "GuardianID");
+                            }
+                            base("SellerGuardians")
+                            .select({
+                                filterByFormula: guardiansToGet,
+                            })
+                            .eachPage(function page(guardianRecords, fetchNextPage) {
+                                guardianRecords.forEach((guardian, guardianIndex) => {
+                                    let updatedUserRecord = userRecord;
+                                    const { id, fields } = guardian;
+                                    updatedUserRecord.roleInfo[fundraiserIndex]["fields"]["sellerGuardians"].splice(guardianIndex, 1, (
+                                        {
+                                            "id": id,
+                                            "fields": fields,
+                                        }
+                                    ))
+                                    setUserRecord({...updatedUserRecord});
+                                })
+                                fetchNextPage();
+                            }, function done(err) {
+                                if (err) {
+                                    console.error(err); return;
+                                }
+                                setWhichDataIsLoaded("guardians")
+                            })
+                        }
+                    }
+                })
+            } else if (whichDataIsLoaded === "guardians") {
+                userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
+                    const { role, fields: fundraiserFields } = fundraiser;
+                    const { guardianRecords } = userRecord;
+                    if (fundraiserFields) {
+                        const { sellerGuardians } = fundraiserFields;
+                        sellerGuardians.map((guardian, guardianIndex) => {
+                            if (guardian['fields']) {
+                                const { fields: { Sellers: guardiansSellers } } = guardian;
+                                const sellersToGet = () => {
+                                    if (role === "seller") {
+                                            return createFilterFormula(usersSellerRecords, "recordID");
+                                    } else if (role === "organizer" && guardiansSellers) {
+                                        return createFilterFormula(guardiansSellers, "recordID");
+                                    } else if (role === "organizer" && !guardiansSellers) {
+                                        return `IF({recordID} != "")`
+                                    } else if (role === "guardian" && guardianRecords.includes(guardian.id)) {
+                                        return createFilterFormula(guardiansSellers, "recordID");
+                                    } else {
+                                        return `IF({recordID} = "")`;
+                                    };
+                                };
+                                base("Sellers")
+                                .select({
+                                    filterByFormula: sellersToGet(),
+                                    fields: getRoleSpecificSellerFields(role),
+                                })
+                                .eachPage(function page(sellerRecords, fetchNextPage) {
+                                        sellerRecords.forEach((seller, sellerIndex) => {
                                             let updatedUserRecord = userRecord;
-                                            const { id, fields } = order;
-                                            updatedUserRecord
-                                                .roleInfo
+                                            const { id, fields } = seller;
+                                            updatedUserRecord.roleInfo
                                                 [fundraiserIndex]
                                                 ["fields"]
-                                                ["sellers"]
-                                                [sellerIndex]
+                                                ["sellerGuardians"]
+                                                [guardianIndex]
                                                 ["fields"]
-                                                ["Orders"]
-                                                    .splice(orderIndex, 1, (
-                                                        {
-                                                            "id": id,
-                                                            "fields": fields,
-                                                        }
-                                                    ))
-                                                setUserRecord({...updatedUserRecord});
+                                                ["Sellers"]
+                                            .splice(sellerIndex, 1, (
+                                                {
+                                                    "id": id,
+                                                    "fields": fields,
+                                                }
+                                            ))
+                                            setUserRecord({...updatedUserRecord});
                                         })
-                                        fetchNextPage();
-                                    }, function done(err) {
-                                        if (err) {
-                                            console.error(err); return
-                                        }
-                                        setWhichDataIsLoaded("orders");
-                                    });
+                                    fetchNextPage();
+                                }, function done(err) {
+                                    if (err) {
+                                        console.error(err); return
+                                    }
+                                    setWhichDataIsLoaded("sellers");
+                                });
                             }
-                        });
+                        })
                     }
-                }
-            })
+                })
+            } else if (whichDataIsLoaded === "sellers") {
+                userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
+                    const { role } = fundraiser;
+                    const { fields: fundraiserFields } = fundraiser;
+                    if (fundraiserFields && fundraiserFields['sellerGuardians']) {
+                        const { sellerGuardians } = fundraiserFields;
+                        if (sellerGuardians.length) {
+                            sellerGuardians.map((guardian, guardianIndex) => {
+                                if (guardian.id) {
+                                    const {fields: { Sellers: sellers }} = guardian;
+                                    if (sellers) {
+                                        sellers.map((seller, sellerIndex) => {
+                                            if (seller["fields"]) {
+                                                const { fields: { Orders: orders } } = seller;
+                                                if (orders) {
+                                                    base("Orders")
+                                                    .select({
+                                                        filterByFormula: createFilterFormula(orders, "Order ID"),
+                                                        fields: getRoleSpecificOrderFields(role),
+                                                    })
+                                                    .eachPage(function page(orderRecords, fetchNextPage) {
+                                                        orderRecords.forEach((order, orderIndex) => {
+                                                            let updatedUserRecord = userRecord;
+                                                            const { id, fields } = order;
+                                                            updatedUserRecord.roleInfo
+                                                                [fundraiserIndex]
+                                                                ["fields"]
+                                                                ["sellerGuardians"]
+                                                                [guardianIndex]
+                                                                ["fields"]
+                                                                ["Sellers"]
+                                                                [sellerIndex]
+                                                                ["fields"]
+                                                                ["Orders"]
+                                                                .splice(orderIndex, 1, (
+                                                                    {
+                                                                        "id": id,
+                                                                        "fields": fields,
+                                                                    }
+                                                                ))
+                                                            setUserRecord({...updatedUserRecord});
+                                                        })
+                                                        fetchNextPage();
+                                                    }, function done(err) {
+                                                        if (err) {
+                                                            console.error(err); return
+                                                        }
+                                                    })
+                                                };
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+                setWhichDataIsLoaded("orders");
+            } else if (whichDataIsLoaded === "orders") {
+                const filterRecords = (role) => userRecord.roleInfo.filter((record) => record.role === role);
+                // let organizerFundraisers = () => filterRecords("organizer") ? filterRecords("organizer") : '';
+                // let sellerFundraisers = () => filterRecords("seller") ? filterRecords("seller") : '';
+                // let guardianFundraisers = () => filterRecords("guardian") ? filterRecords("guardian") : '';
+                // let providerFundraisers = () => filterRecords("provider") ? filterRecords("provider") : '';
+                setFundraisers([
+                    ...userRecord.roleInfo
+                    // "organizerFundraisers": [...organizerFundraisers()],
+                    // "sellerFundraisers": [...sellerFundraisers()],
+                    // "providerFundraisers": [...providerFundraisers()],
+                    // "guardianFundraisers": [...guardianFundraisers()],
+                ]);
+                setWhichDataIsLoaded("all");
+            }
         }
-    }, [userRecord, whichDataIsLoaded]);
-
+        return () => {
+            cancelled = true
+        };
+    }, [userRecord.Email, whichDataIsLoaded]);
+   
+  
     useEffect(() => {
-        if (whichDataIsLoaded === "orders") {
-            
-        }
-    }, [whichDataIsLoaded])
+        if (fundraisers) {
+            let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
+            console.log("activeFundraisers: ", activeFundraisers);
+            recordsDispatch({
+                type: 'setFundraiserToDisplay',
+                payload: activeFundraisers[0],
+            })
+            // const firstActiveFundraiser = filter(fundraisers, matches({'status': 'Active'}));
+            // const firstActiveFundraiser = find(fundraisers["fields"], matchesProperty("status", "Active"));
+        };
+      
+    }, [fundraisers]);
 
-    return (<RecordsContext.Provider value={
-        {recordsState, recordsDispatch}
-    }>
-        <Router basename={'/'}>
-            <NavBar/> {/* {recordsState["drawerVisible"] &&
-            <EditDrawer />
-          }
-        <Switch> 
-          <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
-          <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
-          <ProtectedRoute path="/profile" component={Profile} />
-          <ProtectedRoute path="/orgView" component={OrganizerView} />
-        </Switch> */}
-            {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
-            {
-            userRecord.roleInfo && <div>Here is the data: {
-                JSON.stringify(userRecord.roleInfo)
-            }</div>
-        } </Router>
-    </RecordsContext.Provider>);
+    return (
+        // if !loggedIn, "please log in"
+        // if loading, "loading fundraiser data"
+        // if user is provider, show Provider view
+        // if user is organizer, show Organizer view
+        // if user is guardian, show Guardian view
+        <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
+            <Router basename={'/'}>
+                <NavBar/> 
+                {/* <div>Provider view goes here.</div>
+                <div>Organizer view goes here.</div>
+                <div>Guardian view goes here.</div>
+                <div>Seller view goes here.</div> */}
+                {/* {
+                recordsState["drawerVisible"] &&
+                <EditDrawer />
+                } */}
+                {
+                    recordsState['fundraiserToDisplay'] && 
+                        <div>Here is the data: 
+                            {JSON.stringify(recordsState['fundraiserToDisplay'])}
+                        </div>
+                }
+                {/* <Switch> 
+                    <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
+                    <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
+                    <ProtectedRoute path="/profile" component={Profile} />
+                    <ProtectedRoute path="/orgView" component={OrganizerView} />
+                </Switch> */}
+                {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
+            </Router>
+        </RecordsContext.Provider>
+    );
 }
 
 export default withRouter(App);

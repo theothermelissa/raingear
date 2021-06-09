@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
+import { Avatar, Dropdown } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import LoginButton from './LoginButton';
 import firehouseLogo from '../images/firehouseLogo.png';
+import { RecordsContext } from '../App';
 
 const{ Header } = Layout;
 
 const NavBar = () => {
+  const { recordsState: { user: { picture } } } = useContext(RecordsContext);
+
+  const accountMenu = (
+    <Menu>
+      <Menu.Item key="0">
+        <a target="_blank" rel="noopener noreferrer" href="/">
+          View Another Fundraiser
+        </a>
+      </Menu.Item>
+      <Menu.Item key="1">
+        <a target="_blank" rel="noopener noreferrer" href="/">
+          Edit Your Profile
+        </a>
+      </Menu.Item>
+    </Menu>
+  )
+
     return (
         <>
           <Row justify="end">
@@ -39,6 +59,17 @@ const NavBar = () => {
                     style={{ float: "right" }}
                     key="4">
                     <LoginButton />
+                  </Menu.Item>
+                  <Menu.Item
+                    style={{ float: "right" }}
+                    key="5"
+                  >
+                    {picture  
+                      ? <Dropdown overlay={accountMenu} placement="bottomCenter" >
+                          <Avatar src={<img src={picture} />} onClick={() => console.log("clicked")} />
+                        </Dropdown>
+                      : <Avatar icon={<UserOutlined />} />
+                    }
                   </Menu.Item>
                 </Menu>
               </Col>

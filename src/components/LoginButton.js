@@ -9,9 +9,9 @@ const LoginButton = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            recordsDispatch({type: 'setUser', payload: user.email})
+            recordsDispatch({type: 'setUser', payload: user})
         }
-    }, []);
+    }, [isAuthenticated]);
 
     const logOutUser = () => {
         recordsDispatch({type: 'removeUser'})

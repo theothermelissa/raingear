@@ -8,12 +8,17 @@ const recordsReducer = (state, action) => {
           case 'setUser': 
                return {
                     ...state,
-                    userEmail: action.payload,
+                    user: action.payload,
                };
+          case 'setFundraiserToDisplay':
+               return {
+                    ...state,
+                    fundraiserToDisplay: action.payload,
+               }
           case 'removeUser': 
                return {
                     ...state,
-                    userEmail: '',
+                    user: '',
                };
           case 'chooseRecord':
                return {
