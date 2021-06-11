@@ -11,6 +11,8 @@ import {sortBy, find, matches, filter} from 'lodash';
 import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
 import OrganizerView from './components/OrganizerView';
+import ProviderView from './components/ProviderView';
+import GuardianView from './components/GuardianView';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
 import userEvent from '@testing-library/user-event';
@@ -28,23 +30,30 @@ export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
+// get the data, save it to the recordsState (done)
+// save the fundraiserToDisplay & userRole to the recordsState (I need the components to access the recordsState instead of receiving the fundraisers as props)
+// display which version of the site based on the role (wait I need different versions)
+// change the fundraiser in the menu (wait I need a menu)
+// components render data
+// profit
+
 const initialState = {
-    focusedRecordID: '',
+    user: '',
+    records: '',
+    fundraiserToDisplay: '',
     viewFocusedRecord: false,
+    focusedRecordID: '',
     drawerVisible: false,
     recordToEdit: '',
     alert: '',
     recordHasChanged: false,
     hoveredID: null,
-    user: '',
-    fundraiserToDisplay: '',
-    userRole: ''
 };
 
 function App() {
     
     const {user, isAuthenticated} = useAuth0();
-    
+    const [loading, setLoading] = useState(true);
     const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
     const [userRecord, setUserRecord] = useState('');
     const [whichDataIsLoaded, setWhichDataIsLoaded] = useState('');
@@ -85,7 +94,7 @@ function App() {
     //fetch fundraiser data for this user
     useEffect(() => {
         let cancelled = false;
-        if (whichDataIsLoaded === "all") {
+        if (cancelled) {
             return;
         } else if (userRecord.Email) {
             const {
@@ -96,11 +105,17 @@ function App() {
                 allFundraisers,
             } = userRecord;
             // fetches fundraiser data from Fundraisers table, saves to userRecord
-            if (cancelled) {
-                console.log("cancelled");
+            // if (cancelled) {
+            //     console.log("cancelled");
+            //     return;
+            // };
+            if (whichDataIsLoaded === "all") {
+                console.log("All data loaded.")
+                setFundraisers([
+                    ...userRecord.roleInfo,
+                ]);
                 return;
-            };
-            if (!whichDataIsLoaded) {
+            } else if (!whichDataIsLoaded) {
                 const fundraisersToGet = arrayify(allFundraisers);
                 base("Fundraisers")
                 .select({
@@ -285,18 +300,11 @@ function App() {
                 })
                 setWhichDataIsLoaded("orders");
             } else if (whichDataIsLoaded === "orders") {
-                const filterRecords = (role) => userRecord.roleInfo.filter((record) => record.role === role);
-                // let organizerFundraisers = () => filterRecords("organizer") ? filterRecords("organizer") : '';
-                // let sellerFundraisers = () => filterRecords("seller") ? filterRecords("seller") : '';
-                // let guardianFundraisers = () => filterRecords("guardian") ? filterRecords("guardian") : '';
-                // let providerFundraisers = () => filterRecords("provider") ? filterRecords("provider") : '';
-                setFundraisers([
-                    ...userRecord.roleInfo
-                    // "organizerFundraisers": [...organizerFundraisers()],
-                    // "sellerFundraisers": [...sellerFundraisers()],
-                    // "providerFundraisers": [...providerFundraisers()],
-                    // "guardianFundraisers": [...guardianFundraisers()],
-                ]);
+                console.log("Order data loaded.")
+                recordsDispatch({
+                    type: "setRecords",
+                    payload: [...userRecord.roleInfo]
+                })
                 setWhichDataIsLoaded("all");
             }
         }
@@ -309,11 +317,11 @@ function App() {
     useEffect(() => {
         if (fundraisers) {
             let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
-            console.log("activeFundraisers: ", activeFundraisers);
             recordsDispatch({
                 type: 'setFundraiserToDisplay',
                 payload: activeFundraisers[0],
-            })
+            });
+            setLoading(false);
             // const firstActiveFundraiser = filter(fundraisers, matches({'status': 'Active'}));
             // const firstActiveFundraiser = find(fundraisers["fields"], matchesProperty("status", "Active"));
         };
@@ -329,20 +337,20 @@ function App() {
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
             <Router basename={'/'}>
                 <NavBar/> 
-                {/* <div>Provider view goes here.</div>
-                <div>Organizer view goes here.</div>
-                <div>Guardian view goes here.</div>
-                <div>Seller view goes here.</div> */}
+                {loading && <div>Loading ...</div>}
+                {recordsState["fundraiserToDisplay"]["role"] === "guardian" && <GuardianView />}
+                {recordsState["fundraiserToDisplay"]["role"] === "organizer" && <OrganizerView />}
+                {recordsState["fundraiserToDisplay"]["role"] === "provider" && <ProviderView />}
                 {/* {
                 recordsState["drawerVisible"] &&
                 <EditDrawer />
                 } */}
-                {
-                    recordsState['fundraiserToDisplay'] && 
+                {/* {
+                    recordsState['records'] && 
                         <div>Here is the data: 
-                            {JSON.stringify(recordsState['fundraiserToDisplay'])}
+                            {JSON.stringify(recordsState['records'])}
                         </div>
-                }
+                } */}
                 {/* <Switch> 
                     <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
                     <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
@@ -356,21 +364,3 @@ function App() {
 }
 
 export default withRouter(App);
-
-// login page
-// is registered user?
-// no -- "denied" page
-// yes -- find record in Users table. use linked fields to determine whether they have more than one role
-// no -- add role-specific data to app state and display it on their "user home" page
-// yes -- add role-specific data for all roles to app state, and redirect user to "choose fundraiser" page
-// for provider user, displayed records are fundraisers
-// for organizer, displayed records are orders and sellers and fundraiser details
-// for seller guardians, displayed records are guardian's seller(s) and their orders and fundraiser details
-// for sellers, displayed records are their own orders and fundraiser details
-// display calendar view with role-specific data in /calendar route
-
-// SellerFundraiser? ? add SellerFundraiser, fundraiser details, orders : don't
-// GuardianFundraiser ? add SellerGuardianFundraiser, fundraiser details, seller w/ orders, other sellers w/ orthers : don't
-// OrganizerFundraiser ? add OrganizerFundraiser, all sellers, all orders : don't
-//
-// };

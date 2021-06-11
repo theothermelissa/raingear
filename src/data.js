@@ -34,9 +34,7 @@
         "RecordID (from Fundraiser) (from sellerRecords)": ["recPpH4XZwX6pw6XX"],
         "userID": "recuDPCZ4oRllR7Y4"
     }
-}
-
-{
+} {
     "organizerRecords": [
         "rec43VLzoUTfiQX13", "recN7rf6hcJgOrhQI"
     ],
@@ -123,4 +121,4 @@
             }
         }
     ]
-}
+} 

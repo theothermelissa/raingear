@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
-import { Avatar, Dropdown } from 'antd';
+import { Avatar, Dropdown, Form, Input, Select } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import LoginButton from './LoginButton';
 import firehouseLogo from '../images/firehouseLogo.png';
@@ -11,13 +11,18 @@ const{ Header } = Layout;
 
 const NavBar = () => {
   const { recordsState: { user: { picture } } } = useContext(RecordsContext);
+  const [form] = Form.useForm();
+  const { Option } = Select;
 
   const accountMenu = (
     <Menu>
       <Menu.Item key="0">
-        <a target="_blank" rel="noopener noreferrer" href="/">
+        <Form>
+
+        </Form>
+        {/* <a target="_blank" rel="noopener noreferrer" href="/">
           View Another Fundraiser
-        </a>
+        </a> */}
       </Menu.Item>
       <Menu.Item key="1">
         <a target="_blank" rel="noopener noreferrer" href="/">
