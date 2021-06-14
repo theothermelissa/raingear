@@ -13,6 +13,7 @@ import Profile from './components/Profile';
 import OrganizerView from './components/OrganizerView';
 import ProviderView from './components/ProviderView';
 import GuardianView from './components/GuardianView';
+import HomePage from './components/HomePage';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
 import userEvent from '@testing-library/user-event';
@@ -68,7 +69,7 @@ function App() {
                 }"`
             }).eachPage(function page(records, fetchNextPage) {
                 records.forEach(function (record) {
-                    let fundraiserList = arrayify(record.fields.allFundraisers)
+                    let fundraiserList = arrayify(record.fields["allFundraisers"])
                     let roleInfo = fundraiserList.map((role) => ({
                         "role": "pending",
                         "fundraiserID": "pending",
@@ -100,17 +101,9 @@ function App() {
             const {
                 sellerRecords: usersSellerRecords,
                 guardianRecords: usersGuardianRecords,
-                organizerRecords: usersOrganizerRecords,
-                providerRecords: usersProviderRecords,
                 allFundraisers,
             } = userRecord;
-            // fetches fundraiser data from Fundraisers table, saves to userRecord
-            // if (cancelled) {
-            //     console.log("cancelled");
-            //     return;
-            // };
             if (whichDataIsLoaded === "all") {
-                console.log("All data loaded.")
                 setFundraisers([
                     ...userRecord.roleInfo,
                 ]);
@@ -158,6 +151,7 @@ function App() {
                             } else {
                                 guardiansToGet = createFilterFormula(fundraisersSellerGuardians, "GuardianID");
                             }
+                            console.log("guardiansToGet: ", guardiansToGet);
                             base("SellerGuardians")
                             .select({
                                 filterByFormula: guardiansToGet,
@@ -300,7 +294,6 @@ function App() {
                 })
                 setWhichDataIsLoaded("orders");
             } else if (whichDataIsLoaded === "orders") {
-                console.log("Order data loaded.")
                 recordsDispatch({
                     type: "setRecords",
                     payload: [...userRecord.roleInfo]
@@ -314,49 +307,56 @@ function App() {
     }, [userRecord.Email, whichDataIsLoaded]);
    
   
+    //set recordsState fundraiserToDisplay to first active fundraiser or, if provider, all fundraisers
     useEffect(() => {
-        if (fundraisers) {
-            let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
-            recordsDispatch({
-                type: 'setFundraiserToDisplay',
-                payload: activeFundraisers[0],
-            });
+        let cancelled = false;
+        if (cancelled) return; 
+        else if (fundraisers) {
+            let isProvider = fundraisers.filter((fundraiser) => fundraiser.role === "provider");
+            if (isProvider.length) {
+                console.log("they're a provider")
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: fundraisers,
+                })
+            } else {
+                let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: activeFundraisers[0],
+                });
+            }
             setLoading(false);
             // const firstActiveFundraiser = filter(fundraisers, matches({'status': 'Active'}));
             // const firstActiveFundraiser = find(fundraisers["fields"], matchesProperty("status", "Active"));
         };
-      
+      return () => cancelled = true;
     }, [fundraisers]);
 
     return (
-        // if !loggedIn, "please log in"
-        // if loading, "loading fundraiser data"
-        // if user is provider, show Provider view
-        // if user is organizer, show Organizer view
-        // if user is guardian, show Guardian view
+        // !loggedIn ? "please log in"
+        // loading ? "loading fundraiser data"
+        // user is provider ? 
+            // / = ProviderView
+            // /Calendar = ProviderCalendar
+            // /Profile = UserProfile
+        // user is organizer ? show Organizer view
+        // user is guardian ? show Guardian view
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
             <Router basename={'/'}>
                 <NavBar/> 
-                {loading && <div>Loading ...</div>}
-                {recordsState["fundraiserToDisplay"]["role"] === "guardian" && <GuardianView />}
-                {recordsState["fundraiserToDisplay"]["role"] === "organizer" && <OrganizerView />}
-                {recordsState["fundraiserToDisplay"]["role"] === "provider" && <ProviderView />}
                 {/* {
                 recordsState["drawerVisible"] &&
                 <EditDrawer />
                 } */}
-                {/* {
-                    recordsState['records'] && 
-                        <div>Here is the data: 
-                            {JSON.stringify(recordsState['records'])}
-                        </div>
-                } */}
-                {/* <Switch> 
-                    <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} />
-                    <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/>
-                    <ProtectedRoute path="/profile" component={Profile} />
-                    <ProtectedRoute path="/orgView" component={OrganizerView} />
-                </Switch> */}
+                <Switch> 
+                    {!isAuthenticated && <div>Please log in using the button at the top right.</div> }
+                    {isAuthenticated && loading && <div>Loading ...</div>}
+                    {/* <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} /> */}
+                    {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
+                    {/* <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/> */}
+                    {/* <ProtectedRoute path="/profile" component={Profile} /> */}
+                </Switch>
                 {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
             </Router>
         </RecordsContext.Provider>
