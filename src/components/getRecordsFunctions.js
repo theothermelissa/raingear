@@ -142,7 +142,7 @@ export const getFundraiserFields = () => {
         "contactEmail",
         "contactPhone",
         "recordID",
-        // "sellers",
+        "sellers",
         "orderCount",
         "inviteSellersURL",
         "sellerGuardians",

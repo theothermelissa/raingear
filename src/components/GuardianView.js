@@ -2,15 +2,40 @@ import React, {useContext, useState, useEffect} from 'react';
 import {Layout, Menu, Breadcrumb} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
 import {RecordsContext} from '../App';
-import { useParams } from 'react-router';
+import Customers from './Customers';
 
 const GuardianView = () => {
-    const {recordsDispatch, recordsState: {records, fundraiserToDisplay, fundraiserToDisplay: {fields: { sellerGuardians: allSellerGuardians }}} } = useContext(RecordsContext);
+    const {
+        recordsDispatch,
+        recordsState: {
+            whichDataIsLoaded,
+            fundraiserToDisplay: {
+                fields: {
+                    sellerGuardians: allSellerGuardians
+                }
+            }
+        }
+    } = useContext(RecordsContext);
     const {Sider, Content} = Layout;
-    const guardianToDisplay = allSellerGuardians.filter((guardian) => guardian.fields)
-    const { fields: {Sellers: sellers} } = guardianToDisplay[0];
-    console.log('sellers: ', sellers);
+    const [currentGuardian, setCurrentGuardian] = useState('');
+    const [sellers, setSellers] = useState('');
+    const [allSellersLoaded, setAllSellersLoaded] = useState(false);
+
+    useEffect(() => {
+        if (whichDataIsLoaded === 'all' && allSellerGuardians) {
+                if (!currentGuardian) {
+                    setCurrentGuardian((allSellerGuardians.filter((guardian) => guardian.fields)[0]))
+                } else if (!sellers) {
+                    setSellers(currentGuardian.fields.Sellers);
+                } else if (sellers[0]) {
+                    setAllSellersLoaded(true)
+                };
+            }
+    }, [allSellerGuardians, whichDataIsLoaded, currentGuardian, sellers]);
+    
     return (
+        <>
+        {allSellersLoaded && 
         <>
             <Layout>
                 <Sider style={
@@ -25,18 +50,23 @@ const GuardianView = () => {
                 width="auto"
                 className="site-layout-background">
                 <Menu theme='dark' width='100%'>
-                    <Menu.Item key='1' icon={<UserOutlined />}>
-                        Seller 1
-                    </Menu.Item>
+                    {sellers.map((seller) => {
+                        return (<Menu.Item key={seller.id} icon={<UserOutlined />}>
+                            {seller.fields.Nickname}
+                        </Menu.Item>)
+                    })
+                    }
                 </Menu>
                 </Sider>
             </Layout>
             <Layout className="site-layout" style={{ marginLeft: 0 }}>
                 <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-                  Stuff goes here. It's Guardian content stuff.
-                  <span style={{ height: "100px" }}/>
+                    <Customers guardian={currentGuardian}/>
+                <span style={{ height: "100px" }}/>
                 </Content>
             </Layout>
+        </>
+        }
         </>
     )
 };

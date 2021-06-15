@@ -49,6 +49,7 @@ const initialState = {
     alert: '',
     recordHasChanged: false,
     hoveredID: null,
+    whichDataIsLoaded: '',
 };
 
 function App() {
@@ -59,6 +60,18 @@ function App() {
     const [userRecord, setUserRecord] = useState('');
     const [whichDataIsLoaded, setWhichDataIsLoaded] = useState('');
     const [fundraisers, setFundraisers] = useState('');
+    const [totalRecordsToGet, setTotalRecordsToGet] = useState({
+        fundraisers: 0,
+        guardians: 0,
+        sellers: 0,
+        orders: 0
+    });
+    const [totalRecordsRetrieved, setTotalRecordsRetrieved] = useState({
+        fundraisers: 0,
+        guardians: 0,
+        sellers: 0,
+        orders: 0
+    });
     
     // get & save user's userRecord with fundraiserIDs using their email
     useEffect(() => {
@@ -98,6 +111,13 @@ function App() {
         if (cancelled) {
             return;
         } else if (userRecord.Email) {
+            let numberGuardians = 0;
+            let numberSellers = 0;
+            let numberOrders = 0;
+            let retrievedFundraisers = 0;
+            let retrievedGuardians = 0;
+            let retrievedSellers = 0;
+            let retrievedOrders = 0;
             const {
                 sellerRecords: usersSellerRecords,
                 guardianRecords: usersGuardianRecords,
@@ -110,14 +130,28 @@ function App() {
                 return;
             } else if (!whichDataIsLoaded) {
                 const fundraisersToGet = arrayify(allFundraisers);
+                const numberOfFundraisers = fundraisersToGet.length;
+                // setTotalRecordsToGet({
+                //     ...totalRecordsToGet,
+                //     fundraisers: fundraisersToGet.length,
+                // });
                 base("Fundraisers")
                 .select({
                     filterByFormula: createFilterFormula(fundraisersToGet, "fundraiserName"),
                     fields: getFundraiserFields(),
                 })
                 .eachPage(function page(records, fetchNextPage) {
-                        records.map((fundraiser) => {
-                            const { id, fields, fields: { fundraiserName: fundraiserNameToMatch } } = fundraiser;
+                    records.map((fundraiser) => {
+                            const { 
+                                id,
+                                fields,
+                                fields: { 
+                                    orders: thisFundraisersOrders,
+                                    sellers: thisFundraisersSellers,
+                                    sellerGuardians: thisFundraisersGuardians,
+                                    fundraiserName: fundraiserNameToMatch 
+                                } 
+                            } = fundraiser;
                             let usersRoleInThisFundraiser = getRecordType(id, userRecord);
                             let updatedRoleInfo = userRecord.roleInfo;
                             let indexOfThisFundraiserInUserRecordRoleInfo = () => {
@@ -131,27 +165,40 @@ function App() {
                                 "role": usersRoleInThisFundraiser,
                                 "fields": fields,
                             }));
-                        })
+                            retrievedFundraisers += 1;
+                            // setTotalRecordsRetrieved({
+                            //     ...totalRecordsRetrieved,
+                            //     fundraisers: totalRecordsRetrieved.fundraisers + 1});
+                            })
                         fetchNextPage();
                     }, function done(err) {
                         if (err) {
                             console.error(err); return
                         }
-                        setWhichDataIsLoaded("fundraisers");
+                        if (numberOfFundraisers === retrievedFundraisers) {
+                            setWhichDataIsLoaded("fundraisers");
+                            // console.log("setting data loaded to fundraisers");
+                            recordsDispatch({
+                                type: 'setDataLoaded',
+                                payload: 'fundraisers'
+                            })
+                        }
                     });
             } else if (whichDataIsLoaded === "fundraisers") {
                 userRecord.roleInfo.map((fundraiser, fundraiserIndex) => {
                     if (fundraiser.fields) {
-                        const { role, fields: { sellerGuardians: fundraisersSellerGuardians }} = fundraiser;
-                        // gets guardian records from fundraisersSellerGuardians table, saves it to userRecord
+                        const { role, fields: { sellerGuardians }} = fundraiser;
+                        // gets guardian records from sellerGuardians table, saves it to userRecord
                         if (role !== "pending") {
                             let guardiansToGet;
-                            if (usersGuardianRecords && fundraisersSellerGuardians.includes(anyOfThese(usersGuardianRecords))) {
+                            if (usersGuardianRecords && sellerGuardians.includes(anyOfThese(usersGuardianRecords))) {
+                                numberGuardians += 1;
                                 guardiansToGet = createFilterFormula(usersGuardianRecords, "GuardianID")
                             } else {
-                                guardiansToGet = createFilterFormula(fundraisersSellerGuardians, "GuardianID");
+                                numberGuardians += sellerGuardians.length;
+                                guardiansToGet = createFilterFormula(sellerGuardians, "GuardianID");
                             }
-                            console.log("guardiansToGet: ", guardiansToGet);
+                            // console.log("guardiansToGet: ", guardiansToGet);
                             base("SellerGuardians")
                             .select({
                                 filterByFormula: guardiansToGet,
@@ -159,7 +206,13 @@ function App() {
                             .eachPage(function page(guardianRecords, fetchNextPage) {
                                 guardianRecords.forEach((guardian, guardianIndex) => {
                                     let updatedUserRecord = userRecord;
-                                    const { id, fields } = guardian;
+                                    const { id, fields, fields: { sellers } } = guardian;
+                                    if (role === "guardian") {
+                                        setTotalRecordsToGet({
+                                            ...totalRecordsToGet,
+                                            sellers: totalRecordsToGet.sellers + sellers
+                                        })
+                                    }
                                     updatedUserRecord.roleInfo[fundraiserIndex]["fields"]["sellerGuardians"].splice(guardianIndex, 1, (
                                         {
                                             "id": id,
@@ -167,13 +220,25 @@ function App() {
                                         }
                                     ))
                                     setUserRecord({...updatedUserRecord});
+                                    // console.log("test totalRecordsRetrieved")
+                                    // setTotalRecordsRetrieved({
+                                    //     "foo": "bar"
+                                    // });
+                                    retrievedGuardians += 1;
                                 })
                                 fetchNextPage();
                             }, function done(err) {
                                 if (err) {
                                     console.error(err); return;
                                 }
-                                setWhichDataIsLoaded("guardians")
+                                if (numberGuardians === retrievedGuardians) {
+                                    setWhichDataIsLoaded("guardians");
+                                    // console.log("setting data loaded to guardians");
+                                    recordsDispatch({
+                                        type: 'setDataLoaded',
+                                        payload: 'guardians'
+                                    })
+                                }
                             })
                         }
                     }
@@ -189,12 +254,15 @@ function App() {
                                 const { fields: { Sellers: guardiansSellers } } = guardian;
                                 const sellersToGet = () => {
                                     if (role === "seller") {
-                                            return createFilterFormula(usersSellerRecords, "recordID");
+                                        numberSellers += 1;
+                                        return createFilterFormula(usersSellerRecords, "recordID");
                                     } else if (role === "organizer" && guardiansSellers) {
+                                        numberSellers += guardiansSellers.length;
                                         return createFilterFormula(guardiansSellers, "recordID");
                                     } else if (role === "organizer" && !guardiansSellers) {
                                         return `IF({recordID} != "")`
                                     } else if (role === "guardian" && guardianRecords.includes(guardian.id)) {
+                                        numberSellers += guardiansSellers.length;
                                         return createFilterFormula(guardiansSellers, "recordID");
                                     } else {
                                         return `IF({recordID} = "")`;
@@ -223,13 +291,22 @@ function App() {
                                                 }
                                             ))
                                             setUserRecord({...updatedUserRecord});
+                                            retrievedSellers += 1;
+                                            // totalRecordsRetrieved["sellers"] += 1;
                                         })
                                     fetchNextPage();
                                 }, function done(err) {
                                     if (err) {
                                         console.error(err); return
                                     }
-                                    setWhichDataIsLoaded("sellers");
+                                    if (numberSellers === retrievedSellers) {
+                                        setWhichDataIsLoaded("sellers");
+                                        // console.log("setting data loaded to sellers");
+                                        recordsDispatch({
+                                            type: 'setDataLoaded',
+                                            payload: 'sellers'
+                                        })
+                                    }
                                 });
                             }
                         })
@@ -250,6 +327,8 @@ function App() {
                                             if (seller["fields"]) {
                                                 const { fields: { Orders: orders } } = seller;
                                                 if (orders) {
+                                                    numberOrders += orders.length;
+                                                    // totalRecordsToGet["orders"] += orders.length;
                                                     base("Orders")
                                                     .select({
                                                         filterByFormula: createFilterFormula(orders, "Order ID"),
@@ -276,11 +355,20 @@ function App() {
                                                                     }
                                                                 ))
                                                             setUserRecord({...updatedUserRecord});
+                                                            retrievedOrders += 1;
                                                         })
                                                         fetchNextPage();
                                                     }, function done(err) {
                                                         if (err) {
                                                             console.error(err); return
+                                                        }
+                                                        if (numberOrders === retrievedOrders) {
+                                                            setWhichDataIsLoaded("orders");
+                                                            // console.log("setting data loaded to orders");
+                                                            recordsDispatch({
+                                                                type: 'setDataLoaded',
+                                                                payload: 'orders'
+                                                            })
                                                         }
                                                     })
                                                 };
@@ -292,20 +380,23 @@ function App() {
                         }
                     }
                 })
-                setWhichDataIsLoaded("orders");
             } else if (whichDataIsLoaded === "orders") {
                 recordsDispatch({
                     type: "setRecords",
                     payload: [...userRecord.roleInfo]
                 })
                 setWhichDataIsLoaded("all");
+                // console.log("setting data loaded to all");
+                recordsDispatch({
+                    type: 'setDataLoaded',
+                    payload: 'all'
+                })
             }
         }
         return () => {
             cancelled = true
         };
-    }, [userRecord.Email, whichDataIsLoaded]);
-   
+    }, [userRecord.Email, whichDataIsLoaded, ]);
   
     //set recordsState fundraiserToDisplay to first active fundraiser or, if provider, all fundraisers
     useEffect(() => {
@@ -314,7 +405,7 @@ function App() {
         else if (fundraisers) {
             let isProvider = fundraisers.filter((fundraiser) => fundraiser.role === "provider");
             if (isProvider.length) {
-                console.log("they're a provider")
+                // console.log("they're a provider")
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
                     payload: fundraisers,
