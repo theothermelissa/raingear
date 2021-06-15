@@ -20,6 +20,7 @@ const GuardianView = () => {
     const [currentGuardian, setCurrentGuardian] = useState('');
     const [sellers, setSellers] = useState('');
     const [allSellersLoaded, setAllSellersLoaded] = useState(false);
+    const [selectedSeller, setSelectedSeller] = useState('');
 
     useEffect(() => {
         if (whichDataIsLoaded === 'all' && allSellerGuardians) {
@@ -32,6 +33,10 @@ const GuardianView = () => {
                 };
             }
     }, [allSellerGuardians, whichDataIsLoaded, currentGuardian, sellers]);
+
+    const selectSeller = (id) => {
+        setSelectedSeller(id);
+    };
     
     return (
         <>
@@ -51,7 +56,7 @@ const GuardianView = () => {
                 className="site-layout-background">
                 <Menu theme='dark' width='100%'>
                     {sellers.map((seller) => {
-                        return (<Menu.Item key={seller.id} icon={<UserOutlined />}>
+                        return (<Menu.Item key={seller.id} icon={<UserOutlined onClick={() => selectSeller(seller.id)} />}>
                             {seller.fields.Nickname}
                         </Menu.Item>)
                     })
@@ -61,7 +66,7 @@ const GuardianView = () => {
             </Layout>
             <Layout className="site-layout" style={{ marginLeft: 0 }}>
                 <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-                    <Customers guardian={currentGuardian}/>
+                    <Customers guardian={currentGuardian.id} seller={selectedSeller}/>
                 <span style={{ height: "100px" }}/>
                 </Content>
             </Layout>

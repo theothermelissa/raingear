@@ -17,7 +17,11 @@ import HomePage from './components/HomePage';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
 import userEvent from '@testing-library/user-event';
-import {getFundraiserFields, getRoleSpecificOrderFields, getRoleSpecificSellerFields} from './components/getRecordsFunctions';
+import {
+    getFundraiserFields,
+    getRoleSpecificOrderFields,
+    getRoleSpecificSellerFields
+} from './components/getRecordsFunctions';
 import {addRecordToArray} from './components/getRecordsFunctions';
 import {chooseTable} from './components/getRecordsFunctions';
 import {getRecordType} from './components/getRecordsFunctions';
@@ -61,12 +65,6 @@ function App() {
     const [whichDataIsLoaded, setWhichDataIsLoaded] = useState('');
     const [fundraisers, setFundraisers] = useState('');
     const [totalRecordsToGet, setTotalRecordsToGet] = useState({
-        fundraisers: 0,
-        guardians: 0,
-        sellers: 0,
-        orders: 0
-    });
-    const [totalRecordsRetrieved, setTotalRecordsRetrieved] = useState({
         fundraisers: 0,
         guardians: 0,
         sellers: 0,
@@ -166,9 +164,6 @@ function App() {
                                 "fields": fields,
                             }));
                             retrievedFundraisers += 1;
-                            // setTotalRecordsRetrieved({
-                            //     ...totalRecordsRetrieved,
-                            //     fundraisers: totalRecordsRetrieved.fundraisers + 1});
                             })
                         fetchNextPage();
                     }, function done(err) {
@@ -177,7 +172,6 @@ function App() {
                         }
                         if (numberOfFundraisers === retrievedFundraisers) {
                             setWhichDataIsLoaded("fundraisers");
-                            // console.log("setting data loaded to fundraisers");
                             recordsDispatch({
                                 type: 'setDataLoaded',
                                 payload: 'fundraisers'
@@ -220,10 +214,6 @@ function App() {
                                         }
                                     ))
                                     setUserRecord({...updatedUserRecord});
-                                    // console.log("test totalRecordsRetrieved")
-                                    // setTotalRecordsRetrieved({
-                                    //     "foo": "bar"
-                                    // });
                                     retrievedGuardians += 1;
                                 })
                                 fetchNextPage();
@@ -233,7 +223,6 @@ function App() {
                                 }
                                 if (numberGuardians === retrievedGuardians) {
                                     setWhichDataIsLoaded("guardians");
-                                    // console.log("setting data loaded to guardians");
                                     recordsDispatch({
                                         type: 'setDataLoaded',
                                         payload: 'guardians'
@@ -292,7 +281,6 @@ function App() {
                                             ))
                                             setUserRecord({...updatedUserRecord});
                                             retrievedSellers += 1;
-                                            // totalRecordsRetrieved["sellers"] += 1;
                                         })
                                     fetchNextPage();
                                 }, function done(err) {
@@ -301,7 +289,6 @@ function App() {
                                     }
                                     if (numberSellers === retrievedSellers) {
                                         setWhichDataIsLoaded("sellers");
-                                        // console.log("setting data loaded to sellers");
                                         recordsDispatch({
                                             type: 'setDataLoaded',
                                             payload: 'sellers'
@@ -328,7 +315,6 @@ function App() {
                                                 const { fields: { Orders: orders } } = seller;
                                                 if (orders) {
                                                     numberOrders += orders.length;
-                                                    // totalRecordsToGet["orders"] += orders.length;
                                                     base("Orders")
                                                     .select({
                                                         filterByFormula: createFilterFormula(orders, "Order ID"),
@@ -364,7 +350,6 @@ function App() {
                                                         }
                                                         if (numberOrders === retrievedOrders) {
                                                             setWhichDataIsLoaded("orders");
-                                                            // console.log("setting data loaded to orders");
                                                             recordsDispatch({
                                                                 type: 'setDataLoaded',
                                                                 payload: 'orders'
@@ -386,7 +371,6 @@ function App() {
                     payload: [...userRecord.roleInfo]
                 })
                 setWhichDataIsLoaded("all");
-                // console.log("setting data loaded to all");
                 recordsDispatch({
                     type: 'setDataLoaded',
                     payload: 'all'
@@ -405,7 +389,6 @@ function App() {
         else if (fundraisers) {
             let isProvider = fundraisers.filter((fundraiser) => fundraiser.role === "provider");
             if (isProvider.length) {
-                // console.log("they're a provider")
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
                     payload: fundraisers,
@@ -418,21 +401,11 @@ function App() {
                 });
             }
             setLoading(false);
-            // const firstActiveFundraiser = filter(fundraisers, matches({'status': 'Active'}));
-            // const firstActiveFundraiser = find(fundraisers["fields"], matchesProperty("status", "Active"));
         };
       return () => cancelled = true;
     }, [fundraisers]);
 
     return (
-        // !loggedIn ? "please log in"
-        // loading ? "loading fundraiser data"
-        // user is provider ? 
-            // / = ProviderView
-            // /Calendar = ProviderCalendar
-            // /Profile = UserProfile
-        // user is organizer ? show Organizer view
-        // user is guardian ? show Guardian view
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
             <Router basename={'/'}>
                 <NavBar/> 

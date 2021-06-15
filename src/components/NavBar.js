@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
 import { Avatar, Dropdown, Form, Input, Select } from 'antd';
@@ -10,21 +10,66 @@ import { RecordsContext } from '../App';
 const{ Header } = Layout;
 
 const NavBar = () => {
-  const { recordsState: { user: { picture } } } = useContext(RecordsContext);
+  const {
+    recordsDispatch,
+    recordsState: {
+      user: {
+        picture
+      },
+      fundraiserToDisplay,
+      fundraiserToDisplay: {
+        role
+      },
+      records
+    }
+  } = useContext(RecordsContext);
+
   const [form] = Form.useForm();
+  const [fundraiserNeedsUpdating, setFundraiserNeedsUpdating] = useState(false);
+  // const [selectedFundraiser, setSelectedFundraiser] = useState('');
+
   const { Option } = Select;
+  // active/most recent fundraiser is automatically selected
+  // if user selects another fundraiser, fundraiser needs to be updated
+  // update fundraiser
+  // fundraiser is updated
+
+  const chooseFundraiser = (record) => {
+    recordsDispatch({
+      type: 'setFundraiserToDisplay',
+      payload: record
+    })
+  };
+
+  // useEffect(() => {
+  //   if (fundraiserNeedsUpdating) {
+  //     updateFundraiser();
+  //   }
+  // }, [fundraiserNeedsUpdating])
+
+  const fundraiserMenu = (
+    <Menu>
+      {records && records.map((fundraiser) => {
+        return (
+          <Menu.Item key={fundraiser.fundraiserID}>
+            <div key={fundraiser.fundraiserName} onClick={() => chooseFundraiser(fundraiser)}>{fundraiser.fields.fundraiserName}</div>
+          </Menu.Item>
+        )
+      })
+      }
+    </Menu>
+  )
 
   const accountMenu = (
     <Menu>
-      <Menu.Item key="0">
+      <Menu.Item key="viewAnotherFundraiser">
         <Form>
-
-        </Form>
-        {/* <a target="_blank" rel="noopener noreferrer" href="/">
+        <a target="_blank" rel="noopener noreferrer" href="/">
           View Another Fundraiser
-        </a> */}
+        </a>
+        </Form> 
       </Menu.Item>
-      <Menu.Item key="1">
+      <Menu.Item key="editYourProfile">
         <a target="_blank" rel="noopener noreferrer" href="/">
           Edit Your Profile
         </a>
@@ -46,12 +91,22 @@ const NavBar = () => {
               <img className="headerLogo" src={firehouseLogo} alt="Firehouse Logo" style={{ height: "50px", width: "auto" }} />
               <Col flex={6} >
                 <Menu theme="dark" mode="horizontal">
-                    <Menu.Item style={{ float: "left" }} key="1">
-                      <NavLink to="/">
-                        Fundraisers
-                      </NavLink>
-                    </Menu.Item>
-                    <Menu.Item style={{ float: "left" }} key="3">
+                    <Menu.Item style={{ float: "left" }} key="fundraiser">
+                    { (role === "provider") ?
+                    <NavLink to="/">
+                      Fundraisers
+                    </NavLink> :
+                    // <div>Provider</div> :
+                    <Dropdown overlay={fundraiserMenu} placement="bottomLeft" >
+                      <div>Fundraisers</div>
+                    </Dropdown>
+                    // <div>Not a Provider</div>
+                        // <Dropdown overlay={fundraiserMenu}>
+                        //   Fundraisers
+                        // </Dropdown>
+                    }
+                    </Menu.Item> 
+                    <Menu.Item style={{ float: "left" }} key="calendar">
                       <NavLink to="/calendar">
                         Calendar
                       </NavLink>
@@ -62,12 +117,12 @@ const NavBar = () => {
                 <Menu theme="dark" mode="horizontal">
                   <Menu.Item 
                     style={{ float: "right" }}
-                    key="4">
+                    key="login">
                     <LoginButton />
                   </Menu.Item>
                   <Menu.Item
                     style={{ float: "right" }}
-                    key="5"
+                    key="avatar"
                   >
                     {picture  
                       ? <Dropdown overlay={accountMenu} placement="bottomCenter" >
