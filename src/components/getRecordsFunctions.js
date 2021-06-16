@@ -95,6 +95,23 @@ export const getRoleSpecificSellerFields = (role) => {
                 "SellerGuardian",
                 "Total Orders",
                 "Total Sales Volume",
+                "Email (from SellerGuardian)",
+                "Phone (from SellerGuardian)",
+                "AddressLine1 (from SellerGuardian)",
+                "AddressLine2 (from SellerGuardian)",
+                "City (from SellerGuardian)",
+                "State (from SellerGuardian)",
+                "Zip (from SellerGuardian)",
+                "Link to Order From This Seller",
+                "Total Orders",
+                "Total Sales Volume",
+                "Contact Email",
+                "Contact Phone",
+                "Contact Address",
+                "Contact Address Line 2",
+                "Contact City",
+                "Contact State",
+                "Contact Zip",
             ];
             break;
         case "guardian": result = [

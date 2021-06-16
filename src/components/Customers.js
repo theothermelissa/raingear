@@ -32,9 +32,9 @@ const Customers = ({ guardian, sellerToView }) => {
                 }
             } = thisGuardian;
             let allOrders = [];
+            //set order data to view in table
             Sellers.map((seller) => {
                 const {fields: {Orders}} = seller;
-                console.log("seller: ", seller)
                 if (sellerToView === "all" || seller.id === sellerToView) {
                     if (Orders) {
                         Orders.map((order) => {

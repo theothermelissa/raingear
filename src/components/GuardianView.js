@@ -47,13 +47,13 @@ const GuardianView = () => {
 
 
     const selectSeller = (id) => {
-        // console.log("clicking to select seller")
+        console.log("clicking to select seller")
         setSelectedSeller(id);
     };
     
     const sellerMenuItems = () => {
         let result = [];
-        let sellerLinks = sellers.map((seller) => {
+        sellers.map((seller) => {
             result.push(
                 <Menu.Item key={seller.id} onClick={() => selectSeller(seller.id)} icon={<UserOutlined />}>
                     {seller.fields.Nickname}
@@ -90,7 +90,7 @@ const GuardianView = () => {
                     </div>
                 <Menu theme='dark' width='100%' defaultSelectedKeys={sellers.length > 1 ? "allSellers" : sellers[0].id}>
                     {sellers.length > 1  
-                        ? sellerMenuItems().map((item) => item)
+                        ? sellerMenuItems()
                         : <Menu.Item key={sellers[0].id} icon={<UserOutlined onClick={() => selectSeller(sellers[0].id)} />}>
                             {sellers[0].fields.Nickname}
                         </Menu.Item>
