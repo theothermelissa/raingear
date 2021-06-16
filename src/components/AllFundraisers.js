@@ -11,7 +11,7 @@ const AllFundraisers = ({fundraisers}) => {
         }} = useContext(RecordsContext);
 
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
-    const [updatedFundraisers, setUpdatedFundraisers] = useState('')
+    const [updatedFundraisers, setUpdatedFundraisers] = useState('');
 
     const chooseRecord = (recordName) => {
         const chosenRecord = find(fundraisers, { fields: "status"}, matchesProperty('organization', recordName));
