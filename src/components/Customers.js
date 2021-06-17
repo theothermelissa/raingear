@@ -19,7 +19,7 @@ const Customers = ({ guardian, sellerToView }) => {
     const [orders, setOrders] = useState('');
 
     const setFullName = (first, last) => `${first} ${last}`;
-    const productInFundraiser = (product) => products.includes(product)
+    const productInFundraiser = (product) => products.includes(product);
     
     //choose customer data to display
     useEffect(() => {

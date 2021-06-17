@@ -53,11 +53,12 @@ const SellerCard = ({ seller }) => {
     const createEmailLink = (email) => `mailto:${email}`;
 
     return (
-        <div style={{backgroundColor: "white", margin: "10px", padding: "8px 8px", width: "200px", borderRadius: "5px", boxShadow: "1px 2px 9px #9E9E9E" }}>
+        <div style={{backgroundColor: "white", margin: "10px", padding: "8px", width: "250px", borderRadius: "5px", boxShadow: "1px 2px 9px #9E9E9E" }}>
             {/* <h2 style={{ color: selectStatusColor(status), margin: 0}}>{convertedDate(deliveryDate)}</h2> */}
             <h3 style={{ color: "#595959", margin: 0}}>{nickname}</h3>
             <div style={{color: "#595959" }}>{formatPhoneNumber(contactPhone)}</div> 
-            <a href={createEmailLink(contactEmail)}>Email</a>
+            <a href={createEmailLink(contactEmail)}>{contactEmail}</a>
+            <h4>{totalOrders} Sales | Total raised: {totalSalesVolume}</h4>
             {/* <a href={createEmailLink(contactEmail)}>Email</a>   */}
         </div>
     )

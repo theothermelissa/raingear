@@ -1,52 +1,169 @@
-import  React, { useContext } from 'react';
-import OrderCard from './OrderCard';
-import { Timeline } from 'antd';
-import selectStatusColor from './selectStatusColor';
+import  React, { useContext, useState, useEffect } from 'react';
+import {Table, Tag} from 'antd';
 import { find, matchesProperty, sortBy } from 'lodash';
+import {format} from 'date-fns';
 import {RecordsContext} from '../App';
 
 
 const Orders = ({ orders, setHovered }) => {
+  const {
+    recordsDispatch, recordsState: {
+      fundraiserToDisplay
+    }
+  } = useContext(RecordsContext);
+
+
+  const [updatedOrders, setUpdatedOrders] = useState('');
+  const [columns, setColumns] = useState('');
+  
+  const productInFundraiser = (product) => fundraiserToDisplay.fields.products.includes(product);
+  const setFullName = (first, last) => `${first} ${last}`;
+
   const chooseRecord = (recordName) => {
     const chosenRecord = find(orders, matchesProperty('seller', recordName));
     recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
   }
+  const formatPhoneNumber= (ph) => {
+    var cleaned = ('' + ph).replace(/\D/g, '');
+    var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+    }
+    return null;
+  }
 
-//   const prefillStatus = (currentStatus) => {
-//     return (
-//         currentStatus ? currentStatus : "Inquiry"
-//     )
-//   };
-  
-  const {
-    recordsDispatch
-  } = useContext(RecordsContext);
+  useEffect(() => {
+    const formattedDate = (date) => format(new Date(date), 'MMM dd');
+    if (orders) {
+      let allOrders = [];
+      orders.map((order) => {
+        const { id, fields: {
+          "Order ID": orderID,
+          Date: date,
+          Seller: seller,
+          "Supporter First Name": supporterFirstName,
+          "Supporter Last Name": supporterLastName,
+          "Supporter Email": supporterEmail,
+          "Supporter Phone": supporterPhone,
+          ButtQty: buttQty,
+          HamQty: hamQty,
+          TurkeyQty: turkeyQty,
+          SauceQty: sauceQty,
+          "ButtPrice (from Fundraiser)": buttPrice,
+          "HamPrice (from Fundraiser)": hamPrice,
+          "TurkeyPrice (from Fundraiser)": turkeyPrice,
+          "SaucePrice (from Fundraiser)": saucePrice,
+          "Total Price": totalPrice,
+          Status: orderStatus,
+          PlaceAnOrderURL: placeAnOrderURL,
+          "Supporter Address": supporterAddress,
+          "Supporter AddressLine2": supporterAddressLine2,
+          "Supporter City": supporterCity,
+          "Supporter State": supporterState,
+          "Supporter Zip": supporterZip,
+          "Supporter MailingList OptIn": supporterOptIn,
+        } } = order;
+        const formattedOrder = {
+          orderID: orderID,
+          date: formattedDate(date),
+          seller: seller,
+          supporterFirstName: supporterFirstName,
+          supporterLastName: supporterLastName,
+          supporterFullName: setFullName(supporterFirstName, supporterLastName),
+          supporterEmail: supporterEmail,
+          supporterPhone: formatPhoneNumber(supporterPhone),
+          buttQty: productInFundraiser("Boston Butts") ? buttQty : '',
+          hamQty: productInFundraiser("Half Hams") ? hamQty : '',
+          turkeyQty: productInFundraiser("Whole Turkeys") ? turkeyQty : '',
+          sauceQty: productInFundraiser("BBQ Sauce") ? sauceQty : '',
+          buttPrice: productInFundraiser("Boston Butts") ? buttPrice : '',
+          hamPrice: productInFundraiser("Half Hams") ? hamPrice : '',
+          turkeyPrice: productInFundraiser("Whole Turkeys") ? turkeyPrice : '',
+          saucePrice: productInFundraiser("BBQ Sauce") ? saucePrice : '',
+          totalPrice: `$${totalPrice}`,
+          orderStatus: orderStatus,
+          placeAnOrderURL: placeAnOrderURL,
+          supporterAddress: supporterAddress,
+          supporterAddressLine2: supporterAddressLine2,
+          supporterCity: supporterCity,
+          supporterState: supporterState,
+          supporterZip: supporterZip,
+          supporterOptIn: supporterOptIn,
+        }
+        allOrders.push(formattedOrder);
+      })
+      setUpdatedOrders(allOrders);
+      const createProductColumns = () => {
+        let columnTitles = [];
+        const productDataIndex = (product) => {
+            let result;
+            switch (product) {
+                case "Boston Butts": result = ("buttQty");
+                    break;
+                case "Half Hams": result = ("hamQty");
+                    break;
+                case "Whole Turkeys": result = ("turkeyQty");
+                    break;
+                case "BBQ Sauce": result = ("sauceQty");
+                    break;
+                default: result = "";
+            }
+            return result;
+        }
+        fundraiserToDisplay.fields.products.map((product) => columnTitles.push({
+            title: product,
+            dataIndex: productDataIndex(product),
+            key: (productDataIndex(product)),
+        }));
+        // console.log("columnTitles: ", columnTitles);
+        return columnTitles;
+      }
+      const createEmailLink = (address) => `mailto:${address}`;
+      setColumns([
+        {
+          title: 'Supporter',
+          dataIndex: 'supporterFullName',
+          key: 'name',
+        },
+        {
+            title: 'Order Date',
+            dataIndex: 'date',
+            key: 'date',
+        },
+        {
+            title: "Phone",
+            dataIndex: 'supporterPhone',
+            key: 'supporterPhone',
+        },
+        ...createProductColumns(),
+        {
+            title: 'Total',
+            dataIndex: 'totalPrice',
+            key: 'totalPrice'
+        },
+        {
+            title: 'Email',
+            dataIndex: 'supporterEmail',
+            key: 'supporterEmail',
+            render: text => <a href={createEmailLink(text)}>{text}</a>,
+            width: '00px'
+        }
+      ])
+    }
+  }, [orders])
   
   return (
-    <div>
-      <div>
-        <Timeline
-          mode="left"
-          style={{
-            marginLeft: "20px",
-            padding: "30px 40px 0px 0px",
-            maxWidth: '500px'
-          }}
-        >
-        {sortBy(orders, ['deliveryDate']).map(order => (
-            <Timeline.Item 
-              onMouseEnter={() => setHovered(order['recordID'])}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => chooseRecord(order['organization'])}
-            //   color={selectStatusColor(prefillStatus(order["status"]))}
-              key={order["recordID"]}
-            >
-              <OrderCard order={order} />
-            </Timeline.Item>
-        ))}
-        </Timeline>
-      </div>
-    </div>
+    <>
+      {updatedOrders.length
+        ? <Table
+          columns={columns}
+          dataSource={updatedOrders}
+          pagination={false}
+          id='ordersTable'
+          />
+        : <h1>No orders yet!</h1>
+      }
+    </>
   );
 }
 

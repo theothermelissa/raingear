@@ -89,18 +89,19 @@ const OrganizerView = () => {
                         height: '100vh',
                         position: 'fixed',
                         left: 0,
-                        backgroundColor: '#d9d9d9' 
+                        backgroundColor: '#d9d9d9',
                     }
                 }
                 width="auto"
                 className="site-layout-background">
                     {/* <div>Here are the sellers: {JSON.stringify(sellersToDisplay)}</div> */}
+                    {/* <h1 style={{ fontSize: '1.5em', margin: '10px 0px 0px 90px' }}>SELLERS</h1> */}
                     <Sellers sellers={sellersToDisplay} />
                 </Sider>
             </Layout>
             <Layout>
                 <Content style={{ overflow: 'initial', minHeight: '100vh'}}>
-                    Here are the orders: {JSON.stringify(ordersToDisplay)}
+                    <Orders orders={ordersToDisplay} />
                 </Content>
             </Layout>
         </>
