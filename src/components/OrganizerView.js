@@ -56,7 +56,6 @@ const OrganizerView = () => {
                             // return;
                         // };
                         sellers.map((seller) => {
-                            console.log("seller in OrganizerView: ", seller);
                             allSellers.push(seller)
                             if (seller.fields.Orders) {
                                 // totalOrders = totalOrders + seller.fields.Orders.length;

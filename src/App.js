@@ -10,9 +10,6 @@ import NavBar from './components/NavBar';
 import {sortBy, find, matches, filter} from 'lodash';
 import FundraisersPage from './components/FundraisersPage';
 import Profile from './components/Profile';
-import OrganizerView from './components/OrganizerView';
-import ProviderView from './components/ProviderView';
-import GuardianView from './components/GuardianView';
 import HomePage from './components/HomePage';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
@@ -242,7 +239,7 @@ function App() {
                             if (guardian['fields']) {
                                 const { fields: { Sellers: guardiansSellers } } = guardian;
                                 const sellersToGet = () => {
-                                    if (role === "seller") {
+                                    if (role.role) {
                                         numberSellers += 1;
                                         return createFilterFormula(usersSellerRecords, "recordID");
                                     } else if (role === "organizer" && guardiansSellers) {
@@ -260,7 +257,7 @@ function App() {
                                 base("Sellers")
                                 .select({
                                     filterByFormula: sellersToGet(),
-                                    fields: getRoleSpecificSellerFields(role),
+                                    fields: getRoleSpecificSellerFields(role.role ? "seller" : role),
                                 })
                                 .eachPage(function page(sellerRecords, fetchNextPage) {
                                         sellerRecords.forEach((seller, sellerIndex) => {
@@ -318,7 +315,7 @@ function App() {
                                                     base("Orders")
                                                     .select({
                                                         filterByFormula: createFilterFormula(orders, "Order ID"),
-                                                        fields: getRoleSpecificOrderFields(role),
+                                                        fields: getRoleSpecificOrderFields(role.role ? "seller" : role),
                                                     })
                                                     .eachPage(function page(orderRecords, fetchNextPage) {
                                                         orderRecords.forEach((order, orderIndex) => {

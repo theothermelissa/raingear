@@ -20,6 +20,14 @@ const Customers = ({ guardian, sellerToView }) => {
 
     const setFullName = (first, last) => `${first} ${last}`;
     const productInFundraiser = (product) => products.includes(product);
+    const formatPhoneNumber= (ph) => {
+        var cleaned = ('' + ph).replace(/\D/g, '');
+        var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+          return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+        }
+        return null;
+      }
     
     //choose customer data to display
     useEffect(() => {
@@ -72,7 +80,7 @@ const Customers = ({ guardian, sellerToView }) => {
                                 supporterLastName: supporterLastName,
                                 supporterFullName: setFullName(supporterFirstName, supporterLastName),
                                 supporterEmail: supporterEmail,
-                                supporterPhone: supporterPhone,
+                                supporterPhone: formatPhoneNumber(supporterPhone),
                                 buttQty: productInFundraiser("Boston Butts") ? buttQty : '',
                                 hamQty: productInFundraiser("Half Hams") ? hamQty : '',
                                 turkeyQty: productInFundraiser("Whole Turkeys") ? turkeyQty : '',
@@ -119,6 +127,7 @@ const Customers = ({ guardian, sellerToView }) => {
                     title: product,
                     dataIndex: productDataIndex(product),
                     key: (productDataIndex(product)),
+                    align: 'center',
                 }));
                 // console.log("columnTitles: ", columnTitles);
                 return columnTitles;
@@ -134,11 +143,13 @@ const Customers = ({ guardian, sellerToView }) => {
                     title: 'Order Date',
                     dataIndex: 'date',
                     key: 'date',
+                    width: '80px',
                 },
                 {
                     title: "Phone",
                     dataIndex: 'supporterPhone',
                     key: 'supporterPhone',
+                    width: '140px',
                 },
                 ...createProductColumns(),
                 {

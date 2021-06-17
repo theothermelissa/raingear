@@ -124,16 +124,15 @@ export const getRoleSpecificSellerFields = (role) => {
                 "Total Sales Volume",
             ];
             break;
-        case "seller": result = [
-                "Email",
-                "Nickname",
-                "recordID",
-                "Orders",
-                "Total Orders",
-                "Total Sales Volume",
-            ];
-            break;
-        default: result = "";
+        default: result = [
+            "Email",
+            "Nickname",
+            "recordID",
+            "Orders",
+            "Total Orders",
+            "Total Sales Volume",
+            "Link to Order From This Seller",
+        ];
     }
     return result;
 }
@@ -193,7 +192,8 @@ export const getRecordType = (id, data) => {
     let result;
     const {
         organizerRecords,
-        "Fundraiser (from sellerRecords)": sellerRecords,
+        sellerRecords,
+        "Fundraiser (from sellerRecords)": sellerFundraiserRecords,
         "Active Fundraiser (from guardianRecords)": guardianRecords,
         providerRecords,
     } = data;
@@ -201,8 +201,8 @@ export const getRecordType = (id, data) => {
     if (organizerRecords && organizerRecords.includes(id)) {
         result = "organizer";
     }
-    if (sellerRecords && sellerRecords.includes(id)) {
-        result = "seller";
+    if (sellerFundraiserRecords && sellerFundraiserRecords.includes(id)) {
+        result = {role: "seller", id: sellerRecords};
     }
     if (guardianRecords && guardianRecords.includes(id)) {
         result = "guardian";

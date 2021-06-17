@@ -114,6 +114,7 @@ const Orders = ({ orders, setHovered }) => {
             title: product,
             dataIndex: productDataIndex(product),
             key: (productDataIndex(product)),
+            align: 'center',
         }));
         // console.log("columnTitles: ", columnTitles);
         return columnTitles;

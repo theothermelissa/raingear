@@ -90,28 +90,30 @@ const NavBar = () => {
             >
               <img className="headerLogo" src={firehouseLogo} alt="Firehouse Logo" style={{ height: "50px", width: "auto" }} />
               <Col flex={6} >
-                <Menu theme="dark" mode="horizontal">
-                    <Menu.Item style={{ float: "left" }} key="fundraiser">
                     { (role === "provider") ?
-                    <NavLink to="/">
-                      Fundraisers
-                    </NavLink> :
+                    <Menu theme="dark" mode="horizontal">
+                      <Menu.Item style={{ float: "left" }} key="fundraiser">
+                        <NavLink to="/">
+                          Fundraisers
+                        </NavLink> 
+                      </Menu.Item> 
+                      <Menu.Item style={{ float: "left" }} key="calendar">
+                        <NavLink to="/calendar">
+                          Calendar
+                        </NavLink>
+                      </Menu.Item>
+                    </Menu>
+                    :
                     // <div>Provider</div> :
-                    <Dropdown overlay={fundraiserMenu} placement="bottomLeft" >
-                      <div>Fundraisers</div>
-                    </Dropdown>
-                    // <div>Not a Provider</div>
-                        // <Dropdown overlay={fundraiserMenu}>
-                        //   Fundraisers
-                        // </Dropdown>
+                    <Menu theme="dark" mode="horizontal">
+                      <Menu.Item style={{ float: "left" }} key="fundraiser">
+                        <Dropdown overlay={fundraiserMenu} placement="bottomLeft" >
+                          <div>Fundraisers</div>
+                        </Dropdown>
+                      </Menu.Item> 
+                    </Menu>
                     }
-                    </Menu.Item> 
-                    <Menu.Item style={{ float: "left" }} key="calendar">
-                      <NavLink to="/calendar">
-                        Calendar
-                      </NavLink>
-                    </Menu.Item>
-                </Menu>
+                    
               </Col>
               <Col flex={1}>
                 <Menu theme="dark" mode="horizontal">

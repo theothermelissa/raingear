@@ -14,8 +14,6 @@ const Sellers = ({ sellers }) => {
     }
   }, [sellers])
 
-  console.log("sortedSellers: ", sortedSellers)
-
   // const chooseRecord = (recordName) => {
   //   const chosenRecord = find(orders, matchesProperty('seller', recordName));
   //   recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
