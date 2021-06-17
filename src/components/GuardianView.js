@@ -15,7 +15,14 @@ const GuardianView = () => {
                     sellerGuardians: allSellerGuardians,
                     deliveryDate,
                     deliveryAddress,
+                    deliveryCity,
+                    deliveryState,
+                    deliveryZip,
                     fundraiserName,
+                    contactFirstName,
+                    contactLastName,
+                    contactPhone,
+                    contactEmail,
                 }
             }
         }
@@ -26,7 +33,15 @@ const GuardianView = () => {
     const [allSellersLoaded, setAllSellersLoaded] = useState(false);
     const [selectedSeller, setSelectedSeller] = useState('all');
 
-    const formattedDate = (date) => format(new Date(date), 'MMM dd');
+    const formattedDate = (date) => format(new Date(date), 'MMMM dd');
+    function formatPhoneNumber(ph) {
+        var cleaned = ('' + ph).replace(/\D/g, '');
+        var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+          return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+        }
+        return null;
+      }
     
     useEffect(() => {
         if (whichDataIsLoaded === 'all' && allSellerGuardians) {
@@ -85,17 +100,26 @@ const GuardianView = () => {
                 className="site-layout-background">
                     <div style={{ padding: "12px" }}>
                         <h1>{fundraiserName}</h1>
-                        <h1>Delivery {<b>{formattedDate(deliveryDate)}</b>}</h1>
-                        <h1>@ {deliveryAddress}</h1>
+                        <h1 >Delivery on</h1>
+                        <h1 >{<b style={{ color: "darkred", fontSize: "2em" }}>{formattedDate(deliveryDate)}</b>}</h1>
+                        <h2 style={{ marginBottom: "-5px" }}>{deliveryAddress}</h2>
+                        <h2>{deliveryCity}, {deliveryState} {deliveryZip}</h2>
+                        <br></br>
                     </div>
-                <Menu theme='dark' width='100%' defaultSelectedKeys={sellers.length > 1 ? "allSellers" : sellers[0].id}>
-                    {sellers.length > 1  
-                        ? sellerMenuItems()
-                        : <Menu.Item key={sellers[0].id} icon={<UserOutlined onClick={() => selectSeller(sellers[0].id)} />}>
-                            {sellers[0].fields.Nickname}
-                        </Menu.Item>
-                    }
-                </Menu>
+                    <Menu theme='dark' width='100%' defaultSelectedKeys={sellers.length > 1 ? "allSellers" : sellers[0].id}>
+                        {sellers.length > 1  
+                            ? sellerMenuItems()
+                            : <Menu.Item key={sellers[0].id} icon={<UserOutlined onClick={() => selectSeller(sellers[0].id)} />}>
+                                {sellers[0].fields.Nickname}
+                            </Menu.Item>
+                        }
+                    </Menu>
+                    <div style={{ padding: "30px 12px" }}>
+                        <h1>Fundraiser Coordinator: </h1>
+                        <h2 style={{ marginBottom: "-5px" }}>{contactFirstName} {contactLastName}</h2>
+                        <h2>{formatPhoneNumber(contactPhone)}</h2>
+                    </div>
+
                 </Sider>
             </Layout>
             <Layout className="site-layout" >

@@ -155,12 +155,19 @@ const Orders = ({ orders, setHovered }) => {
   
   return (
     <>
-      {updatedOrders.length
+      { 
+      updatedOrders.length
         ? <Table
           columns={columns}
           dataSource={updatedOrders}
           pagination={false}
           id='ordersTable'
+          // scroll={
+          //   {
+          //       x: 200,
+          //       y: 250
+          //   }
+          // }
           />
         : <h1>No orders yet!</h1>
       }

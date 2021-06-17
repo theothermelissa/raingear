@@ -7,6 +7,11 @@ import SellerCard from './SellerCard';
 const Sellers = ({ sellers }) => {
   const [sortedSellers, setSortedSellers] = useState('');
 
+  const setHovered = (id) => {
+    console.log("hovering over id: ", id)
+    // recordsDispatch({type: 'setHovered', payload: id})
+  };
+
   useEffect(() => {
     if (sellers) {
       let result = orderBy(sellers, item => [item.fields['Total Orders'], item.fields['Total Sales Volume']], ['desc', 'desc']);
@@ -25,7 +30,7 @@ const Sellers = ({ sellers }) => {
   
   return (
     <div>
-      {sortedSellers && sortedSellers.map((seller) => <SellerCard seller={seller} />)}
+      {sortedSellers && sortedSellers.map((seller) => <SellerCard seller={seller} setHovered={setHovered} />)}
     </div>
   );
 }

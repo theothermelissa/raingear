@@ -377,7 +377,7 @@ function App() {
         return () => {
             cancelled = true
         };
-    }, [userRecord.Email, whichDataIsLoaded, ]);
+    }, [userRecord.Email, whichDataIsLoaded]);
   
     //set recordsState fundraiserToDisplay to first active fundraiser or, if provider, all fundraisers
     useEffect(() => {
@@ -406,12 +406,12 @@ function App() {
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
             <Router basename={'/'}>
                 <NavBar/> 
-                {/* {
+                {
                 recordsState["drawerVisible"] &&
                 <EditDrawer />
-                } */}
+                }
                 <Switch> 
-                    {!isAuthenticated && <div>Please log in using the button at the top right.</div> }
+                    {!isAuthenticated && <div>Please log in.</div> }
                     {isAuthenticated && loading && <div>Loading ...</div>}
                     {/* <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} /> */}
                     {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
