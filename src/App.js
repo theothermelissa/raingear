@@ -4,11 +4,12 @@ import {notification} from 'antd';
 import {BrowserRouter as Router, Switch, Route, withRouter} from "react-router-dom";
 import './App.scss';
 import recordsReducer from './reducers/recordsReducer';
+import highlightReducer from './reducers/highlightReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
 import {sortBy, find, matches, filter} from 'lodash';
-import FundraisersPage from './components/FundraisersPage';
+import ProviderView from './components/ProviderView';
 import Profile from './components/Profile';
 import HomePage from './components/HomePage';
 import ProtectedRoute from './auth/protected-route';
@@ -31,15 +32,10 @@ import { create, indexOf, update } from 'lodash';
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
+export const HighlightContext = React.createContext(null);
+export const HighlightDispatch = React.createContext(null);
 
-// get the data, save it to the recordsState (done)
-// save the fundraiserToDisplay & userRole to the recordsState (I need the components to access the recordsState instead of receiving the fundraisers as props)
-// display which version of the site based on the role (wait I need different versions)
-// change the fundraiser in the menu (wait I need a menu)
-// components render data
-// profit
-
-const initialState = {
+const initialRecordsState = {
     user: '',
     records: '',
     fundraiserToDisplay: '',
@@ -49,15 +45,20 @@ const initialState = {
     recordToEdit: '',
     alert: '',
     recordHasChanged: false,
-    hoveredID: null,
+    hoveredIDs: null,
     whichDataIsLoaded: '',
+};
+
+const initialHighlightState = {
+    highlightedRecordIDs: null,
 };
 
 function App() {
     
     const {user, isAuthenticated} = useAuth0();
     const [loading, setLoading] = useState(true);
-    const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
+    const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialRecordsState);
+    const [highlightState, highlightDispatch] = useReducer(highlightReducer, initialHighlightState);
     const [userRecord, setUserRecord] = useState('');
     const [whichDataIsLoaded, setWhichDataIsLoaded] = useState('');
     const [fundraisers, setFundraisers] = useState('');
@@ -404,22 +405,24 @@ function App() {
 
     return (
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
-            <Router basename={'/'}>
-                <NavBar/> 
-                {
-                recordsState["drawerVisible"] &&
-                <EditDrawer />
-                }
-                <Switch> 
-                    {!isAuthenticated && <div>Please log in.</div> }
-                    {isAuthenticated && loading && <div>Loading ...</div>}
-                    {/* <Route exact path="/" render={props => <FundraisersPage fundraisers={fundraisers} {...props}/>} /> */}
-                    {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
-                    {/* <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/> */}
-                    {/* <ProtectedRoute path="/profile" component={Profile} /> */}
-                </Switch>
-                {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
-            </Router>
+            <HighlightContext.Provider value={{highlightState, highlightDispatch}}>
+                <Router basename={'/'}>
+                    <NavBar/> 
+                    {
+                    recordsState["drawerVisible"] &&
+                    <EditDrawer />
+                    }
+                    <Switch> 
+                        {!isAuthenticated && <div>Please log in.</div> }
+                        {isAuthenticated && loading && <div>Loading ...</div>}
+                        {/* <Route exact path="/" render={props => <ProviderView fundraisers={fundraisers} {...props}/>} /> */}
+                        {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
+                        {/* <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/> */}
+                        {/* <ProtectedRoute path="/profile" component={Profile} /> */}
+                    </Switch>
+                    {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}
+                </Router>
+            </HighlightContext.Provider>
         </RecordsContext.Provider>
     );
 }

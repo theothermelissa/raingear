@@ -1,16 +1,11 @@
 import  React, { useContext, useEffect, useState } from 'react';
 import { find, matchesProperty, orderBy } from 'lodash';
-import {RecordsContext} from '../App';
 import SellerCard from './SellerCard';
+import highlightReducer from '../reducers/highlightReducer';
 
 
-const Sellers = ({ sellers }) => {
+const Sellers = ({ sellers, setHighlight, removeHighlight }) => {
   const [sortedSellers, setSortedSellers] = useState('');
-
-  const setHovered = (id) => {
-    console.log("hovering over id: ", id)
-    // recordsDispatch({type: 'setHovered', payload: id})
-  };
 
   useEffect(() => {
     if (sellers) {
@@ -21,16 +16,12 @@ const Sellers = ({ sellers }) => {
 
   // const chooseRecord = (recordName) => {
   //   const chosenRecord = find(orders, matchesProperty('seller', recordName));
-  //   recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
+  //   highlightDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
   // }
-  
-  const {
-    recordsDispatch
-  } = useContext(RecordsContext);
   
   return (
     <div>
-      {sortedSellers && sortedSellers.map((seller) => <SellerCard seller={seller} setHovered={setHovered} />)}
+      {sortedSellers && sortedSellers.map((seller) => <SellerCard seller={seller} key={seller.id} setHighlight={setHighlight} removeHighlight={removeHighlight} />)}
     </div>
   );
 }

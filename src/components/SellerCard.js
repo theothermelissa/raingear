@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import 'antd/dist/antd.css';
 // import { format } from 'date-fns'
 // import selectStatusColor from './selectStatusColor';
 
-const SellerCard = ({ seller, setHovered }) => {
-
-    // const convertedDate = (date) => format(new Date(date), 'MMMM dd');
+const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
 
     const { 
         id,
@@ -37,9 +35,9 @@ const SellerCard = ({ seller, setHovered }) => {
             "Contact City": contactCity,
             "Contact State": contactState,
             "Contact Zip": contactZip,
+            "Orders": orders,
         }
     } = seller;
-    // console.log("seller.fields: ", seller.fields)
     
     function formatPhoneNumber(ph) {
         var cleaned = ('' + ph).replace(/\D/g, '');
@@ -48,14 +46,20 @@ const SellerCard = ({ seller, setHovered }) => {
           return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
         return null;
-      }
+    }
+
+    const createOrderList = () => {
+        if (orders) {
+            return orders.map((order) => order.id)
+        }
+    }
 
     const createEmailLink = (email) => `mailto:${email}`;
 
     return (
         <div 
-            onMouseEnter={() => setHovered(id)} 
-            onMouseLeave={() => setHovered(null)}
+            onMouseEnter={() => setHighlight(createOrderList(orders))} 
+            onMouseLeave={() => removeHighlight()} 
             style={{
                 backgroundColor: "white",
                 margin: "10px",

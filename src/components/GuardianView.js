@@ -68,6 +68,9 @@ const GuardianView = () => {
     
     const sellerMenuItems = () => {
         let result = [];
+        result.push(
+            <Menu.Item key="allSellers" onClick={() => selectSeller("all")} icon={<TeamOutlined />}>View All Sellers</Menu.Item>
+        )
         sellers.map((seller) => {
             result.push(
                 <Menu.Item key={seller.id} onClick={() => selectSeller(seller.id)} icon={<UserOutlined />}>
@@ -75,9 +78,6 @@ const GuardianView = () => {
                 </Menu.Item>
             )
         });
-        result.push(
-            <Menu.Item key="allSellers" onClick={() => selectSeller("all")} icon={<TeamOutlined />}>View All</Menu.Item>
-        )
         return result;
     };
     
@@ -100,9 +100,10 @@ const GuardianView = () => {
                 className="site-layout-background">
                     <div style={{ padding: "12px" }}>
                         <h1>{fundraiserName}</h1>
-                        <h1 >Delivery on</h1>
-                        <h1 >{<b style={{ color: "darkred", fontSize: "2em" }}>{formattedDate(deliveryDate)}</b>}</h1>
-                        <h2 style={{ marginBottom: "-5px" }}>{deliveryAddress}</h2>
+                        <br></br>
+                        <h1 >Delivery on:</h1>
+                        <h1 style={{ margin: "0px 0px -5px 0px" }} >{<b style={{ color: "darkred", fontSize: "2em" }}>{formattedDate(deliveryDate)}</b>}</h1>
+                        <h2 style={{ margin: "-5px 0px" }}>{deliveryAddress}</h2>
                         <h2>{deliveryCity}, {deliveryState} {deliveryZip}</h2>
                         <br></br>
                     </div>

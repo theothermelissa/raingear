@@ -2,7 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import {Layout, Menu, Breadcrumb} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
 import {find, matchesProperty} from 'lodash';
-import {RecordsContext} from '../App';
+import {RecordsContext, HighlightContext} from '../App';
 import Orders from './Orders';
 import Sellers from './Sellers';
 
@@ -11,83 +11,83 @@ const OrganizerView = () => {
         recordsDispatch,
         recordsState: {
             whichDataIsLoaded,
-            hoveredID,
+            hoveredIDs,
             fundraiserToDisplay: {
+                id,
                 fields: fundraiserFields,
                 fields: {
-                    sellerGuardians
+                    sellerGuardians,
+                    fundraiserName,
+                    organization,
+                    deliveryDate,
+                    deliveryAddress,
+                    deliveryCity,
+                    deliveryState,
+                    deliveryZip,
+                    deliveryNotes,
+                    products,
+                    customerButtPrice,
+                    customerHamPrice,
+                    customerTurkeyPrice,
+                    customerSaucePrice,
+                    orders,
+                    contactFirstName,
+                    contactLastName,
+                    contactEmail,
+                    contactPhone,
+                    recordID,
+                    sellers,
+                    orderCount,
+                    inviteSellersURL,
+                    status,
+                    buttCount,
+                    hamCount,
+                    turkeyCount,
+                    sauceCount,
+                    organizationProceeds
                 }
             }
         }
     } = useContext(RecordsContext);
+
+    const {
+        highlightState: {
+            highlightedRecordIDs,
+        },
+        highlightDispatch
+    } = useContext(HighlightContext);
+
     const {Sider, Content} = Layout;
 
     const [sellersToDisplay, setSellersToDisplay] = useState('');
     const [ordersToDisplay, setOrdersToDisplay] = useState('');
-    const [highlightedOrders, setHighlightedOrders] = useState('');
+    const [recordsToHighlight, setRecordsToHighlight] = useState('');
 
-    // const isHovered = (id) => highlightedRecordIDs.includes(id);
-
-    // useEffect(() => {
-    //     if (hoveredID && !highlightedOrders) {
-    //         console.log("There's a hoveredID: ", hoveredID)
-    //         // setHighlightedOrders(find(ordersToDisplay, matchesProperty('recordID', hoveredID)));
-    //     }
-    //     // return() => {
-    //     //     setHighlightedOrders('')
-    //     // }
-    // }, [hoveredID])
-
-    // useEffect(() => {
-    //     if (selectedSeller) {
-    //         console.log("selectedSeller: ", selectedSeller);
-    //     }
-    //     return () => {
-    //         setSelectedSeller('');
-    //     }
-    // }, [selectedSeller])
+    const setHighlight = (ids) => setRecordsToHighlight(ids);
+    const removeHighlight = () => setRecordsToHighlight(null);
 
     useEffect(() => {
         if (sellerGuardians) {
-            // let totalGuardians = sellerGuardians.length;
-            // let guardiansRetrieved = 0;
             let allOrders = [];
             let allSellers = [];
             if (!sellersToDisplay) {
-                sellerGuardians.map((guardian) => {
-                    // let totalSellers = 0;
-                    // let sellersRetrieved = 0;
-                    // let totalOrders = 0;
-                    // let ordersRetrieved = 0;
-                    const {
-                        fields: {
-                            Sellers: sellers
-                        }
-                    } = guardian;
-                    if (sellers) {
-                        // totalSellers = sellers.length;
-                        // console.log("totalSellers: ", totalSellers);
-                        // if (totalSellers === sellersRetrieved && totalOrders === ordersRetrieved) {
-                        // setSellersToDisplay(allSellers);
-                        // setOrdersToDisplay(allOrders);
-                        // return;
-                        // };
-                        sellers.map((seller) => {
-                            allSellers.push(seller)
-                            if (seller.fields.Orders) { // totalOrders = totalOrders + seller.fields.Orders.length;
-                                seller.fields.Orders.map((order) => {
-                                    allOrders.push(order);
-                                    // console.log("increment ordersRetrieved.")
-                                    // ordersRetrieved += 1;
-                                });
+                    sellerGuardians.map((guardian) => {
+                        const {
+                            fields: {
+                                Sellers: sellers
                             }
-                            // console.log("increment sellersRetrieved.")
-                            // sellersRetrieved += 1;
-                        })
-                    }
-                    // console.log("increment guardiansRetrieved.")
-                    // guardiansRetrieved += 1;
-                })
+                        } = guardian;
+                        if (sellers) {
+                            sellers.map((seller) => {
+                                allSellers.push(seller)
+                                if (seller.fields.Orders) { 
+                                    seller.fields.Orders.map((order) => {
+                                        allOrders.push(order);
+                                    });
+                                }
+                            })
+                        }
+                    })
                 setSellersToDisplay(allSellers);
                 setOrdersToDisplay(allOrders);
             }
@@ -109,9 +109,7 @@ const OrganizerView = () => {
                     }
                     width="auto"
                     className="site-layout-background">
-                    {/* <div>Here are the sellers: {JSON.stringify(sellersToDisplay)}</div> */}
-                    {/* <h1 style={{ fontSize: '1.5em', margin: '10px 0px 0px 90px' }}>SELLERS</h1> */}
-                    <Sellers sellers={sellersToDisplay}/>
+                    <Sellers sellers={sellersToDisplay} setHighlight={setHighlight} removeHighlight={removeHighlight} />
                 </Sider>
             </Layout>
             <Layout>
@@ -121,7 +119,7 @@ const OrganizerView = () => {
                         minHeight: '100vh'
                     }
                 }>
-                    <Orders orders={ordersToDisplay}/>
+                    <Orders orders={ordersToDisplay} recordsToHighlight={recordsToHighlight}/>
                 </Content>
             </Layout>
         </>

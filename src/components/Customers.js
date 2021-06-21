@@ -5,6 +5,7 @@ import {RecordsContext} from '../App';
 
 const Customers = ({ guardian, sellerToView }) => {
     const { recordsDispatch, recordsState: {
+        hoveredIDs,
         fundraiserToDisplay: {
             fields: {
                 sellerGuardians: allSellerGuardians,
@@ -20,6 +21,7 @@ const Customers = ({ guardian, sellerToView }) => {
 
     const setFullName = (first, last) => `${first} ${last}`;
     const productInFundraiser = (product) => products.includes(product);
+    const chooseRecord = (id) => recordsDispatch({type: 'chooseRecord', payload: id});
     const formatPhoneNumber= (ph) => {
         var cleaned = ('' + ph).replace(/\D/g, '');
         var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -27,7 +29,7 @@ const Customers = ({ guardian, sellerToView }) => {
           return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
         return null;
-      }
+    };
     
     //choose customer data to display
     useEffect(() => {
@@ -74,6 +76,7 @@ const Customers = ({ guardian, sellerToView }) => {
                             } } = order;
                             const updatedOrders = {
                                 orderID: orderID,
+                                key: orderID,
                                 date: formattedDate(date),
                                 seller: seller,
                                 supporterFirstName: supporterFirstName,

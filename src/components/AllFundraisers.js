@@ -8,10 +8,12 @@ import {RecordsContext} from '../App';
 const AllFundraisers = ({fundraisers}) => {
     const {recordsDispatch, recordsState: {
             hoveredID
-        }} = useContext(RecordsContext);
+        }
+    } = useContext(RecordsContext);
 
-    const convertedDate = (date) => format(new Date(date), 'MMM dd');
     const [updatedFundraisers, setUpdatedFundraisers] = useState('');
+    
+    const convertedDate = (date) => format(new Date(date), 'MMM dd');
 
     const chooseRecord = (recordName) => {
         const chosenRecord = find(fundraisers, { fields: "status"}, matchesProperty('organization', recordName));
@@ -21,37 +23,6 @@ const AllFundraisers = ({fundraisers}) => {
     const prefillStatus = (currentStatus) => {
         return(currentStatus ? currentStatus : "Inquiry")
     };
-
-    useEffect(() => {
-        if (fundraisers[0]) {
-            setUpdatedFundraisers(fundraisers.map(record => {
-                return {
-                    ...record,
-                    'deliveryDate': convertedDate(record['deliveryDate']),
-                    'organizationProceeds': `$${
-                        Math.round(record['organizationProceeds'])
-                    }`,
-                    'totalRevenue': `$${
-                        Math.round(record['totalRevenue'])
-                    }`,
-                    'firehouseFee': `$${
-                        Math.round(record['firehouseFee'])
-                    }`,
-                    'isHovered': record['recordID'] === hoveredID,
-                    'key': record["recordID"],
-                    'status': `${
-                        prefillStatus(record["status"])
-                    }`
-                }
-            }))
-        }
-    }, [fundraisers, hoveredID]);
-
-    const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
-
-    const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
-    const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
-    const isHovered = (id) => id === hoveredID;
 
     const chooseProduct = (product) => {
         switch (product) {
@@ -111,6 +82,37 @@ const AllFundraisers = ({fundraisers}) => {
                 return null;
         }
     }
+
+    useEffect(() => {
+        if (fundraisers[0]) {
+            setUpdatedFundraisers(fundraisers.map(record => {
+                return {
+                    ...record,
+                    'deliveryDate': convertedDate(record['deliveryDate']),
+                    'organizationProceeds': `$${
+                        Math.round(record['organizationProceeds'])
+                    }`,
+                    'totalRevenue': `$${
+                        Math.round(record['totalRevenue'])
+                    }`,
+                    'firehouseFee': `$${
+                        Math.round(record['firehouseFee'])
+                    }`,
+                    'isHovered': record['recordID'] === hoveredID,
+                    'key': record["recordID"],
+                    'status': `${
+                        prefillStatus(record["status"])
+                    }`
+                }
+            }))
+        }
+    }, [fundraisers, hoveredID]);
+
+    const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
+
+    const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
+    const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
+    const isHovered = (id) => id === hoveredID;
 
     const columns = [
         {

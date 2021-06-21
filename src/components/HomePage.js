@@ -3,7 +3,7 @@ import { RecordsContext } from '../App';
 import GuardianView from './GuardianView';
 import OrganizerView from './OrganizerView';
 import SellerView from './SellerView';
-import FundraisersPage from './FundraisersPage';
+import ProviderView from './ProviderView';
 
 const HomePage = () => {
     const { recordsState: { fundraiserToDisplay: { role } } } = useContext(RecordsContext);
@@ -12,7 +12,7 @@ const HomePage = () => {
             {role.role && <SellerView sellerIDs={role.id}/>}
             {role === "guardian" && <GuardianView />}
             {role === "organizer" && <OrganizerView />}
-            {role === "provider" && <FundraisersPage />}
+            {/* {role === "provider" && <ProviderView />} */}
         </>
     )
 };

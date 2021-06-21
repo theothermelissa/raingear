@@ -5,7 +5,8 @@ import {format} from 'date-fns';
 import {RecordsContext} from '../App';
 
 
-const Orders = ({ orders, setHovered }) => {
+const Orders = ({ orders, recordsToHighlight }) => {
+  console.log("recordsToHighlight: ", recordsToHighlight)
   const {
     recordsDispatch, recordsState: {
       fundraiserToDisplay
@@ -18,11 +19,20 @@ const Orders = ({ orders, setHovered }) => {
   
   const productInFundraiser = (product) => fundraiserToDisplay.fields.products.includes(product);
   const setFullName = (first, last) => `${first} ${last}`;
+  const isHighlighted = (id) => {
+    if (recordsToHighlight) {
+      if (recordsToHighlight.includes(id)) {
+        console.log("match");
+        return true;
+      }
+      return false;
+    } else {return false} 
+  };
 
-  const chooseRecord = (recordName) => {
-    const chosenRecord = find(orders, matchesProperty('seller', recordName));
-    recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
+  const chooseRecord = (id) => {
+    recordsDispatch({type: 'chooseRecord', payload: id})
   }
+
   const formatPhoneNumber= (ph) => {
     var cleaned = ('' + ph).replace(/\D/g, '');
     var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -31,6 +41,7 @@ const Orders = ({ orders, setHovered }) => {
     }
     return null;
   }
+
 
   useEffect(() => {
     const formattedDate = (date) => format(new Date(date), 'MMM dd');
@@ -65,6 +76,7 @@ const Orders = ({ orders, setHovered }) => {
         } } = order;
         const formattedOrder = {
           orderID: orderID,
+          key: orderID,
           date: formattedDate(date),
           seller: seller,
           supporterFirstName: supporterFirstName,
@@ -124,12 +136,12 @@ const Orders = ({ orders, setHovered }) => {
         {
           title: 'Supporter',
           dataIndex: 'supporterFullName',
-          key: 'name',
+          key: 'supporterName',
         },
         {
             title: 'Order Date',
             dataIndex: 'date',
-            key: 'date',
+            key: 'orderDate',
         },
         {
             title: "Phone",
@@ -162,6 +174,14 @@ const Orders = ({ orders, setHovered }) => {
           dataSource={updatedOrders}
           pagination={false}
           id='ordersTable'
+          onRow={
+            (record, rowIndex) => {
+              return {
+                className: isHighlighted(record.orderID) ? 'hovered' : '',
+              }
+            }
+          }
+          // bordered={true}
           // scroll={
           //   {
           //       x: 200,

@@ -26,6 +26,7 @@ const recordsReducer = (state, action) => {
                     user: '',
                };
           case 'chooseRecord':
+               // console.log("Chosen record:", action.payload);
                return {
                     ...state,
                     focusedRecordID: action.payload,
@@ -44,7 +45,7 @@ const recordsReducer = (state, action) => {
           case 'setHovered':
                return {
                     ...state,
-                    hoveredID: action.payload,
+                    hoveredIDs: action.payload,
                };
           case 'showDrawer':
                return {
