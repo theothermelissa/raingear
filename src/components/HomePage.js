@@ -12,7 +12,7 @@ const HomePage = () => {
             {role.role && <SellerView sellerIDs={role.id}/>}
             {role === "guardian" && <GuardianView />}
             {role === "organizer" && <OrganizerView />}
-            {/* {role === "provider" && <ProviderView />} */}
+            {role === "provider" && <ProviderView />}
         </>
     )
 };

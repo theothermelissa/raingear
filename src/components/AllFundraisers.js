@@ -5,9 +5,10 @@ import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
 import {RecordsContext} from '../App';
 
-const AllFundraisers = ({fundraisers}) => {
+const AllFundraisers = ({ hoveredFundraiser }) => {
     const {recordsDispatch, recordsState: {
-            hoveredID
+            hoveredID,
+            fundraiserToDisplay: { fundraisers }
         }
     } = useContext(RecordsContext);
 
@@ -15,10 +16,15 @@ const AllFundraisers = ({fundraisers}) => {
     
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
 
-    const chooseRecord = (recordName) => {
-        const chosenRecord = find(fundraisers, { fields: "status"}, matchesProperty('organization', recordName));
-        recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
+    const chooseRecord = (id) => {
+        recordsDispatch({type: 'chooseRecord', payload: id})
     }
+
+    const isHighlighted = (id) => {
+        if (hoveredFundraiser) {
+            return (hoveredFundraiser === id) 
+        } else return false;
+    };
 
     const prefillStatus = (currentStatus) => {
         return(currentStatus ? currentStatus : "Inquiry")
@@ -84,8 +90,9 @@ const AllFundraisers = ({fundraisers}) => {
     }
 
     useEffect(() => {
-        if (fundraisers[0]) {
-            setUpdatedFundraisers(fundraisers.map(record => {
+        if (fundraisers) {
+            setUpdatedFundraisers(fundraisers.map(fundraiser => {
+                const { fields: record} = fundraiser
                 return {
                     ...record,
                     'deliveryDate': convertedDate(record['deliveryDate']),
@@ -98,7 +105,7 @@ const AllFundraisers = ({fundraisers}) => {
                     'firehouseFee': `$${
                         Math.round(record['firehouseFee'])
                     }`,
-                    'isHovered': record['recordID'] === hoveredID,
+                    // 'isHovered': record['recordID'] === hoveredID,
                     'key': record["recordID"],
                     'status': `${
                         prefillStatus(record["status"])
@@ -217,6 +224,7 @@ const AllFundraisers = ({fundraisers}) => {
                     pagination={false}
                     size='small'
                     id='fundraisersTable'
+                    bordered={true}
                     scroll={
                         {
                             x: 700,
@@ -227,16 +235,29 @@ const AllFundraisers = ({fundraisers}) => {
                         (record, rowIndex) => {
                             return {
                                 onClick: event => {
-                                    chooseRecord(record["organization"])
+                                    chooseRecord(record["recordID"])
                                 },
-                                className: isHovered(record.recordID) ? 'hovered' : '', // click row
+                                className: isHighlighted(record.recordID) ? 'hovered' : '', // click row
                                 id: `row${
                                     record.recordID
                                 }`,
                                 key: rowIndex
                             };
                         }
-                    }/>
+                        // (record, rowIndex) => {
+                        //     return {
+                        //         onClick: event => {
+                        //             chooseRecord(record["organization"])
+                        //         },
+                        //         // className: isHovered(record.recordID) ? 'hovered' : '', // click row
+                        //         id: `row${
+                        //             record.recordID
+                        //         }`,
+                        //         key: rowIndex
+                        //     };
+                        // }
+                    }
+                    />
             </div>
         } </>
     );

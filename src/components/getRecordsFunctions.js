@@ -208,10 +208,7 @@ export const getRecordType = (id, data) => {
         result = "guardian";
     };
     if (providerRecords && providerRecords.includes(id)) {
-        result = {
-            "role": "provider",
-            "id": id
-        };
+        result = "provider";
     };
     return result;
 };

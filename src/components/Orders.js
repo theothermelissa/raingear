@@ -6,7 +6,6 @@ import {RecordsContext} from '../App';
 
 
 const Orders = ({ orders, recordsToHighlight }) => {
-  console.log("recordsToHighlight: ", recordsToHighlight)
   const {
     recordsDispatch, recordsState: {
       fundraiserToDisplay
@@ -22,7 +21,6 @@ const Orders = ({ orders, recordsToHighlight }) => {
   const isHighlighted = (id) => {
     if (recordsToHighlight) {
       if (recordsToHighlight.includes(id)) {
-        console.log("match");
         return true;
       }
       return false;

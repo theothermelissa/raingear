@@ -26,7 +26,6 @@ const recordsReducer = (state, action) => {
                     user: '',
                };
           case 'chooseRecord':
-               // console.log("Chosen record:", action.payload);
                return {
                     ...state,
                     focusedRecordID: action.payload,

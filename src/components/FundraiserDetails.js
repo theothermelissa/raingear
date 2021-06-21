@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { find, matchesProperty } from 'lodash';
 import {RecordsContext} from '../App';
 import {
     Card,
@@ -10,44 +11,63 @@ import {
 
 const {Meta} = Card;
 
-const FundraiserDetails = ({ recordToDisplay }) => {
+const FundraiserDetails = () => {
     const {
         recordsDispatch,
+        recordsState: {
+            fundraiserToDisplay: {
+                fundraisers
+            },
+            focusedRecordID,
+        }
     } = useContext(RecordsContext);
+
+    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('fundraiserID', focusedRecordID)));
+
+    useEffect(() => {
+        if (fundraisers) {
+            let fullFundraiserRecord = find(fundraisers, matchesProperty('fundraiserID', focusedRecordID));
+            setViewThisFundraiser(fullFundraiserRecord);
+        }
+    }, [fundraisers])
 
 
     const {
-        fundraiserName,
-        deliveryCity,
-        deliveryAddress,
-        deliveryState,
-        deliveryZip,
-        deliveryNotes,
-        daysUntilDelivery,
-        contactFirstName,
-        contactPhone,
-        contactLastName,
-        contactAddress,
-        contactAddressLine2,
-        contactCity,
-        contactState,
-        contactZip,
-        contactPreferredMethod,
-        contactEmail,
-        status,
-        buttCount,
-        hamCount,
-        turkeyCount,
-        sauceCount,
-        customerButtPrice,
-        customerHamPrice,
-        customerTurkeyPrice,
-        customerSaucePrice,
-        firehouseFee,
-        orderTotals,
-        organizationProceeds,
-        recordID,
-    } = recordToDisplay;
+        fields: {
+            fundraiserName,
+            deliveryCity,
+            deliveryAddress,
+            deliveryState,
+            deliveryZip,
+            deliveryNotes,
+            daysUntilDelivery,
+            contactFirstName,
+            contactPhone,
+            contactLastName,
+            contactAddress,
+            contactAddressLine2,
+            contactCity,
+            contactState,
+            contactZip,
+            contactPreferredMethod,
+            contactEmail,
+            status,
+            buttCount,
+            hamCount,
+            turkeyCount,
+            sauceCount,
+            customerButtPrice,
+            customerHamPrice,
+            customerTurkeyPrice,
+            customerSaucePrice,
+            firehouseFee,
+            orderTotals,
+            organizationProceeds,
+            recordID,
+        }
+    } = viewThisFundraiser;
+
+    console.log('fundraiserName: ', fundraiserName);
 
     let orders = [];
     if (orderTotals) {

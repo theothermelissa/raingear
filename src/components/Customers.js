@@ -126,7 +126,7 @@ const Customers = ({ guardian, sellerToView }) => {
                     }
                     return result;
                 }
-                products.map((product) => columnTitles.push({
+                products.map((product, index) => columnTitles.push({
                     title: product,
                     dataIndex: productDataIndex(product),
                     key: (productDataIndex(product)),

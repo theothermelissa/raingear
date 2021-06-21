@@ -1,4 +1,4 @@
-import  React, { useContext } from 'react';
+import  React, { useContext, useEffect, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import { Timeline } from 'antd';
 import selectStatusColor from './selectStatusColor';
@@ -6,9 +6,19 @@ import { find, matchesProperty, sortBy } from 'lodash';
 import {RecordsContext} from '../App';
 
 
-const FundraiserTimeline = ({ fundraisers, setHovered }) => {
+const FundraiserTimeline = ({ setHovered }) => {
+  const { recordsDispatch, recordsState: {
+    fundraiserToDisplay: { fundraisers }
+  }} = useContext(RecordsContext)
+
+  const [fundraisersForCards, setFundraisersForCards] = useState('');
+
+  useEffect(() => {
+    setFundraisersForCards(fundraisers.map((fundraiser) => fundraiser.fields))
+  }, fundraisers)
+  
   const chooseRecord = (recordName) => {
-    const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
+    const chosenRecord = find(fundraisersForCards, matchesProperty('organization', recordName));
     recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
   }
 
@@ -17,10 +27,6 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
         currentStatus ? currentStatus : "Inquiry"
     )
   };
-  
-  const {
-    recordsDispatch
-  } = useContext(RecordsContext);
   
   return (
     <div>
@@ -33,8 +39,9 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
             maxWidth: '500px'
           }}
         >
-        {sortBy(fundraisers, ['deliveryDate']).map(fundraiser => (
+        {sortBy(fundraisersForCards, ['deliveryDate']).map(fundraiser => (
             <Timeline.Item 
+              // onMouseEnter={() => console.log("fundraiser to hover: ", fundraiser["recordID"])}
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
               onMouseLeave={() => setHovered(null)}
               onClick={() => chooseRecord(fundraiser['organization'])}

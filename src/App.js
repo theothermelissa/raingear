@@ -190,7 +190,6 @@ function App() {
                                 numberGuardians += sellerGuardians.length;
                                 guardiansToGet = createFilterFormula(sellerGuardians, "GuardianID");
                             }
-                            // console.log("guardiansToGet: ", guardiansToGet);
                             base("SellerGuardians")
                             .select({
                                 filterByFormula: guardiansToGet,
@@ -389,7 +388,10 @@ function App() {
             if (isProvider.length) {
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
-                    payload: fundraisers,
+                    payload: {
+                        role: "provider",
+                        fundraisers: fundraisers
+                    },
                 })
             } else {
                 let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
