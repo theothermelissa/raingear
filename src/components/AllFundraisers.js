@@ -218,7 +218,8 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
 
     return (
         <> {
-            updatedFundraisers && <div>
+            updatedFundraisers && 
+            <div style={{ width: '70vw' }}>
                 <Table dataSource={dataSource}
                     columns={columns}
                     pagination={false}
@@ -244,18 +245,6 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                                 key: rowIndex
                             };
                         }
-                        // (record, rowIndex) => {
-                        //     return {
-                        //         onClick: event => {
-                        //             chooseRecord(record["organization"])
-                        //         },
-                        //         // className: isHovered(record.recordID) ? 'hovered' : '', // click row
-                        //         id: `row${
-                        //             record.recordID
-                        //         }`,
-                        //         key: rowIndex
-                        //     };
-                        // }
                     }
                     />
             </div>

@@ -67,8 +67,6 @@ const FundraiserDetails = () => {
         }
     } = viewThisFundraiser;
 
-    console.log('fundraiserName: ', fundraiserName);
-
     let orders = [];
     if (orderTotals) {
         orderTotals.map((total) => orders.push(total));
@@ -121,7 +119,8 @@ const FundraiserDetails = () => {
                     {
                         margin: "16px 0px",
                         padding: "0px",
-                        backgroundColor: '#fafafa'
+                        backgroundColor: '#fafafa',
+                        minWidth: "70vw",
                     }
                 }
                 extra={

@@ -419,7 +419,7 @@ function App() {
                         {isAuthenticated && loading && <div>Loading ...</div>}
                         {/* <Route exact path="/" render={props => <ProviderView fundraisers={fundraisers} {...props}/>} /> */}
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
-                        {/* <Route path="/calendar" render={props => fundraisers[0] && <FirehouseCalendar fundraisers={fundraisers} {...props} />}/> */}
+                        <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>
                         {/* <ProtectedRoute path="/profile" component={Profile} /> */}
                     </Switch>
                     {/* {userRecord.id && <div>Here is the data: {JSON.stringify(userRecord)}</div>} */}

@@ -2,9 +2,11 @@ import React, {useContext, useState, useEffect} from 'react';
 import {Layout, Menu, Breadcrumb} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
 import {find, matchesProperty} from 'lodash';
-import {RecordsContext, HighlightContext} from '../App';
-import Orders from './Orders';
+import {RecordsContext} from '../App';
+import AllOrders from './AllOrders';
+import OrderDetails from './OrderDetails';
 import Sellers from './Sellers';
+import InviteSellersButton from './InviteSellersButton';
 
 const OrganizerView = () => {
     const {
@@ -12,6 +14,7 @@ const OrganizerView = () => {
         recordsState: {
             whichDataIsLoaded,
             hoveredIDs,
+            viewFocusedRecord,
             fundraiserToDisplay: {
                 id,
                 fields: fundraiserFields,
@@ -50,13 +53,6 @@ const OrganizerView = () => {
         }
     } = useContext(RecordsContext);
 
-    const {
-        highlightState: {
-            highlightedRecordIDs,
-        },
-        highlightDispatch
-    } = useContext(HighlightContext);
-
     const {Sider, Content} = Layout;
 
     const [sellersToDisplay, setSellersToDisplay] = useState('');
@@ -66,6 +62,7 @@ const OrganizerView = () => {
     const setHighlight = (ids) => setRecordsToHighlight(ids);
     const removeHighlight = () => setRecordsToHighlight(null);
 
+    //sets Sellers and Orders to display
     useEffect(() => {
         if (sellerGuardians) {
             let allOrders = [];
@@ -98,18 +95,25 @@ const OrganizerView = () => {
     return (
         <>
             <Layout>
-                <Sider style={
+                <Sider 
+                    width="auto"
+                    className="site-layout-background"
+                    style={
                         {
                             overflow: 'auto',
                             height: '100vh',
                             position: 'fixed',
                             left: 0,
-                            backgroundColor: '#d9d9d9'
+                            backgroundColor: '#d9d9d9',
                         }
                     }
-                    width="auto"
-                    className="site-layout-background">
-                    <Sellers sellers={sellersToDisplay} setHighlight={setHighlight} removeHighlight={removeHighlight} />
+                >
+                    <Sellers
+                        sellers={sellersToDisplay}
+                        setHighlight={setHighlight}
+                        removeHighlight={removeHighlight}
+                    />
+                    <InviteSellersButton link={inviteSellersURL} />
                 </Sider>
             </Layout>
             <Layout>
@@ -119,8 +123,12 @@ const OrganizerView = () => {
                         minHeight: '100vh'
                     }
                 }>
-                    <Orders orders={ordersToDisplay} recordsToHighlight={recordsToHighlight}/>
-                </Content>
+                    <AllOrders
+                        orders={ordersToDisplay}
+                        recordsToHighlight={recordsToHighlight}
+                />
+                  {viewFocusedRecord && <OrderDetails />}
+               </Content>
             </Layout>
         </>
     )

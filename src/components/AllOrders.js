@@ -5,7 +5,7 @@ import {format} from 'date-fns';
 import {RecordsContext} from '../App';
 
 
-const Orders = ({ orders, recordsToHighlight }) => {
+const AllOrders = ({ orders, recordsToHighlight }) => {
   const {
     recordsDispatch, recordsState: {
       fundraiserToDisplay
@@ -176,6 +176,7 @@ const Orders = ({ orders, recordsToHighlight }) => {
             (record, rowIndex) => {
               return {
                 className: isHighlighted(record.orderID) ? 'hovered' : '',
+                onClick: () => chooseRecord(record.orderID),
               }
             }
           }
@@ -193,4 +194,4 @@ const Orders = ({ orders, recordsToHighlight }) => {
   );
 }
 
-export default Orders;
+export default AllOrders;

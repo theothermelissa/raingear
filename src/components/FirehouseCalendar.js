@@ -5,16 +5,23 @@ import moment from 'moment';
 import {RecordsContext} from '../App';
 
 
-const FirehouseCalendar = ({ fundraisers }) => {
+const FirehouseCalendar = () => {
     const [fundraiserData, setFundraiserData] = useState([]);
     const {
-        recordsDispatch
+        recordsDispatch,
+        recordsState: {
+            fundraiserToDisplay: {
+                fundraisers
+            }
+        }
       } = useContext(RecordsContext);
 
-    useEffect(() => {
-        setFundraiserData(fundraisers.map(record => {
+      
+      useEffect(() => {
+          setFundraiserData(fundraisers.map(record => {
+            console.log("record.fields: ", record.fields)
             return {
-                ...record,
+                ...record.fields,
                 'deliveryDate': moment(record['deliveryDate']),
                 'key': record["recordID"],
             }
