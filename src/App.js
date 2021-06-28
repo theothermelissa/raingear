@@ -40,7 +40,7 @@ const initialRecordsState = {
     records: '',
     fundraiserToDisplay: '',
     viewFocusedRecord: false,
-    focusedRecordID: '',
+    focusedRecord: '',
     drawerVisible: false,
     recordToEdit: '',
     alert: '',

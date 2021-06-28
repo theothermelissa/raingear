@@ -1,5 +1,5 @@
 import  React, { useContext, useState, useEffect } from 'react';
-import {Table, Tag} from 'antd';
+import {Table, Tag, Modal} from 'antd';
 import { find, matchesProperty, sortBy } from 'lodash';
 import {format} from 'date-fns';
 import {RecordsContext} from '../App';
@@ -27,8 +27,8 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
     } else {return false} 
   };
 
-  const chooseRecord = (id) => {
-    recordsDispatch({type: 'chooseRecord', payload: id})
+  const chooseRecord = (order) => {
+    recordsDispatch({type: 'chooseRecord', payload: order})
   }
 
   const formatPhoneNumber= (ph) => {
@@ -176,7 +176,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
             (record, rowIndex) => {
               return {
                 className: isHighlighted(record.orderID) ? 'hovered' : '',
-                onClick: () => chooseRecord(record.orderID),
+                onClick: () => chooseRecord(record),
               }
             }
           }

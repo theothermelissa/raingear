@@ -28,9 +28,14 @@ const recordsReducer = (state, action) => {
           case 'chooseRecord':
                return {
                     ...state,
-                    focusedRecordID: action.payload,
+                    focusedRecord: action.payload,
                     viewFocusedRecord: true,
                };
+          case 'dismissRecord':
+               return {
+                    ...state,
+                    viewFocusedRecord: false,
+               }
           case 'updateRecords':
                return {
                     ...state,

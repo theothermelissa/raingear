@@ -62,7 +62,6 @@ const GuardianView = () => {
 
 
     const selectSeller = (id) => {
-        console.log("clicking to select seller")
         setSelectedSeller(id);
     };
     

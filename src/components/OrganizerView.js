@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {Layout, Menu, Breadcrumb} from 'antd';
+import {Layout, Menu, Breadcrumb, Modal} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
 import {find, matchesProperty} from 'lodash';
 import {RecordsContext} from '../App';
@@ -61,6 +61,9 @@ const OrganizerView = () => {
 
     const setHighlight = (ids) => setRecordsToHighlight(ids);
     const removeHighlight = () => setRecordsToHighlight(null);
+    const dismissModal = () => recordsDispatch({
+        type: 'dismissRecord',
+    })
 
     //sets Sellers and Orders to display
     useEffect(() => {
@@ -90,7 +93,6 @@ const OrganizerView = () => {
             }
         }
     }, [fundraiserFields, sellersToDisplay, ordersToDisplay]);
-
 
     return (
         <>
@@ -127,7 +129,14 @@ const OrganizerView = () => {
                         orders={ordersToDisplay}
                         recordsToHighlight={recordsToHighlight}
                 />
-                  {viewFocusedRecord && <OrderDetails />}
+                <Modal 
+                    title="Order Details"
+                    visible={viewFocusedRecord}
+                    onOK={dismissModal}
+                    onCancel={dismissModal}
+                >
+                    <OrderDetails />
+                </Modal>
                </Content>
             </Layout>
         </>

@@ -18,15 +18,15 @@ const FundraiserDetails = () => {
             fundraiserToDisplay: {
                 fundraisers
             },
-            focusedRecordID,
+            focusedRecord,
         }
     } = useContext(RecordsContext);
 
-    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('fundraiserID', focusedRecordID)));
+    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('fundraiserID', focusedRecord)));
 
     useEffect(() => {
         if (fundraisers) {
-            let fullFundraiserRecord = find(fundraisers, matchesProperty('fundraiserID', focusedRecordID));
+            let fullFundraiserRecord = find(fundraisers, matchesProperty('fundraiserID', focusedRecord));
             setViewThisFundraiser(fullFundraiserRecord);
         }
     }, [fundraisers])
