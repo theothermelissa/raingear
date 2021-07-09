@@ -100,8 +100,6 @@ const EditFundraiser = () => {
     const closeDrawer = () => recordsDispatch({type: "closeDrawer"});
 
     const submitRecordChanges = (values) => {
-        console.log("values: ", values);
-        console.log("recordToEdit: ", recordToEdit);
         base('Fundraisers').update([
             {
                 "id": recordToEdit,
@@ -113,12 +111,14 @@ const EditFundraiser = () => {
                 return;
             }
         });
-        recordsDispatch({type: "updateRecords"});
+        recordsDispatch({
+            type: "updateRecords",
+            payload: recordToEdit,
+        });
         closeDrawer();
     };
 
     function getExistingValues() {
-        console.log("existingValues: ", existingValues)
         return existingValues;
     }
 

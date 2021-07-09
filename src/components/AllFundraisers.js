@@ -102,8 +102,8 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     'totalRevenue': `$${
                         Math.round(record['totalRevenue'])
                     }`,
-                    'firehouseFee': `$${
-                        Math.round(record['firehouseFee'])
+                    'providerFee': `$${
+                        Math.round(record['providerFee'])
                     }`,
                     // 'isHovered': record['recordID'] === hoveredID,
                     'key': record["recordID"],
@@ -162,16 +162,16 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
             )
         },
         {
-            title: 'FH Total',
-            dataIndex: 'firehouseFee',
-            key: 'firehouseFee',
+            title: "We've Made",
+            dataIndex: 'providerFee',
+            key: 'providerFee',
             render: item => (
                 <>
                     <div>{item}</div>
                 </>
             )
         }, {
-            title: 'Org Total',
+            title: "They've Raised",
             dataIndex: 'organizationProceeds',
             key: 'organizationProceeds',
             render: item => (

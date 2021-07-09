@@ -1,4 +1,4 @@
-export const defaultGuardianRecord = "recuI6t9TkoTtniBs";
+export const defaultGuardianRecord = "recRQHAvZDdaZXPft";
 
 export const getRoleSpecificOrderFields = (role) => {
     let result;
@@ -78,6 +78,31 @@ export const getRoleSpecificOrderFields = (role) => {
                 "Supporter Zip",
             ]
             break;
+        case "provider": result = [
+                "Order ID",
+                "Date",
+                // "Seller",
+                // "Supporter First Name",
+                // "Supporter Last Name",
+                // "Supporter Email",
+                // "Supporter Phone",
+                "ButtQty",
+                "HamQty",
+                "TurkeyQty",
+                "SauceQty",
+                "ButtPrice (from Fundraiser)",
+                "HamPrice (from Fundraiser)",
+                "TurkeyPrice (from Fundraiser)",
+                "SaucePrice (from Fundraiser)",
+                "Total Price",
+                "Status",
+                // "PlaceAnOrderURL",
+                // "Supporter AddressLine1",
+                // "Supporter AddressLine2",
+                // "Supporter State",
+                // "Supporter Zip",
+            ]
+            break;
         default: result = "";
     };
     return result;
@@ -117,6 +142,16 @@ export const getRoleSpecificSellerFields = (role) => {
         case "guardian": result = [
                 "Email",
                 "Nickname",
+                "recordID",
+                "Orders",
+                "SellerGuardian",
+                "Total Orders",
+                "Total Sales Volume",
+            ];
+            break;
+        case "provider": result = [
+                // "Email",
+                // "Nickname",
                 "recordID",
                 "Orders",
                 "SellerGuardian",
@@ -167,7 +202,9 @@ export const getFundraiserFields = () => {
         "hamCount",
         "turkeyCount",
         "sauceCount",
-        "organizationProceeds"
+        "organizationProceeds",
+        "totalRevenue",
+        "providerFee",
     ];
 };
 
@@ -180,6 +217,11 @@ export const addRecordToArray = (record, array) => {
     } else {
         return [record]
     }
+};
+
+export const saveRecordInArray = (record, list, index) => {
+    list.splice(index, 1, record);
+    return list;
 };
 
 export const arrayify = (string) => {
@@ -195,7 +237,7 @@ export const getRecordType = (id, data) => {
         sellerRecords,
         "Fundraiser (from sellerRecords)": sellerFundraiserRecords,
         "Active Fundraiser (from guardianRecords)": guardianRecords,
-        providerRecords,
+        "Fundraisers (from Providers)": providerRecords,
     } = data;
     
     if (organizerRecords && organizerRecords.includes(id)) {

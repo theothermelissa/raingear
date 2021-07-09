@@ -40,6 +40,7 @@ const recordsReducer = (state, action) => {
                return {
                     ...state,
                     recordHasChanged: true,
+                    recordUpdated: action.payload,
                };
           case 'doNotUpdate':
                return {
