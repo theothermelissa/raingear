@@ -15,8 +15,12 @@ export const getFundraisers = (user, ids, callback) => {
             const { 
                 id,
                 fields,
-                fields: {sellerGuardians}
+                fields: {
+                    sellerGuardians,
+                    deliveryDate
+                },
             } = fundraiserRecord;
+            console.log("deliveryDate: ", deliveryDate)
             fundraiserData.push({
                 role: getRecordType(id, user),
                 id,

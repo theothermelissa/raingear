@@ -14,20 +14,20 @@ const FirehouseCalendar = () => {
                 fundraisers
             }
         }
-      } = useContext(RecordsContext);
+    } = useContext(RecordsContext);
 
       
-      useEffect(() => {
-          setFundraiserData(fundraisers.map(record => {
-            console.log("record.fields: ", record.fields)
+    useEffect(() => {
+        setFundraiserData(fundraisers.map(record => {
             return {
                 ...record.fields,
-                'deliveryDate': moment(record['deliveryDate']),
+                'deliveryDate': moment(record['fields']['deliveryDate']),
                 'key': record["recordID"],
             }
         }))
     }, [fundraisers]);
 
+        
     const showDrawer = (item) => {
         recordsDispatch({type: "selectDate", payload: item});
         recordsDispatch({type: "showDrawer"});
@@ -51,6 +51,7 @@ const FirehouseCalendar = () => {
             <div>
                 {fundraiserData && fundraiserData.map(item => {
                     if (dateIsMatch(date, item["deliveryDate"])) {
+                        console.log('match')
                         return (
                             <div key={item["organization"]} onClick={() => chooseRecordToEdit(item["organization"])}>
                                 <Avatar.Group style={{ width: '100%', backgroundColor: '#f0f0f0', padding: "3px",borderRadius: "5px", margin: "4px 4px 0px 0px", }} >
