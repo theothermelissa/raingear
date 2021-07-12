@@ -5,11 +5,6 @@ const recordsReducer = (state, action) => {
                     ...state,
                     records: action.payload,
                };
-          case 'setDataLoaded':
-               return {
-                    ...state,
-                    whichDataIsLoaded: action.payload,
-               }
           case 'setUser': 
                return {
                     ...state,

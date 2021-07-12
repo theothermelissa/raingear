@@ -22,11 +22,11 @@ const FundraiserDetails = () => {
         }
     } = useContext(RecordsContext);
 
-    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('fundraiserID', focusedRecord)));
+    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('id', focusedRecord.toString())));
 
     useEffect(() => {
         if (fundraisers) {
-            let fullFundraiserRecord = find(fundraisers, matchesProperty('fundraiserID', focusedRecord));
+            let fullFundraiserRecord = find(fundraisers, matchesProperty('id', focusedRecord));
             setViewThisFundraiser(fullFundraiserRecord);
         }
     }, [fundraisers])

@@ -65,8 +65,9 @@ export const getFundraisers = (user, ids, callback) => {
                 })
             }
         })
+    }).then(() => {
+        callback(fundraiserData)
     })
-    callback(fundraiserData)
 }
 
 export const getGuardian = (id, guardianIndex, callback) => {
