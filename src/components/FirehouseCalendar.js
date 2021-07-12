@@ -51,7 +51,6 @@ const FirehouseCalendar = () => {
             <div>
                 {fundraiserData && fundraiserData.map(item => {
                     if (dateIsMatch(date, item["deliveryDate"])) {
-                        console.log('match')
                         return (
                             <div key={item["organization"]} onClick={() => chooseRecordToEdit(item["organization"])}>
                                 <Avatar.Group style={{ width: '100%', backgroundColor: '#f0f0f0', padding: "3px",borderRadius: "5px", margin: "4px 4px 0px 0px", }} >

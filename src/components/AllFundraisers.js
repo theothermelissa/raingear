@@ -8,11 +8,12 @@ import {RecordsContext} from '../App';
 const AllFundraisers = ({ hoveredFundraiser }) => {
     const {recordsDispatch, recordsState: {
             hoveredID,
+            recordHasChanged,
             fundraiserToDisplay: { fundraisers }
         }
     } = useContext(RecordsContext);
 
-    const [updatedFundraisers, setUpdatedFundraisers] = useState('');
+    const [updatedFundraisers, setUpdatedFundraisers] = useState(fundraisers);
     
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
 
@@ -92,30 +93,31 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
     useEffect(() => {
         if (fundraisers) {
             setUpdatedFundraisers(fundraisers.map(fundraiser => {
-                const { fields: record} = fundraiser
+                const { id, role, fields} = fundraiser;
                 return {
-                    ...record,
-                    'deliveryDate': convertedDate(record['deliveryDate']),
-                    'organizationProceeds': `$${
-                        Math.round(record['organizationProceeds'])
-                    }`,
-                    'totalRevenue': `$${
-                        Math.round(record['totalRevenue'])
-                    }`,
-                    'providerFee': `$${
-                        Math.round(record['providerFee'])
-                    }`,
-                    // 'isHovered': record['recordID'] === hoveredID,
-                    'key': record["recordID"],
-                    'status': `${
-                        prefillStatus(record["status"])
-                    }`
+                        ...fields,
+                        'deliveryDate': convertedDate(fields['deliveryDate']),
+                        'organizationProceeds': `$${
+                            Math.round(fields['organizationProceeds'])
+                        }`,
+                        'totalRevenue': `$${
+                            Math.round(fields['totalRevenue'])
+                        }`,
+                        'providerFee': `$${
+                            Math.round(fields['providerFee'])
+                        }`,
+                        // 'isHovered': fields['fieldsID'] === hoveredID,
+                        'key': fields["recordID"],
+                        'status': `${
+                            prefillStatus(fields["status"])
+                        }`
                 }
             }))
         }
     }, [fundraisers, hoveredID]);
 
     const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
+
 
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
@@ -226,6 +228,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     size='small'
                     id='fundraisersTable'
                     bordered={true}
+                    // rowKey={object => object.id}
                     scroll={
                         {
                             x: 700,
@@ -234,15 +237,14 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     }
                     onRow={
                         (record, rowIndex) => {
+                            const { recordID: id } = record;
                             return {
                                 onClick: event => {
-                                    chooseRecord(record["recordID"])
+                                    chooseRecord(id)
                                 },
-                                className: isHighlighted(record.recordID) ? 'hovered' : '', // click row
-                                id: `row${
-                                    record.recordID
-                                }`,
-                                key: rowIndex
+                                className: isHighlighted(id) ? 'hovered' : '', // click row
+                                id: id,
+                                key: id,
                             };
                         }
                     }

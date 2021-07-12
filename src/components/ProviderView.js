@@ -1,10 +1,9 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState} from 'react';
 import {Layout} from 'antd';
 import FundraiserTimeline from './FundraiserTimeline';
 import AllFundraisers from './AllFundraisers';
 import FundraiserDetails from './FundraiserDetails';
 import {RecordsContext} from '../App';
-import {find, matchesProperty} from 'lodash';
 
 const {Sider, Content} = Layout;
 

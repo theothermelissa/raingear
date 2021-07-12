@@ -15,10 +15,11 @@ const FundraiserDetails = () => {
     const {
         recordsDispatch,
         recordsState: {
+            recordHasChanged,
             fundraiserToDisplay: {
                 fundraisers
             },
-            focusedRecord,
+            focusedRecord
         }
     } = useContext(RecordsContext);
 
@@ -29,7 +30,7 @@ const FundraiserDetails = () => {
             let fullFundraiserRecord = find(fundraisers, matchesProperty('id', focusedRecord));
             setViewThisFundraiser(fullFundraiserRecord);
         }
-    }, [fundraisers])
+    }, [fundraisers, focusedRecord, recordHasChanged])
 
 
     const {

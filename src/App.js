@@ -7,7 +7,7 @@ import highlightReducer from './reducers/highlightReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
-import {find, indexOf, result} from 'lodash';
+import {findIndex, matchesProperty} from 'lodash';
 import ProviderView from './components/ProviderView';
 import Profile from './components/Profile';
 import HomePage from './components/HomePage';
@@ -53,19 +53,8 @@ function App() {
         drawerVisible,
     } = recordsState;
     
-    // get & save user's user with fundraiserIDs using their email
+    // set user data by email
     useEffect(() => {
-        // if (recordHasChanged) {
-        //     console.log("the record has changed and we need to update something");
-        //     const recordToReload = find(fundraisers, ['fundraiserID', recordUpdated])
-        //     const fundraiserIndex = indexOf(fundraisers, recordToReload)
-        //     console.log('fundraiserIndex: ', fundraiserIndex);
-        //     // const fetchCompleteFundraiserData = () => {
-        //     //     base("Fundraisers")
-        //     //         .select
-        //     // }
-        //     //fetch complete fundraiser data
-        // }
         if (isAuthenticated && !user) {
             base('Users').select({
                     filterByFormula: `{Email} = "${
@@ -98,11 +87,10 @@ function App() {
         }
     }, [isAuthenticated, user, recordHasChanged])
 
-    //set recordsState fundraiserToDisplay to first active fundraiser or, if provider, all fundraisers
+    // set fundraiserToDisplay
     useEffect(() => {
-        // let cancelled = false;
-        // if (cancelled) { return }; 
         if (fundraisers) {
+            console.log("Fundraisers in App: ", fundraisers)
             const isProvider = record => record.role === 'provider';
             const isActive = record => record.fields.status === 'Active';
             let providerRecords = fundraisers.filter(isProvider);
@@ -134,49 +122,45 @@ function App() {
             }
             setLoading(false);
         }
-        // if (fundraisers) {
-        //     console.log("fundraisers: ", fundraisers)
-        //     fundraisers.map((fundraiser) => console.log('fundraiser: ', fundraiser))
-        //     // function isProvider (record) {
-        //     //     return record.role === 'provider';
-        //     // };
-        //     // console.log('test: ', isProvider(fundraisers[0]))
-        //     // console.log('fundraisers.find(isProvider): ',fundraisers.find(isProvider));
-        //     // console.log('test: ', [{id: 1, role: "potato"}, {id: 2, role:'provider'}].find(isProvider));
-        //     // let isProvider = fundraisers.filter((fundraiser) => fundraiser.role === "provider");
-        //     // if (isProvider.length) {
-        //     //     recordsDispatch({
-        //     //         type: 'setFundraiserToDisplay',
-        //     //         payload: {
-        //     //             role: "provider",
-        //     //             fundraisers: fundraisers
-        //     //         },
-        //     //     })
-        //     // } else {
-        //     //     let activeFundraisers = fundraisers.filter((fundraiser) => fundraiser.fields.status === "Active");
-        //     //     recordsDispatch({
-        //     //         type: 'setFundraiserToDisplay',
-        //     //         payload: activeFundraisers[0],
-        //     //     });
-        //     // }
-        //     // setLoading(false);
-        // };
-    //   return () => cancelled = true;
     }, [fundraisers]);
 
+    // fetch fundraiser data
     useEffect(() => {
         if (user.Email) {
-            const {
-                allFundraisers,
-                roleInfo
-            } = user;
-            // console.log("fundraisers: ", fundraisers)
-            const callbackForFetch = (result) => {
-                setFundraisers(result);
+            if (recordsState.recordHasChanged) {
+                const {
+                    recordToEdit
+                } = recordsState
+                let newFundraisers = fundraisers;
+                console.log("recordToEdit: ", recordToEdit);
+                const fundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordToEdit))
+                const callbackForFetch = (result) => {
+                    newFundraisers[fundraiserIndex] = {
+                        role: 'provider',
+                        id: result[0].recordID,
+                        fields: result[0]
+                    };
+                    }
+                    getFundraisers(user, [recordToEdit], callbackForFetch);
+                    console.log('newFundraisers: ', newFundraisers)
+                    recordsDispatch({
+                        type: 'setFundraiserToDisplay',
+                        payload: {
+                            role: 'provider',
+                            fundraisers: newFundraisers
+                        }
+                    })
+            } else {
+                const {
+                    allFundraisers
+                } = user;
+                const callbackForFetch = (result) => {
+                    setFundraisers(result);
+                }
+                getFundraisers(user, allFundraisers, callbackForFetch);
             }
-            getFundraisers(user, allFundraisers, callbackForFetch);
         }
-    }, [user])
+    }, [user, recordsState.recordHasChanged])
     
     return (
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
@@ -185,9 +169,8 @@ function App() {
                     <NavBar/> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
-                        {!isAuthenticated && <div>Please log in.</div> }
+                        {/* {!isAuthenticated && <div>Please log in.</div> } */}
                         {isAuthenticated && loading && <div>Loading ...</div>}
-                        <Route exact path="/" render={props => <ProviderView fundraisers={fundraisers} {...props}/>} />
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
                         <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>
                         <ProtectedRoute path="/profile" component={Profile} />
