@@ -132,7 +132,6 @@ const Customers = ({ guardian, sellerToView }) => {
                     key: (productDataIndex(product)),
                     align: 'center',
                 }));
-                // console.log("columnTitles: ", columnTitles);
                 return columnTitles;
             }
             const createEmailLink = (address) => `mailto:${address}`;

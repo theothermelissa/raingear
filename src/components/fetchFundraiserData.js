@@ -6,7 +6,6 @@ import { forEach } from 'lodash';
 
 export const getFundraisers = (user, ids, callback) => {
     let fundraiserData = [];
-    console.log('ids: ', ids)
     base('Fundraisers').select({
         filterByFormula: createFilterFormula(ids, 'recordID')
     })

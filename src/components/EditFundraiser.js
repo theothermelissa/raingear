@@ -107,7 +107,7 @@ const EditFundraiser = () => {
             }
         ], function (err, records) {
             if (err) {
-                console.log("Error: ", err);
+                console.error(err);
                 return;
             }
         });

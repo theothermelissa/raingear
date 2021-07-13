@@ -8,7 +8,6 @@ import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
 import {findIndex, matchesProperty} from 'lodash';
-import ProviderView from './components/ProviderView';
 import Profile from './components/Profile';
 import HomePage from './components/HomePage';
 import { getFundraisers } from './components/fetchFundraiserData';
@@ -90,7 +89,6 @@ function App() {
     // set fundraiserToDisplay
     useEffect(() => {
         if (fundraisers) {
-            console.log("Fundraisers in App: ", fundraisers)
             const isProvider = record => record.role === 'provider';
             const isActive = record => record.fields.status === 'Active';
             let providerRecords = fundraisers.filter(isProvider);
@@ -127,30 +125,6 @@ function App() {
     // fetch fundraiser data
     useEffect(() => {
         if (user.Email) {
-            if (recordsState.recordHasChanged) {
-                const {
-                    recordToEdit
-                } = recordsState
-                let newFundraisers = fundraisers;
-                console.log("recordToEdit: ", recordToEdit);
-                const fundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordToEdit))
-                const callbackForFetch = (result) => {
-                    newFundraisers[fundraiserIndex] = {
-                        role: 'provider',
-                        id: result[0].recordID,
-                        fields: result[0]
-                    };
-                    }
-                    getFundraisers(user, [recordToEdit], callbackForFetch);
-                    console.log('newFundraisers: ', newFundraisers)
-                    recordsDispatch({
-                        type: 'setFundraiserToDisplay',
-                        payload: {
-                            role: 'provider',
-                            fundraisers: newFundraisers
-                        }
-                    })
-            } else {
                 const {
                     allFundraisers
                 } = user;
@@ -159,8 +133,15 @@ function App() {
                 }
                 getFundraisers(user, allFundraisers, callbackForFetch);
             }
-        }
     }, [user, recordsState.recordHasChanged])
+
+    useEffect(() => {
+        if (recordsState.recordHasChanged) {
+            recordsDispatch({
+                type: 'doNotUpdate'
+            })
+        }
+    }, [recordsState])
     
     return (
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>

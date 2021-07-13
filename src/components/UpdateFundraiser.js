@@ -27,10 +27,9 @@ const UpdateFundraiser = ({ fundraisers }) => {
         'rec43VLzoUTfiQX13', 
         function (err, record) {
             if (err) {
-                console.log("Error: ", err);
+                console.error(err);
                 return;
             } 
-            // console.log("Retrieved fundraiser #: 'rec43VLzoUTfiQX13'")
             setActiveFundraiser(record);
             setHasBeenUpdated(false);
         });

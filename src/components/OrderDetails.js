@@ -40,7 +40,6 @@ const OrderDetails = () => {
     useEffect(() => {
         if (focusedRecord) {
             let sellers = [];
-            console.log("focusedRecord: ", focusedRecord);
             sellerGuardians.map((guardian) => {
                 const { fields: {
                     Sellers
@@ -48,7 +47,6 @@ const OrderDetails = () => {
                 sellers.push(...Sellers);
             });
             const thisOrdersSeller = find(sellers, matchesProperty('id', focusedRecord.seller[0]))
-            console.log("thisOrdersSeller: ", thisOrdersSeller);
             setChosenOrder({
                 ...focusedRecord,
                 sellerRecord: thisOrdersSeller,

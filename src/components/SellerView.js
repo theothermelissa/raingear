@@ -35,7 +35,6 @@ const SellerView = ({ sellerIDs }) => {
             sellerGuardians.map((guardian) => {
                 const { fields: { Sellers }} = guardian;
                 if (Sellers) {
-                    // console.log("sellerIDs: ", sellerIDs)
                     const thisSellersRecord = find(Sellers, matchesProperty('id', anyOfThese(sellerIDs)))
                     const { fields: {
                         Nickname: nickname,

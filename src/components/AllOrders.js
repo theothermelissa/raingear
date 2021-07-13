@@ -126,7 +126,6 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
             key: (productDataIndex(product)),
             align: 'center',
         }));
-        // console.log("columnTitles: ", columnTitles);
         return columnTitles;
       }
       const createEmailLink = (address) => `mailto:${address}`;

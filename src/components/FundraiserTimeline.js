@@ -41,7 +41,6 @@ const FundraiserTimeline = ({ setHovered }) => {
         >
         {sortBy(fundraisersForCards, ['deliveryDate']).map(fundraiser => (
             <Timeline.Item 
-              // onMouseEnter={() => console.log("fundraiser to hover: ", fundraiser["recordID"])}
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
               onMouseLeave={() => setHovered(null)}
               onClick={() => chooseRecord(fundraiser['organization'])}
