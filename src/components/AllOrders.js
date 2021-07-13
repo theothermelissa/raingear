@@ -1,6 +1,5 @@
 import  React, { useContext, useState, useEffect } from 'react';
-import {Table, Tag, Modal} from 'antd';
-import { find, matchesProperty, sortBy } from 'lodash';
+import {Table} from 'antd';
 import {format} from 'date-fns';
 import {RecordsContext} from '../App';
 
@@ -179,13 +178,6 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
               }
             }
           }
-          // bordered={true}
-          // scroll={
-          //   {
-          //       x: 200,
-          //       y: 250
-          //   }
-          // }
           />
         : <h1>No orders yet!</h1>
       }

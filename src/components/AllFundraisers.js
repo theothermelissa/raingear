@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {sortBy, find, matchesProperty} from 'lodash';
+import {sortBy, uniqueId, snakeCase} from 'lodash';
 import {Table, Tag} from 'antd';
 import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
@@ -8,12 +8,11 @@ import {RecordsContext} from '../App';
 const AllFundraisers = ({ hoveredFundraiser }) => {
     const {recordsDispatch, recordsState: {
             hoveredID,
-            recordHasChanged,
             fundraiserToDisplay: { fundraisers }
         }
     } = useContext(RecordsContext);
 
-    const [updatedFundraisers, setUpdatedFundraisers] = useState(fundraisers);
+    const [dataSource, setDataSource] = useState('');
     
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
 
@@ -34,7 +33,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
     const chooseProduct = (product) => {
         switch (product) {
             case 'Boston Butts':
-                return <div key={product}
+                return <div key={uniqueId(`${snakeCase(product)}`)}
                     className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
@@ -47,7 +46,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                         {product}</div>
                 </div>
             case 'Half Hams':
-                return <div key={product}
+                return <div key={uniqueId(`${snakeCase(product)}`)}
                     className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
@@ -60,7 +59,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                         {product}</div>
                 </div>
             case 'Whole Turkeys':
-                return <div key={product}
+                return <div key={uniqueId(`${snakeCase(product)}`)}
                     className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
@@ -73,7 +72,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                         {product}</div>
                 </div>
             case 'BBQ Sauce':
-                return <div key={product}
+                return <div key={uniqueId(`${snakeCase(product)}`)}
                     className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
@@ -92,8 +91,8 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
 
     useEffect(() => {
         if (fundraisers) {
-            setUpdatedFundraisers(fundraisers.map(fundraiser => {
-                const { id, role, fields} = fundraiser;
+            let formattedFundraisers = fundraisers.map(fundraiser => {
+                const { id, fields} = fundraiser;
                 return {
                         ...fields,
                         'deliveryDate': convertedDate(fields['deliveryDate']),
@@ -106,22 +105,18 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                         'providerFee': `$${
                             Math.round(fields['providerFee'])
                         }`,
-                        // 'isHovered': fields['fieldsID'] === hoveredID,
-                        'key': fields["recordID"],
+                        // 'key': uniqueId(`${id}`),
                         'status': `${
                             prefillStatus(fields["status"])
                         }`
                 }
-            }))
+            });
+            setDataSource(sortBy(formattedFundraisers, 'priority'))
         }
-    }, [fundraisers, hoveredID]);
-
-    const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
-
+    }, [fundraisers]);
 
     const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
     const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
-    const isHovered = (id) => id === hoveredID;
 
     const columns = [
         {
@@ -144,7 +139,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     status && <Tag color={
                             selectStatusColor(status)
                         }
-                        key={status}>
+                        key={uniqueId('status_')}>
                         {
                         status.toUpperCase()
                     } </Tag>
@@ -219,16 +214,16 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
     ];
 
     return (
-        <> {
-            updatedFundraisers && 
             <div style={{ width: '70vw' }}>
-                <Table dataSource={dataSource}
+        { dataSource && 
+                <Table 
+                    dataSource={dataSource}
                     columns={columns}
                     pagination={false}
                     size='small'
                     id='fundraisersTable'
                     bordered={true}
-                    // rowKey={object => object.id}
+                    rowKey={row => row.key}
                     scroll={
                         {
                             x: 700,
@@ -238,19 +233,20 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     onRow={
                         (record, rowIndex) => {
                             const { recordID: id } = record;
+                            console.log("`${id}_${rowIndex}`: ", `${id}_${rowIndex}`)
                             return {
                                 onClick: event => {
                                     chooseRecord(id)
                                 },
                                 className: isHighlighted(id) ? 'hovered' : '', // click row
                                 id: id,
-                                key: id,
+                                key: uniqueId(`${id}_${rowIndex}`),
                             };
                         }
                     }
                     />
+                } 
             </div>
-        } </>
     );
 }
 

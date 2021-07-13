@@ -10,8 +10,13 @@ const {Sider, Content} = Layout;
 const ProviderView = () => {
     const { recordsDispatch, recordsState: {
         viewFocusedRecord,
+        fundraiserToDisplay: {
+            fundraisers
+        },
     } } = useContext(RecordsContext);
     const [hoveredFundraiser, setHoveredFundraiser] = useState('');
+
+    console.log('fundraisers in ProviderView: ', fundraisers);
 
     const setHovered = (id) => {
         setHoveredFundraiser(id);
@@ -42,7 +47,7 @@ const ProviderView = () => {
                         }
                     }>
                     <>
-                      <AllFundraisers hoveredFundraiser={hoveredFundraiser} />
+                      {fundraisers && <AllFundraisers hoveredFundraiser={hoveredFundraiser} />}
                       <div style={{height: "300px"}}>
                       </div>
                     </>

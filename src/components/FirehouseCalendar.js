@@ -12,7 +12,8 @@ const FirehouseCalendar = () => {
         recordsState: {
             fundraiserToDisplay: {
                 fundraisers
-            }
+            },
+            recordHasChanged
         }
     } = useContext(RecordsContext);
 
@@ -25,7 +26,7 @@ const FirehouseCalendar = () => {
                 'key': record["recordID"],
             }
         }))
-    }, [fundraisers]);
+    }, [fundraisers, recordHasChanged]);
 
         
     const showDrawer = (item) => {

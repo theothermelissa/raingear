@@ -42,6 +42,7 @@ const FundraiserDetails = () => {
             deliveryZip,
             deliveryNotes,
             daysUntilDelivery,
+            daysUntilCook,
             contactFirstName,
             contactPhone,
             contactLastName,
@@ -61,7 +62,7 @@ const FundraiserDetails = () => {
             customerHamPrice,
             customerTurkeyPrice,
             customerSaucePrice,
-            firehouseFee,
+            providerFee,
             orderTotals,
             organizationProceeds,
             recordID,
@@ -73,12 +74,12 @@ const FundraiserDetails = () => {
         orderTotals.map((total) => orders.push(total));
     }
 
-    const relativeDeliveryDate = () => {
-        if (daysUntilDelivery > 0) {
-            return `DELIVERY IN ${daysUntilDelivery} DAYS`
-        } else if (daysUntilDelivery === 0) {
-            return "DELIVERY TODAY"
-        } return `DELIVERY WAS ${-daysUntilDelivery} DAYS AGO`
+    const relativeDate = (days, event) => {
+        if (days > 0) {
+            return `${event} IN ${days} DAYS`
+        } else if (days === 0) {
+            return `${event} TODAY`
+        } return `${event} WAS ${-days} DAYS AGO`
     }
 
     const totalProducts = buttCount + hamCount + turkeyCount + sauceCount;
@@ -144,7 +145,7 @@ const FundraiserDetails = () => {
                                         </>
                                     ]
                             }>
-                                <Meta title="COOK IN ______"/> {
+                                <Meta title={relativeDate(daysUntilCook, "COOK")}/> {
                                     totalProducts > 0 
                                         ? <>
                                             <div>{
@@ -200,7 +201,7 @@ const FundraiserDetails = () => {
                     }>
                         <Card bordered={false}>
                             <Meta title={
-                                relativeDeliveryDate()
+                                relativeDate(daysUntilDelivery, "DELIVERY")
                             }/>
                             <Descriptions layout={"vertical"}
                                 column={1}>
@@ -212,9 +213,11 @@ const FundraiserDetails = () => {
                                         : ""
                                     }    
                                 </Descriptions.Item>
-                                <Descriptions.Item label="Note">
-                                    {deliveryNotes}</Descriptions.Item>
-                                <Descriptions.Item label=""></Descriptions.Item>
+                                {deliveryNotes && <Descriptions.Item label="Note">
+                                    {deliveryNotes}
+                                </Descriptions.Item>}
+                                <Descriptions.Item label="">
+                                </Descriptions.Item>
                             </Descriptions>
                         </Card>
                     </Col>
@@ -262,7 +265,7 @@ const FundraiserDetails = () => {
                         </Card>
                         <Card bordered={false}>
                             <Meta title={
-                                `FIREHOUSE PROFIT: $${firehouseFee}`
+                                `FIREHOUSE PROFIT: $${providerFee}`
                             }/>
                             <Descriptions column={1}>
                                 <Descriptions.Item label="Their Paid Orders">

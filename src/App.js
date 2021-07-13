@@ -31,7 +31,6 @@ const initialRecordsState = {
     alert: '',
     recordHasChanged: false,
     hoveredIDs: null,
-    recordUpdated: '',
 };
 
 const initialHighlightState = {
@@ -153,7 +152,7 @@ function App() {
                         {/* {!isAuthenticated && <div>Please log in.</div> } */}
                         {isAuthenticated && loading && <div>Loading ...</div>}
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
-                        <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>
+                        {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
                         <ProtectedRoute path="/profile" component={Profile} />
                     </Switch>
                 </Router>

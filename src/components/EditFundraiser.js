@@ -113,7 +113,6 @@ const EditFundraiser = () => {
         });
         recordsDispatch({
             type: "updateRecords",
-            payload: recordToEdit,
         });
         closeDrawer();
     };
