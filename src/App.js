@@ -13,6 +13,7 @@ import HomePage from './components/HomePage';
 import { getFundraisers } from './components/fetchFundraiserData';
 import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
+import { getUser } from './components/fetchUserData';
 
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
@@ -54,34 +55,35 @@ function App() {
     // set user data by email
     useEffect(() => {
         if (isAuthenticated && !user) {
-            base('Users').select({
-                    filterByFormula: `{Email} = "${
-                    auth0User.email
-                }"`
-            }).eachPage(function page(records, fetchNextPage) {
-                records.forEach(function (record) {
-                    let workingFundraiserList = record.fields["allFundraisers"]
-                    let roleInfo = workingFundraiserList.map((id) => {
-                        return ({
-                            "role": "pending",
-                            "fundraiserID": id,
-                        })
-                    });
-                    recordsDispatch({
-                        type: "setUser",
-                        payload: {
-                            ... record.fields,
-                            "roleInfo": roleInfo,
-                        }
-                    });
+            const callbackForFetch = (result) => {
+                recordsDispatch({
+                    type: "setUser",
+                    payload: result
                 });
-                fetchNextPage();
-            }, function done(err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-            })
+            }
+            getUser(auth0User.email, callbackForFetch);
+            // base('Users').select({
+            //         filterByFormula: `{Email} = "${
+            //         auth0User.email
+            //     }"`
+            // }).eachPage(function page(records, fetchNextPage) {
+            //     records.forEach(function (record) {
+            //         let workingFundraiserList = record.fields["allFundraisers"]
+            //         let roleInfo = workingFundraiserList.map((id) => {
+            //             return ({
+            //                 "role": "pending",
+            //                 "fundraiserID": id,
+            //             })
+            //         });
+                    
+            //     });
+            //     fetchNextPage();
+            // }, function done(err) {
+            //     if (err) {
+            //         console.error(err);
+            //         return;
+            //     }
+            // })
         }
     }, [isAuthenticated, user, recordHasChanged])
 

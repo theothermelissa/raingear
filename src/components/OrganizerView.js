@@ -15,42 +15,43 @@ const OrganizerView = () => {
             whichDataIsLoaded,
             hoveredIDs,
             viewFocusedRecord,
-            fundraiserToDisplay: {
-                id,
-                fields: fundraiserFields,
-                fields: {
-                    sellerGuardians,
-                    fundraiserName,
-                    organization,
-                    deliveryDate,
-                    deliveryAddress,
-                    deliveryCity,
-                    deliveryState,
-                    deliveryZip,
-                    deliveryNotes,
-                    products,
-                    customerButtPrice,
-                    customerHamPrice,
-                    customerTurkeyPrice,
-                    customerSaucePrice,
-                    orders,
-                    contactFirstName,
-                    contactLastName,
-                    contactEmail,
-                    contactPhone,
-                    recordID,
-                    sellers,
-                    orderCount,
-                    inviteSellersURL,
-                    status,
-                    buttCount,
-                    hamCount,
-                    turkeyCount,
-                    sauceCount,
-                    organizationProceeds
-                }
+            fundraiserToDisplay:
+                { fundraisers: {
+                    id,
+                    fields: fundraiserFields,
+                    fields: {
+                        sellerGuardians,
+                        fundraiserName,
+                        organization,
+                        deliveryDate,
+                        deliveryAddress,
+                        deliveryCity,
+                        deliveryState,
+                        deliveryZip,
+                        deliveryNotes,
+                        products,
+                        customerButtPrice,
+                        customerHamPrice,
+                        customerTurkeyPrice,
+                        customerSaucePrice,
+                        orders,
+                        contactFirstName,
+                        contactLastName,
+                        contactEmail,
+                        contactPhone,
+                        recordID,
+                        sellers,
+                        orderCount,
+                        inviteSellersURL,
+                        status,
+                        buttCount,
+                        hamCount,
+                        turkeyCount,
+                        sauceCount,
+                        organizationProceeds
+                    }
+                } }
             }
-        }
     } = useContext(RecordsContext);
 
     const {Sider, Content} = Layout;
@@ -66,33 +67,33 @@ const OrganizerView = () => {
     })
 
     //sets Sellers and Orders to display
-    useEffect(() => {
-        if (sellerGuardians) {
-            let allOrders = [];
-            let allSellers = [];
-            if (!sellersToDisplay) {
-                    sellerGuardians.map((guardian) => {
-                        const {
-                            fields: {
-                                Sellers: sellers
-                            }
-                        } = guardian;
-                        if (sellers) {
-                            sellers.map((seller) => {
-                                allSellers.push(seller)
-                                if (seller.fields.Orders) { 
-                                    seller.fields.Orders.map((order) => {
-                                        allOrders.push(order);
-                                    });
-                                }
-                            })
-                        }
-                    })
-                setSellersToDisplay(allSellers);
-                setOrdersToDisplay(allOrders);
-            }
-        }
-    }, [fundraiserFields, sellersToDisplay, ordersToDisplay]);
+    // useEffect(() => {
+    //     if (sellerGuardians) {
+    //         let allOrders = [];
+    //         let allSellers = [];
+    //         if (!sellersToDisplay) {
+    //                 sellerGuardians.map((guardian) => {
+    //                     const {
+    //                         fields: {
+    //                             Sellers: sellers
+    //                         }
+    //                     } = guardian;
+    //                     if (sellers) {
+    //                         sellers.map((seller) => {
+    //                             allSellers.push(seller)
+    //                             if (seller.fields.Orders) { 
+    //                                 seller.fields.Orders.map((order) => {
+    //                                     allOrders.push(order);
+    //                                 });
+    //                             }
+    //                         })
+    //                     }
+    //                 })
+    //             setSellersToDisplay(allSellers);
+    //             setOrdersToDisplay(allOrders);
+    //         }
+    //     }
+    // }, [fundraiserFields, sellersToDisplay, ordersToDisplay]);
 
     return (
         <>

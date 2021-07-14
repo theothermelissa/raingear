@@ -1,7 +1,7 @@
 import React from 'react';
 import { createFilterFormula, getRecordType } from './getRecordsFunctions';
 import {base} from '../App';
-import {defaultGuardianRecord} from './getRecordsFunctions';
+import {defaultGuardianRecord, arrayify} from './getRecordsFunctions';
 import { forEach } from 'lodash';
 
 export const getFundraisers = (user, ids, callback) => {
@@ -31,16 +31,17 @@ export const getFundraisers = (user, ids, callback) => {
                 })
                 .all()
                 .then((guardians) => {
-                    guardians.forEach((guardianRecord, guardianIndex) => {
+                    guardians.forEach((guardian, guardianIndex) => {
                         const {
                             id,
                             fields,
                             fields: {Sellers: sellers}
-                        } = guardianRecord;
+                        } = guardian;
                         fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex] = {id, fields};
                         if (sellers) {
+                            const sellerIDs = arrayify(sellers);
                             base('Sellers').select({
-                                filterByFormula: createFilterFormula(sellers, 'recordID')
+                                filterByFormula: createFilterFormula(sellerIDs, 'recordID')
                             })
                             .all()
                             .then((sellers) => {
@@ -50,6 +51,7 @@ export const getFundraisers = (user, ids, callback) => {
                                     } = sellerRecord;
                                     fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'][sellerIndex] = {id, fields}
                                     if (orders) {
+                                        const orderIDs = arrayify(orders)
                                         base('Orders').select({
                                             filterByFormula: createFilterFormula(orders, 'Order ID')
                                         })

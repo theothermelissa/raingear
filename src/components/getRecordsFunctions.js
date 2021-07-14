@@ -224,11 +224,15 @@ export const saveRecordInArray = (record, list, index) => {
     return list;
 };
 
-export const arrayify = (string) => {
-    let first = string.split(', ');
-    let result = first.filter((element) => element !== null && element !== '');
-    return result;
-};
+export const arrayify = (input) => Array.isArray(input)
+        ? input
+        : input.split(", ");
+
+// export const arrayify = (string) => {
+//     let first = string.split(', ');
+//     let result = first.filter((element) => element !== null && element !== '');
+//     return result;
+// };
 
 export const getRecordType = (id, data) => {
     let result;
@@ -285,11 +289,13 @@ export const createFilterFormula = (recordsList, fieldToSearch) => {
     let stringToReturn;
     let stringOpen = `OR({${fieldToSearch}}="`;
     let stringClose = `")`;
+    const recordsListAsArray = arrayify(recordsList);
+    
     let orSequence = () => {
-        if (recordsList.length > 1) {
-            return recordsList.join(`", {${fieldToSearch}}="`)
+        if (recordsListAsArray.length > 1) {
+            return recordsListAsArray.join(`", {${fieldToSearch}}="`)
         } else {
-            return `${recordsList[0]}`;
+            return `${recordsListAsArray[0]}`;
         }
     };
     stringToReturn = stringOpen + orSequence() + stringClose;
