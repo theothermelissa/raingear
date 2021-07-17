@@ -1,7 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {Layout, Menu, Breadcrumb, Modal} from 'antd';
-import {UserOutlined, TeamOutlined} from '@ant-design/icons';
-import {find, matchesProperty} from 'lodash';
+import {Layout, Modal} from 'antd';
 import {RecordsContext} from '../App';
 import AllOrders from './AllOrders';
 import OrderDetails from './OrderDetails';
@@ -11,10 +9,10 @@ import InviteSellersButton from './InviteSellersButton';
 const OrganizerView = () => {
     const {
         recordsDispatch,
+        recordsState,
         recordsState: {
-            whichDataIsLoaded,
-            hoveredIDs,
             viewFocusedRecord,
+            fundraiserToDisplay,
             fundraiserToDisplay:
                 { fundraisers: {
                     id,
@@ -53,6 +51,8 @@ const OrganizerView = () => {
                 } }
             }
     } = useContext(RecordsContext);
+    console.log("recordsState.fundraiserToDisplay.fundraisers.fields.sellerGuardians in OrganizerView: ", recordsState.fundraiserToDisplay.fundraisers.fields.sellerGuardians)
+    console.log('sellerGuardians in OrganizerView: ', sellerGuardians)
 
     const {Sider, Content} = Layout;
 
@@ -65,38 +65,49 @@ const OrganizerView = () => {
     const dismissModal = () => recordsDispatch({
         type: 'dismissRecord',
     })
+    
+//     //sets Sellers and Orders to display
+    useEffect(() => {
+        // const { fundraisers: {fields, fields: { sellerGuardians }} } = fundraiserToDisplay;
+        const relevantFundraisers = fundraiserToDisplay.fundraisers;
+        const firstFundRaiser = relevantFundraisers;
+        const relevantFields = firstFundRaiser.fields;
+        const sellerGuardians = relevantFields.sellerGuardians;
 
-    //sets Sellers and Orders to display
-    // useEffect(() => {
-    //     if (sellerGuardians) {
-    //         let allOrders = [];
-    //         let allSellers = [];
-    //         if (!sellersToDisplay) {
-    //                 sellerGuardians.map((guardian) => {
-    //                     const {
-    //                         fields: {
-    //                             Sellers: sellers
-    //                         }
-    //                     } = guardian;
-    //                     if (sellers) {
-    //                         sellers.map((seller) => {
-    //                             allSellers.push(seller)
-    //                             if (seller.fields.Orders) { 
-    //                                 seller.fields.Orders.map((order) => {
-    //                                     allOrders.push(order);
-    //                                 });
-    //                             }
-    //                         })
-    //                     }
-    //                 })
-    //             setSellersToDisplay(allSellers);
-    //             setOrdersToDisplay(allOrders);
-    //         }
-    //     }
-    // }, [fundraiserFields, sellersToDisplay, ordersToDisplay]);
+
+        // const sellerGuardians = fundraiserToDisplay.fundraisers[0]['fields']['sellerGuardians'];
+        // console.log('sellerGuardians in OrganizerView: ', sellerGuardians);
+        if (sellerGuardians) {
+            let allOrders = [];
+            let allSellers = [];
+            // console.log("sellerGuardians in OrganizerView: ", sellerGuardians);
+            if (!sellersToDisplay) {
+                sellerGuardians.map((guardian) => {
+                    console.log("guardian in OrganizerView: ", JSON.stringify(guardian));
+                        const {
+                            fields: {
+                                Sellers: sellers
+                            }
+                        } = guardian;
+                        if (sellers) {
+                            sellers.map((seller) => {
+                                allSellers.push(seller)
+                                if (seller.fields.Orders) { 
+                                    seller.fields.Orders.map((order) => {
+                                        allOrders.push(order);
+                                    });
+                                }
+                            })
+                        }
+                    })
+                setSellersToDisplay(allSellers);
+                setOrdersToDisplay(allOrders);
+            }
+        }
+    }, [sellerGuardians]);
 
     return (
-        <>
+        <> 
             <Layout>
                 <Sider 
                     width="auto"
@@ -141,7 +152,7 @@ const OrganizerView = () => {
                </Content>
             </Layout>
         </>
-    )
+     )
 };
 
 export default OrganizerView;

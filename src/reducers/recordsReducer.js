@@ -1,4 +1,7 @@
 const recordsReducer = (state, action) => {
+     if (action.type === 'setFundraiserToDisplay') {
+          console.log("payload: ", action.payload)
+     }
      switch (action.type) {
           case 'setRecords':
                return {
@@ -11,9 +14,10 @@ const recordsReducer = (state, action) => {
                     user: action.payload,
                };
           case 'setFundraiserToDisplay':
+            console.log('set it!')
                return {
                     ...state,
-                    fundraiserToDisplay: action.payload,
+                    fundraiserToDisplay: {...action.payload},
                }
           case 'removeUser': 
                return {

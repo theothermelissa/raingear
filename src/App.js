@@ -111,6 +111,7 @@ function App() {
                     },
                 })
             } else {
+                console.log("fundraisers[0] in App to dispatch: ", fundraisers[0])
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
                     payload: {
@@ -132,6 +133,7 @@ function App() {
                 const callbackForFetch = (result) => {
                     setFundraisers(result);
                 }
+                // setFundraisers(getFundraisers(user, allFundraisers))
                 getFundraisers(user, allFundraisers, callbackForFetch);
             }
     }, [user, recordsState.recordHasChanged])

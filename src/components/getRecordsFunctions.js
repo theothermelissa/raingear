@@ -224,9 +224,14 @@ export const saveRecordInArray = (record, list, index) => {
     return list;
 };
 
-export const arrayify = (input) => Array.isArray(input)
-        ? input
-        : input.split(", ");
+export const arrayify = (input) => {
+    // console.log("input: ", JSON.stringify(input))
+    if (Array.isArray(input)) {
+        return input
+    } else if (input) {
+        return input.split(", ")
+    }
+}
 
 // export const arrayify = (string) => {
 //     let first = string.split(', ');

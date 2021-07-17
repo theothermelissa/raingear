@@ -35,6 +35,7 @@ const NavBar = () => {
   // fundraiser is updated
 
   const chooseFundraiser = (record) => {
+    console.log("Record: ", record)
     recordsDispatch({
       type: 'setFundraiserToDisplay',
       payload: record
