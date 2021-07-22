@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
 import { Avatar, Dropdown, Form, Input, Select } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+// import { UserOutlined } from '@ant-design/icons';
 import LoginButton from './LoginButton';
 import firehouseLogo from '../images/firehouseLogo.png';
 import { RecordsContext } from '../App';
@@ -13,10 +13,10 @@ const NavBar = () => {
   const {
     recordsDispatch,
     recordsState: {
-      user: {
-        picture
-      },
-      fundraiserToDisplay,
+      user,
+      // user: {
+      //   picture
+      // },
       fundraiserToDisplay: {
         role
       },
@@ -25,34 +25,25 @@ const NavBar = () => {
   } = useContext(RecordsContext);
 
   const [form] = Form.useForm();
-  const [fundraiserNeedsUpdating, setFundraiserNeedsUpdating] = useState(false);
-  // const [selectedFundraiser, setSelectedFundraiser] = useState('');
 
   const { Option } = Select;
-  // active/most recent fundraiser is automatically selected
-  // if user selects another fundraiser, fundraiser needs to be updated
-  // update fundraiser
-  // fundraiser is updated
 
   const chooseFundraiser = (record) => {
-    console.log("Record: ", record)
     recordsDispatch({
       type: 'setFundraiserToDisplay',
-      payload: record
+      payload: {
+        role: record.role,
+        fundraisers: {...record}
+      }
     })
   };
 
-  // useEffect(() => {
-  //   if (fundraiserNeedsUpdating) {
-  //     updateFundraiser();
-  //   }
-  // }, [fundraiserNeedsUpdating])
-
   const fundraiserMenu = (
     <Menu>
-      {records && records.map((fundraiser) => {
+      {records && records.map((fundraiser, fundraiserIndex) => {
+        // console.log("fundraiser in NavBar: ", fundraiser)
         return (
-          <Menu.Item key={fundraiser.fundraiserID}>
+          <Menu.Item key={`${fundraiser.id}${fundraiserIndex}`}>
             <div key={fundraiser.fundraiserName} onClick={() => chooseFundraiser(fundraiser)}>{fundraiser.fields.fundraiserName}</div>
           </Menu.Item>
         )
@@ -86,17 +77,26 @@ const NavBar = () => {
                 position: "fixed",
                 display: "flex",
                 zIndex: 1000,
-                width: '100%' 
+                width: '100%',
+                breakpoint: 'lg',
                 }}
             >
-              <img className="headerLogo" src={firehouseLogo} alt="Firehouse Logo" style={{ height: "50px", width: "auto" }} />
+              <img
+                className="headerLogo"
+                src={firehouseLogo}
+                alt="Firehouse Logo"
+                style={{
+                  height: "50px",
+                  width: "auto"
+                  }}
+              />
               <Col flex={6} >
                     { (role === "provider") ?
                     <Menu theme="dark" mode="horizontal">
                       <Menu.Item style={{ float: "left" }} key="fundraiser">
-                        <NavLink to="/">
+                        {user && <NavLink to="/">
                           Fundraisers
-                        </NavLink> 
+                        </NavLink> }
                       </Menu.Item> 
                       <Menu.Item style={{ float: "left" }} key="calendar">
                         <NavLink to="/calendar">
@@ -108,9 +108,9 @@ const NavBar = () => {
                     // <div>Provider</div> :
                     <Menu theme="dark" mode="horizontal">
                       <Menu.Item style={{ float: "left" }} key="fundraiser">
-                        <Dropdown overlay={fundraiserMenu} placement="bottomLeft" >
+                        {user && <Dropdown overlay={fundraiserMenu} placement="bottomCenter" >
                           <div>Fundraisers</div>
-                        </Dropdown>
+                        </Dropdown>}
                       </Menu.Item> 
                     </Menu>
                     }
@@ -127,12 +127,12 @@ const NavBar = () => {
                     style={{ float: "right" }}
                     key="avatar"
                   >
-                    {picture  
+                    {/* {picture  
                       ? <Dropdown overlay={accountMenu} placement="bottomCenter" >
                           <Avatar src={<img src={picture} />} onClick={() => console.log("clicked")} />
                         </Dropdown>
                       : <Avatar icon={<UserOutlined />} />
-                    }
+                    } */}
                   </Menu.Item>
                 </Menu>
               </Col>

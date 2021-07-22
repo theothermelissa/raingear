@@ -10,6 +10,8 @@ const LoginButton = () => {
     useEffect(() => {
         if (isAuthenticated) {
             recordsDispatch({type: 'setUser', payload: user})
+        } else {
+            recordsDispatch({type: 'removeUser'})
         }
     }, [isAuthenticated]);
 

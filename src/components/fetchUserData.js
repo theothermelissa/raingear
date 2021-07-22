@@ -1,6 +1,4 @@
-import React from 'react';
 import {base} from '../App';
-import recordsReducer from '../reducers/recordsReducer';
 import { createFilterFormula, arrayify } from './getRecordsFunctions';
 
 export const getUser = (email, callback) => {
@@ -16,7 +14,6 @@ export const getUser = (email, callback) => {
             }
         } = users[0];
         const usersFundraiserList = arrayify(allFundraisers);
-        // console.log('usersFundraiserList: ', usersFundraiserList)
         const roleInfo = usersFundraiserList.map((id) => {
             return ({
                 'role': 'pending',

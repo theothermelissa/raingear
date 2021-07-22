@@ -15,8 +15,12 @@ const recordsReducer = (state, action) => {
                     ...state,
                     user: action.payload,
                };
+          case 'removeUser': 
+               return {
+                    ...state,
+                    user: '',
+               };
           case 'setFundraiserToDisplay':
-               console.log("action.payload: ", action.payload);
                return {
                     ...state,
                     fundraiserToDisplay: {...action.payload},
@@ -24,7 +28,7 @@ const recordsReducer = (state, action) => {
           case 'removeUser': 
                return {
                     ...state,
-                    user: '',
+                    user: 'removed',
                };
           case 'chooseRecord':
                return {
@@ -41,6 +45,7 @@ const recordsReducer = (state, action) => {
                return {
                     ...state,
                     recordHasChanged: true,
+                    
                };
           case 'doNotUpdate':
                return {

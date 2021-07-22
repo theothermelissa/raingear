@@ -16,8 +16,6 @@ const ProviderView = () => {
     } } = useContext(RecordsContext);
     const [hoveredFundraiser, setHoveredFundraiser] = useState('');
 
-    console.log('fundraisers in ProviderView: ', fundraisers);
-
     const setHovered = (id) => {
         setHoveredFundraiser(id);
     };

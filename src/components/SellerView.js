@@ -1,14 +1,12 @@
 import React, {useState, useContext, useEffect} from 'react';
 import { RecordsContext } from '../App';
 import {find, matchesProperty} from 'lodash';
-import { Layout, Menu, Breadcrumb, Button } from 'antd';
+import { Layout,Button } from 'antd';
 import {format} from 'date-fns';
-import Sellers from './Sellers';
 import {anyOfThese} from './getRecordsFunctions';
 
 const SellerView = ({ sellerIDs }) => {
     const { recordsState: {
-        fundraiserToDisplay,
         fundraiserToDisplay: {
             fields: {
                 sellerGuardians,
@@ -20,7 +18,7 @@ const SellerView = ({ sellerIDs }) => {
             }
         }
     } } = useContext(RecordsContext);
-    const {Sider, Content} = Layout;
+    const {Content} = Layout;
 
     const [orderLink, setOrderLink] = useState('');
     const [nickname, setNickname] = useState('');
@@ -31,7 +29,6 @@ const SellerView = ({ sellerIDs }) => {
 
     useEffect(() => {
         if (sellerGuardians) {
-            const allSellers = [];
             sellerGuardians.map((guardian) => {
                 const { fields: { Sellers }} = guardian;
                 if (Sellers) {

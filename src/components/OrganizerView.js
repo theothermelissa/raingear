@@ -9,47 +9,17 @@ import InviteSellersButton from './InviteSellersButton';
 const OrganizerView = () => {
     const {
         recordsDispatch,
-        recordsState,
         recordsState: {
             viewFocusedRecord,
-            fundraiserToDisplay,
-            fundraiserToDisplay:
-                { fundraisers: {
-                    id,
-                    fields: fundraiserFields,
+            fundraiserToDisplay: {
+                fundraisers: {
                     fields: {
                         sellerGuardians,
-                        fundraiserName,
-                        organization,
-                        deliveryDate,
-                        deliveryAddress,
-                        deliveryCity,
-                        deliveryState,
-                        deliveryZip,
-                        deliveryNotes,
-                        products,
-                        customerButtPrice,
-                        customerHamPrice,
-                        customerTurkeyPrice,
-                        customerSaucePrice,
-                        orders,
-                        contactFirstName,
-                        contactLastName,
-                        contactEmail,
-                        contactPhone,
-                        recordID,
-                        sellers,
-                        orderCount,
                         inviteSellersURL,
-                        status,
-                        buttCount,
-                        hamCount,
-                        turkeyCount,
-                        sauceCount,
-                        organizationProceeds
                     }
-                } }
+                }
             }
+        }
     } = useContext(RecordsContext);
 
     const {Sider, Content} = Layout;
@@ -60,14 +30,9 @@ const OrganizerView = () => {
 
     const setHighlight = (ids) => setRecordsToHighlight(ids);
     const removeHighlight = () => setRecordsToHighlight(null);
-    const dismissModal = () => recordsDispatch({
-        type: 'dismissRecord',
-    })
-    
-//     //sets Sellers and Orders to display
-    useEffect(() => {
-        const { fundraisers: {fields, fields: { sellerGuardians }} } = fundraiserToDisplay;
+    const dismissModal = () => recordsDispatch({type: 'dismissRecord'})
 
+    useEffect(() => {
         if (sellerGuardians) {
             let allOrders = [];
             let allSellers = [];
@@ -82,15 +47,15 @@ const OrganizerView = () => {
                         if (sellers) {
                             sellers.map((seller) => {
                                 allSellers.push(seller)
-                                if (seller.fields.Orders) { 
+                                if (seller.fields.Orders) {
                                     seller.fields.Orders.map((order) => {
                                         allOrders.push(order);
-                                        });
-                                    }
-                                })
-                            }
+                                    });
+                                }
+                            })
                         }
-                    })
+                    }
+                })
                 setSellersToDisplay(allSellers);
                 setOrdersToDisplay(allOrders);
             }
@@ -98,27 +63,22 @@ const OrganizerView = () => {
     },);
 
     return (
-        <> 
+        <>
             <Layout>
-                <Sider 
-                    width="auto"
-                    className="site-layout-background"
+                <Sider width="auto" className="site-layout-background"
                     style={
                         {
                             overflow: 'auto',
                             height: '100vh',
                             position: 'fixed',
                             left: 0,
-                            backgroundColor: '#d9d9d9',
+                            backgroundColor: '#d9d9d9'
                         }
-                    }
-                >
-                    <Sellers
-                        sellers={sellersToDisplay}
+                }>
+                    <Sellers sellers={sellersToDisplay}
                         setHighlight={setHighlight}
-                        removeHighlight={removeHighlight}
-                    />
-                    <InviteSellersButton link={inviteSellersURL} />
+                        removeHighlight={removeHighlight}/>
+                    <InviteSellersButton link={inviteSellersURL}/>
                 </Sider>
             </Layout>
             <Layout>
@@ -128,23 +88,24 @@ const OrganizerView = () => {
                         minHeight: '100vh'
                     }
                 }>
-                    <AllOrders
-                        orders={ordersToDisplay}
-                        recordsToHighlight={recordsToHighlight}
-                />
-                <Modal 
-                    title="Order Details"
-                    visible={viewFocusedRecord}
-                    onOK={dismissModal}
-                    onCancel={dismissModal}
-                    footer={null}
-                >
-                    <OrderDetails />
-                </Modal>
-               </Content>
+                    <AllOrders orders={ordersToDisplay}
+                        recordsToHighlight={recordsToHighlight}/>
+                    <Modal title="Order Information"
+                        visible={viewFocusedRecord}
+                        onOK={dismissModal}
+                        onCancel={dismissModal}
+                        footer={null}
+                    >
+                        <OrderDetails 
+                            style={{
+                                paddingLeft: '100px'
+                            }}
+                        />
+                    </Modal>
+                </Content>
             </Layout>
         </>
-     )
+    )
 };
 
 export default OrganizerView;

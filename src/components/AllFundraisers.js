@@ -233,12 +233,11 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
                     onRow={
                         (record, rowIndex) => {
                             const { recordID: id } = record;
-                            console.log("`${id}_${rowIndex}`: ", `${id}_${rowIndex}`)
                             return {
                                 onClick: event => {
                                     chooseRecord(id)
                                 },
-                                className: isHighlighted(id) ? 'hovered' : '', // click row
+                                className: isHighlighted(id) ? 'hovered' : '', 
                                 id: id,
                                 key: uniqueId(`${id}_${rowIndex}`),
                             };

@@ -6,13 +6,15 @@ import SellerView from './SellerView';
 import ProviderView from './ProviderView';
 
 const HomePage = () => {
-    const { recordsState: { fundraiserToDisplay: { role, fundraisers } } } = useContext(RecordsContext);
+    const { recordsState: { fundraiserToDisplay, fundraiserToDisplay: { role, fundraisers } } } = useContext(RecordsContext);
     return (
         <>
-            {role.role && <SellerView sellerIDs={role.id}/>}
-            {role === "guardian" && fundraisers && <GuardianView />}
-            {role === "organizer" && fundraisers && <OrganizerView />}
-            {role === "provider" && fundraisers && <ProviderView />}
+            {fundraiserToDisplay && <div>
+                {role.role && <SellerView sellerIDs={role.id}/>}
+                {role === "guardian" && fundraisers && <GuardianView />}
+                {role === "organizer" && fundraisers && <OrganizerView />}
+                {role === "provider" && fundraisers && <ProviderView />}
+            </div>}
         </>
     )
 };

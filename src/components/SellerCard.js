@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React from 'react';
 import 'antd/dist/antd.css';
-// import { format } from 'date-fns'
-// import selectStatusColor from './selectStatusColor';
 
 const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
 

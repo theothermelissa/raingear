@@ -1,20 +1,21 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {Table, Tag} from 'antd';
+import {Table} from 'antd';
 import {format} from 'date-fns';
 import {RecordsContext} from '../App';
+import { uniqueId } from 'lodash';
 
 const Customers = ({ guardian, sellerToView }) => {
     const { recordsDispatch, recordsState: {
-        hoveredIDs,
         fundraiserToDisplay: {
-            fields: {
-                sellerGuardians: allSellerGuardians,
-                products
+            fundraisers: {
+                fields: {
+                    sellerGuardians: allSellerGuardians,
+                    products
+                }
             }
         }
     } } = useContext(RecordsContext);
     
-    const [updatedCustomers, setUpdatedCustomers] = useState('');
     const [currentGuardianRecord, setCurrentGuardianRecord] = useState('');
     const [columns, setColumns] = useState('');
     const [orders, setOrders] = useState('');
@@ -179,6 +180,17 @@ const Customers = ({ guardian, sellerToView }) => {
                     dataSource={orders} 
                     pagination={false}
                     id='customersTable'
+                    onRow={
+                        (record, rowIndex) => {
+                            const { id } = record;
+                            return {
+                                onClick: event => {
+                                    chooseRecord(id)
+                                },
+                                key: uniqueId(`${id}_${rowIndex}`)
+                            }
+                        }
+                    }
                 />
                 : <h1>No orders yet!</h1>
             }

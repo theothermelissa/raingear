@@ -1,28 +1,31 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {Layout, Menu, Breadcrumb} from 'antd';
+import {Layout, Menu, Modal} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
 import {RecordsContext} from '../App';
 import Customers from './Customers';
 import {format} from 'date-fns';
+import OrderDetails from './OrderDetails';
 
 const GuardianView = () => {
     const {
         recordsDispatch,
         recordsState: {
-            whichDataIsLoaded,
+            viewFocusedRecord,
             fundraiserToDisplay: {
-                fields: {
-                    sellerGuardians: allSellerGuardians,
-                    deliveryDate,
-                    deliveryAddress,
-                    deliveryCity,
-                    deliveryState,
-                    deliveryZip,
-                    fundraiserName,
-                    contactFirstName,
-                    contactLastName,
-                    contactPhone,
-                    contactEmail,
+                fundraisers: {
+                    fields: {
+                        sellerGuardians: allSellerGuardians,
+                        deliveryDate,
+                        deliveryAddress,
+                        deliveryCity,
+                        deliveryState,
+                        deliveryZip,
+                        organization,
+                        contactFirstName,
+                        contactLastName,
+                        contactPhone,
+                        contactEmail,
+                    }
                 }
             }
         }
@@ -32,6 +35,8 @@ const GuardianView = () => {
     const [sellers, setSellers] = useState('');
     const [allSellersLoaded, setAllSellersLoaded] = useState(false);
     const [selectedSeller, setSelectedSeller] = useState('all');
+
+    const dismissModal = () => recordsDispatch({type: 'dismissRecord'})
 
     const formattedDate = (date) => format(new Date(date), 'MMMM dd');
     function formatPhoneNumber(ph) {
@@ -44,7 +49,7 @@ const GuardianView = () => {
       }
     
     useEffect(() => {
-        if (whichDataIsLoaded === 'all' && allSellerGuardians) {
+        if (allSellerGuardians) {
                 if (!currentGuardian) {
                     setCurrentGuardian((allSellerGuardians.filter((guardian) => guardian.fields)[0]))
                 } else if (!sellers) {
@@ -57,7 +62,7 @@ const GuardianView = () => {
                     }
                 };
             }
-    }, [allSellerGuardians, whichDataIsLoaded, currentGuardian, sellers, selectedSeller]);
+    }, [allSellerGuardians, currentGuardian, sellers, selectedSeller]);
 
 
 
@@ -80,7 +85,6 @@ const GuardianView = () => {
         return result;
     };
     
-    // console.log("selectedSeller: ", selectedSeller)
     return (
         <>
         {allSellersLoaded && 
@@ -98,7 +102,7 @@ const GuardianView = () => {
                 width="280px"
                 className="site-layout-background">
                     <div style={{ padding: "12px" }}>
-                        <h1>{fundraiserName}</h1>
+                        <h1>{organization}</h1>
                         <br></br>
                         <h1 >Delivery on:</h1>
                         <h1 style={{ margin: "0px 0px -5px 0px" }} >{<b style={{ color: "darkred", fontSize: "2em" }}>{formattedDate(deliveryDate)}</b>}</h1>
@@ -126,6 +130,27 @@ const GuardianView = () => {
                 <Content style={{ overflow: 'initial', minHeight: "100vh", }}>
                     <Customers guardian={currentGuardian.id} sellerToView={selectedSeller}/>
                 <span style={{ height: "100px" }}/>
+                </Content>
+            </Layout>
+            <Layout>
+                <Content style={
+                    {
+                        overflow: 'initial',
+                        minHeight: '100vh'
+                    }
+                }>
+                    <Modal title="Order Information"
+                        visible={viewFocusedRecord}
+                        onOK={dismissModal}
+                        onCancel={dismissModal}
+                        footer={null}
+                    >
+                        <OrderDetails 
+                            style={{
+                                paddingLeft: '100px'
+                            }}
+                        />
+                    </Modal>
                 </Content>
             </Layout>
         </>
