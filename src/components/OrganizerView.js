@@ -51,8 +51,6 @@ const OrganizerView = () => {
                 } }
             }
     } = useContext(RecordsContext);
-    console.log("recordsState.fundraiserToDisplay.fundraisers.fields.sellerGuardians in OrganizerView: ", recordsState.fundraiserToDisplay.fundraisers.fields.sellerGuardians)
-    console.log('sellerGuardians in OrganizerView: ', sellerGuardians)
 
     const {Sider, Content} = Layout;
 
@@ -68,22 +66,14 @@ const OrganizerView = () => {
     
 //     //sets Sellers and Orders to display
     useEffect(() => {
-        // const { fundraisers: {fields, fields: { sellerGuardians }} } = fundraiserToDisplay;
-        const relevantFundraisers = fundraiserToDisplay.fundraisers;
-        const firstFundRaiser = relevantFundraisers;
-        const relevantFields = firstFundRaiser.fields;
-        const sellerGuardians = relevantFields.sellerGuardians;
+        const { fundraisers: {fields, fields: { sellerGuardians }} } = fundraiserToDisplay;
 
-
-        // const sellerGuardians = fundraiserToDisplay.fundraisers[0]['fields']['sellerGuardians'];
-        // console.log('sellerGuardians in OrganizerView: ', sellerGuardians);
         if (sellerGuardians) {
             let allOrders = [];
             let allSellers = [];
-            // console.log("sellerGuardians in OrganizerView: ", sellerGuardians);
             if (!sellersToDisplay) {
                 sellerGuardians.map((guardian) => {
-                    console.log("guardian in OrganizerView: ", JSON.stringify(guardian));
+                    if (guardian.fields) {
                         const {
                             fields: {
                                 Sellers: sellers
@@ -95,16 +85,17 @@ const OrganizerView = () => {
                                 if (seller.fields.Orders) { 
                                     seller.fields.Orders.map((order) => {
                                         allOrders.push(order);
-                                    });
-                                }
-                            })
+                                        });
+                                    }
+                                })
+                            }
                         }
                     })
                 setSellersToDisplay(allSellers);
                 setOrdersToDisplay(allOrders);
             }
         }
-    }, [sellerGuardians]);
+    },);
 
     return (
         <> 
@@ -146,6 +137,7 @@ const OrganizerView = () => {
                     visible={viewFocusedRecord}
                     onOK={dismissModal}
                     onCancel={dismissModal}
+                    footer={null}
                 >
                     <OrderDetails />
                 </Modal>

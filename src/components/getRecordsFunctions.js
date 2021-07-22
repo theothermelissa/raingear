@@ -226,11 +226,13 @@ export const saveRecordInArray = (record, list, index) => {
 
 export const arrayify = (input) => {
     // console.log("input: ", JSON.stringify(input))
-    if (Array.isArray(input)) {
-        return input
-    } else if (input) {
-        return input.split(", ")
-    }
+    if (input) {
+        if (Array.isArray(input)) {
+            return input
+        } else if (input) {
+            return input.split(", ")
+        }
+    } else return [];
 }
 
 // export const arrayify = (string) => {

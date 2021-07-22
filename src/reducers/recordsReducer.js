@@ -1,20 +1,22 @@
 const recordsReducer = (state, action) => {
-     if (action.type === 'setFundraiserToDisplay') {
-          console.log("payload: ", action.payload)
-     }
      switch (action.type) {
           case 'setRecords':
                return {
                     ...state,
                     records: action.payload,
                };
+          case 'setDataLoaded': 
+               return {
+                    ...state,
+                    whichDataIsLoaded: action.payload,
+               }
           case 'setUser': 
                return {
                     ...state,
                     user: action.payload,
                };
           case 'setFundraiserToDisplay':
-            console.log('set it!')
+               console.log("action.payload: ", action.payload);
                return {
                     ...state,
                     fundraiserToDisplay: {...action.payload},

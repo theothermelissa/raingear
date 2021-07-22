@@ -89,7 +89,7 @@ function App() {
 
     // set fundraiserToDisplay
     useEffect(() => {
-        if (fundraisers) {
+        if (fundraisers.length) {
             const isProvider = record => record.role === 'provider';
             const isActive = record => record.fields.status === 'Active';
             let providerRecords = fundraisers.filter(isProvider);
@@ -111,7 +111,6 @@ function App() {
                     },
                 })
             } else {
-                console.log("fundraisers[0] in App to dispatch: ", fundraisers[0])
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
                     payload: {
@@ -126,16 +125,28 @@ function App() {
 
     // fetch fundraiser data
     useEffect(() => {
+        // const setCompleteFundraisers = async (data) => console.log("data: ", data)
         if (user.Email) {
-                const {
-                    allFundraisers
-                } = user;
-                const callbackForFetch = (result) => {
-                    setFundraisers(result);
+            const {
+                allFundraisers
+            } = user;
+
+            // const callbackForFetch = async (result) => {
+            //     let completeFundraisers = await result;
+            //     if (completeFundraisers) {
+            //         console.log('result: ', result)
+            //         setFundraisers(completeFundraisers);
+            //     }
+            // }
+            const callbackForFetch = async (result) => {
+                let completeFundraisers = await result;
+                if (completeFundraisers) {
+                    setFundraisers(completeFundraisers);
                 }
-                // setFundraisers(getFundraisers(user, allFundraisers))
-                getFundraisers(user, allFundraisers, callbackForFetch);
             }
+            getFundraisers(user, allFundraisers, callbackForFetch)
+            // .then(results => setCompleteFundraisers(results));
+        }
     }, [user, recordsState.recordHasChanged])
 
     useEffect(() => {
@@ -150,7 +161,7 @@ function App() {
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
             <HighlightContext.Provider value={{highlightState, highlightDispatch}}>
                 <Router basename={'/'}>
-                    <NavBar/> 
+                    <NavBar /> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
                         {/* {!isAuthenticated && <div>Please log in.</div> } */}

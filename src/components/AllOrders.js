@@ -15,7 +15,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
   const [updatedOrders, setUpdatedOrders] = useState('');
   const [columns, setColumns] = useState('');
   
-  const productInFundraiser = (product) => fundraiserToDisplay.fields.products.includes(product);
+  const productInFundraiser = (product) => fundraiserToDisplay.fundraisers.fields.products.includes(product);
   const setFullName = (first, last) => `${first} ${last}`;
   const isHighlighted = (id) => {
     if (recordsToHighlight) {
@@ -119,7 +119,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
             }
             return result;
         }
-        fundraiserToDisplay.fields.products.map((product) => columnTitles.push({
+        fundraiserToDisplay.fundraisers.fields.products.map((product) => columnTitles.push({
             title: product,
             dataIndex: productDataIndex(product),
             key: (productDataIndex(product)),

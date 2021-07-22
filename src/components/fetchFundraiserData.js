@@ -2,213 +2,475 @@ import React from 'react';
 import { createFilterFormula, getRecordType } from './getRecordsFunctions';
 import {base} from '../App';
 import {defaultGuardianRecord, arrayify} from './getRecordsFunctions';
-import { forEach } from 'lodash';
+import { compact, create, filter, uniq } from 'lodash';
 
-export const getFundraisers = (user, ids, callback) => {
-    // let fundraiserData = [];
-    let workingData = [];
+export const getFundraisers = async (user, ids, callback) => {
+
+    // if fundraiser role exists, get guardian records for each fundraiser
+    // if guardian records exist, get seller records
+    // if seller records exist, etc., and on to orders
+    // return completed fundraiser object
+    
+    
+    const fundraiserIDsToGet = arrayify(ids);
+    const fundraiserRecords = await createFundraiserList(fundraiserIDsToGet);
+    const fundraisersWithGuardianIDs = getGuardianIDs(fundraiserRecords);
+    const fundraisersWithGuardianData = await getGuardianData(fundraisersWithGuardianIDs);
+    const fundraisersWithSellerData = await getSellerData(fundraisersWithGuardianData)
+    const fundraisersWithOrderData = await getOrderData(fundraisersWithSellerData)
+
+    await callback(fundraisersWithOrderData)
     
 
-
-    const getData = (table, filterValue, filterField) => {
+    // const fundraisers = async () => {
+    //     createFundraiserList(fundraiserIDsToGet)
+    //     .then(getGuardianIDs)
+    // };
+    
+    function getData(table, filterValue, filterField) {
         return base(table).select({
             filterByFormula: createFilterFormula(filterValue, filterField)
         })
     };
 
-    const saveDataToArray = (data, array) => {
-        // const { id, fields } = ad data;
-        array.push({ ...data });
+    async function createFundraiserList(ids) {
+        let fundraisers = [];
+        for (let i = 0; i < ids.length; i++) {
+            let fundraiserData = await getData('Fundraisers', ids[i], 'recordID').all();
+            if (fundraiserData.length) {
+                fundraisers.push({
+                    fields: fundraiserData[0].fields,
+                    id: fundraiserData[0].id,
+                    role: getRecordType(fundraiserData[0].id, user),
+                })
+            }
+        }
+        return fundraisers;
     };
 
-    function determineRole(fundraisers) {
-        console.log("first")
-        return fundraisers.map((fundraiser) => {
-            const { id, fields } = fundraiser;
-            const roleInThisFundraiser = getRecordType(id, user);
-            saveDataToArray({ id, fields, role: roleInThisFundraiser }, workingData)
-            return {
+    function getGuardianIDs(fundraiserList) {
+        return fundraiserList.map((fundraiser) => {
+            const {
                 id,
+                role,
                 fields,
-                role: roleInThisFundraiser
-            }
+                fields: {
+                    guardianIDs
+                }} = fundraiser;
+            const allGuardians = [...guardianIDs, defaultGuardianRecord]
+            const guardiansToGet = uniq(allGuardians);
+            return {
+                role,
+                id,
+                fields: {
+                    ...fields,
+                    sellerGuardians: guardiansToGet
+                }
+            };
         })
     }
 
-    function getParticipantDetails(fundraisersWithRole) {
-        console.log("second: ", fundraisersWithRole)
-        return fundraisersWithRole.map((fundraiser, fundraiserIndex) => {
-            const { fields: { guardianIDs } } = fundraiser;
-            if (guardianIDs) {
-                getData('SellerGuardians', guardianIDs, 'GuardianID')
-                    .all()
-                    .then((guardians) => {
-                        workingData[fundraiserIndex]['fields']['sellerGuardians'] = [];
-                        return guardians.map((guardian) => {
-                            const { id, fields } = guardian
-                            saveDataToArray({ id, fields }, workingData[fundraiserIndex]['fields']['sellerGuardians'])
-                        })
-                    }).then(() => {
-                        workingData.forEach((fundraiser, fundraiserIndex) => {
-                            const { fields: { sellerGuardians }} = fundraiser;
-                            if (sellerGuardians) {sellerGuardians.forEach((guardian, guardianIndex) => {
-                                // console.log("guardian: ", guardian)
-                                if (guardian.fields) {const { fields: { Sellers: sellers} } = guardian;
-                                if (sellers) {
-                                    getData('Sellers', sellers, 'recordID')
-                                    .all()
-                                    .then((sellers) => {
-                                        workingData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'] = [];
-                                        return sellers.forEach((seller) => {
-                                            const { id, fields } = seller;
-                                            saveDataToArray({ id, fields }, workingData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers']);
-                                        })
-                                    }).then(() => {
-                                        workingData.forEach((fundraiser, fundraiserIndex) => {
-                                            const { fields: { sellerGuardians }} = fundraiser;
-                                            sellerGuardians.forEach((guardian, guardianIndex) => {
-                                                const {fields: {Sellers: sellers} } = guardian;
-                                                sellers.forEach((seller, sellerIndex) => {
-                                                    if (seller.fields) {const { fields: { Orders: orders }} = seller;
-                                                    if (orders) {
-                                                        getData('Orders', orders, 'Order ID')
-                                                        .all()
-                                                        .then((orders) => {
-                                                            workingData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'][sellerIndex]['fields']['Orders'] = [];
-                                                            return orders.forEach((order) => {
-                                                                const { id, fields } = order;
-                                                                saveDataToArray({ id, fields }, workingData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'][sellerIndex]['fields']['Orders'])
-                                                            })
-                                                        })
-                                                    }}
-                                                })
-                                            })
-                                        })
-                                    })
-                                }}
-                            })}
-                        })
+    async function getSellerData(fundraiserList) {
+        let fundraisersWithSellers = [];
+        for (let i = 0; i < fundraiserList.length; i++) {
+            const fundraiser = fundraiserList[i];
+            const {
+                id,
+                role,
+                fields,
+                fields: {
+                    sellerGuardians
+                }
+            } = fundraiser;
+            let guardians = [];
+            if (sellerGuardians) {
+                for (let j = 0; j < sellerGuardians.length; j++) {
+                    let sellers = [];
+                    const guardian = sellerGuardians[j];
+                    const { 
+                        id: guardianID,
+                        fields: guardianFields,
+                        fields: {
+                            sellerIDs
+                        }
+                    } = guardian;
+                    if (sellerIDs) {
+                        for (let k = 0; k < arrayify(sellerIDs).length; k++) {
+                            let sellerData = await getData('Sellers', sellerIDs[k], 'recordID').all();
+                            if (sellerData.length) {
+                                sellers.push({
+                                    id: sellerData[0]['id'],
+                                    fields: sellerData[0]['fields']
+                                })
+                            }
+                        };
+                    };
+                    guardians.push({
+                        id: guardianID,
+                        fields: {
+                            ...guardianFields,
+                            Sellers: sellers
+                        }
                     })
-            }  else {
-                return fundraiser
+                }
             }
-        })
-    }
+            fundraisersWithSellers.push({
+                id,
+                role,
+                fields: {
+                    ...fields,
+                    sellerGuardians: guardians
+                }
+            })
+        }
+        return fundraisersWithSellers;
+    };
 
-    function setAppState(fundraisers) {
-        console.log("thirst")
-        console.log("workingData: ", workingData)
-        callback(workingData);
-    }
+    
+    async function getOrderData(fundraiserList) {
+        let fundraisersWithOrders = [];
+        for (let i = 0; i < fundraiserList.length; i++) {
+            const fundraiser = fundraiserList[i];
+            const {
+                id,
+                role,
+                fields,
+                fields: {
+                    sellerGuardians
+                }
+            } = fundraiser;
+            let guardians = [];
+            if (sellerGuardians) {
+                for (let j = 0; j < sellerGuardians.length; j++) {
+                    let sellers = [];
+                    const guardian = sellerGuardians[j];
+                    const {
+                        id: guardianID,
+                        fields: guardianFields,
+                        fields: {
+                            Sellers
+                        }
+                    } = guardian;
+                    if (Sellers) {
+                        for (let k = 0; k < Sellers.length; k++) {
+                            let orders = [];
+                            const seller = Sellers[k];
+                            const {
+                                id: sellerID,
+                                fields: sellerFields,
+                                fields: {
+                                    orderIDs
+                                }
+                            } = seller;
+                            if (orderIDs) {
+                                for (let l = 0; l < arrayify(orderIDs).length; l++) {
+                                    let orderData = await getData('Orders', orderIDs[l], 'Order ID').all();
+                                    if (orderData.length) {
+                                        orders.push({
+                                            id: orderData[0]['id'],
+                                            fields: orderData[0]['fields']
+                                        })
+                                    }
+                                }
+                            }
+                            sellers.push({
+                                id: sellerID,
+                                fields: {
+                                    ...sellerFields,
+                                    Orders: orders
+                                }
+                            })
+                        }
+                    }
+                    guardians.push({
+                        id: guardianID,
+                        fields: {
+                            ...guardianFields,
+                            Sellers: sellers
+                        }
+                    })
+                }
+            }
+            console.log("guardians: ", guardians);
+            fundraisersWithOrders.push({
+                id: id,
+                role: role,
+                fields: {
+                    ...fields,
+                    sellerGuardians: guardians
+                }
+            })
+        }
+        return fundraisersWithOrders;
+    };
 
-
-    getData('Fundraisers', ids, 'recordID')
-        .all()
-        .then(determineRole)
-        .then(getParticipantDetails)
-        .then(setAppState)
+    async function getGuardianData(fundraiserList) {
+        
+        let fundraisersWithGuardians = [];
+        
+        for (let i = 0; i < fundraiserList.length; i++) {
+            const fundraiser = fundraiserList[i];        
+            const {
+                id,
+                role,
+                fields,
+                fields: {
+                    sellerGuardians
+                }
+            } = fundraiser;
+            let guardians = [];
             
+            if (sellerGuardians) {
+                for (let j = 0; j < sellerGuardians.length; j++) {
+                    const guardianID = sellerGuardians[j];
+                    let guardianData = await getData('SellerGuardians', guardianID, 'GuardianID').all()
+                    if (guardianData.length) {
+                        guardians.push({
+                            id: guardianData[0]['id'],
+                            fields: guardianData[0]['fields']
+                        })
+                    }
+                };
+            };
+            fundraisersWithGuardians.push({
+                id,
+                role,
+                fields: {
+                    ...fields,
+                    sellerGuardians: guardians
+                }
+            });
+        }
+        return fundraisersWithGuardians;
+    };
 
-    // getData('Fundraisers', ids, 'recordID').all()
-    // .then((fundraisers) => {
-    //     saveData(fundraisers, workingData);
+    // async function getSellerData(fundraiserList) {
+    //     return fundraiserList.map()
+    // }
+    
+    
 
-    //     fundraisers.forEach((record, index) => {
-    //         const { fields: {sellerGuardians} } = record;
-    //         console.log("sellerGuardians: ", sellerGuardians)
-    //         saveData(sellerGuardians, workingData[index]['fields'][sellerGuardians])
-    //         return 
-    //     })
-    //     // .all()
-    //     // .then((guardians) => {
-    //     //     saveData(guardians, index, workingData['sellerGuardians'])
-    //     //     guardians.forEach()
-    //     // })
-    //     // saveData(record, workingData);
-    // });
+    
 
-    // .then((fundraisers) => {
-    //     // console.log("fundraisers: ", fundraisers)
-    //     fundraisers.forEach((fundraiserRecord, fundraiserIndex) => {
-    //         const { 
-    //             id,
-    //             fields: fundraiserFields,
-    //             fields: {
-    //                 sellerGuardians,
-    //                 deliveryDate
-    //             },
-    //         } = fundraiserRecord;
-    //         workingData.push({
-    //             role: getRecordType(id, user),
-    //             id,
-    //             fields: fundraiserFields,
-    //         });
-    //         console.log('workingData: ', workingData);
-    //         if (sellerGuardians) {
-    //             base('SellerGuardians').select({
-    //                 filterByFormula: createFilterFormula(sellerGuardians, 'GuardianID')
-    //             })
-    //             .all()
-    //             .then((guardians) => {
-    //                 let guardianData = []
-    //                 guardians.forEach((guardian, guardianIndex) => {
-    //                     // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex] = [];
-    //                     const {
-    //                         id,
-    //                         fields: guardianFields,
-    //                         fields: {Sellers: sellers}
-    //                     } = guardian;
-    //                     guardianData.push({ id, fields: guardianFields})
-    //                     // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex].push({id, fields: guardianFields});
-    //                     if (sellers) {
-    //                         // console.log('fundraiserData[fundraiserIndex]["fields"]["sellerGuardians"] in seller fetch: ', fundraiserData[fundraiserIndex]["fields"]["sellerGuardians"])
-    //                         // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'] = [];
-    //                         let sellerData = [];
-    //                         const sellerIDs = arrayify(sellers);
-    //                         base('Sellers').select({
-    //                             filterByFormula: createFilterFormula(sellerIDs, 'recordID')
-    //                         })
-    //                         .all()
-    //                         .then((sellers) => {
-    //                             sellers.forEach((sellerRecord, sellerIndex) => {
-    //                                 const {
-    //                                     id,
-    //                                     fields: sellerFields,
-    //                                     fields: {Orders: orders}
-    //                                 } = sellerRecord;
-    //                                 // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'].push({id, fields: sellerFields})
-    //                                 // sellerData.push({ id, fields: sellerFields});
-    //                                 guardianData[guardianIndex]['fields']['Sellers'][sellerIndex] = {id, fields: sellerFields}
-    //                                 if (orders) {
-    //                                     // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'][sellerIndex]['fields']['Orders'] = [];
-    //                                     const orderIDs = arrayify(orders)
-    //                                     base('Orders').select({
-    //                                         filterByFormula: createFilterFormula(orderIDs, 'Order ID')
-    //                                     })
-    //                                     .all()
-    //                                     .then((orders) => {
-    //                                         orders.forEach((orderRecord, orderIndex) => {
-    //                                             const { id, fields: orderFields } = orderRecord;
-    //                                             guardianData[guardianIndex]['fields']['Sellers'][sellerIndex]['fields']['Orders'][orderIndex] = {id, orderFields}
-    //                                             // fundraiserData[fundraiserIndex]['fields']['sellerGuardians'][guardianIndex]['fields']['Sellers'][sellerIndex]['fields']['Orders'].push({id, fields: orderFields});
-    //                                         })
-    //                                     })
-    //                                 }
-    //                             })
-    //                         })
-    //                     }
-    //                 })
-    //                 workingData[fundraiserIndex]['fields']['sellerGuardians'] = guardianData;
-    //             })
+//     function getFundraiserDetailsByID(id) {
+//         return getData('Fundraisers', id, 'recordID')
+//             .all()
+//             .then(determineRole)
+//             .then(getGuardianRecords)
+//             .then(getSellerRecords)
+//             .then(getOrderRecords)
+//             // .then(logStuff)
+
+//     }
+
+//     function determineRole(fundraiser) {
+//         if (!fundraiser.length) {
+//             console.log("fundraiser: ", fundraiser)
+//             return;
+//         }
+//         const { id, fields } = fundraiser[0];
+//         const roleInThisFundraiser = getRecordType(id, user);
+//         return {
+//             id,
+//             fields,
+//             role: roleInThisFundraiser
+//         }
+//     }
+
+//     function getGuardianFields(guardians) {
+//         guardians.map(({id, fields}) => {
+//             console.log("id and fields of guardian: ", id, fields)
+            
+//             return {
+//                 id,
+//                 fields
+//             }
+//         })
+//     }
+
+//     async function fetchGuardianRecords(guardianIDs) {
+//         if (guardianIDs) {
+//             const guardians = await getData('SellerGuardians', guardianIDs, 'GuardianID')
+//                 .all();
+//             return Promise.all(getGuardianFields(guardians));
+//         }
+//     }
+
+//     async function getGuardianRecords(fundraiserWithRole) {
+//         console.log("fundraiserWithRole: ", fundraiserWithRole)
+//         if (fundraiserWithRole) {
+//             const { id, role, fields, fields: { guardianIDs} } = fundraiserWithRole;
+
+//             return {
+//                 id,
+//                 role, 
+//                 fields: {
+//                     ...fields,
+//                     sellerGuardians: await fetchGuardianRecords(guardianIDs)
+//                 }
                 
-    //         }
-    //     })
-    // })
-    // .then(() => {
-    //     // console.log("workingData: ", workingData);
-    //     workingData = fundraiserData;
-    //     // console.log("fundraiserData: ", fundraiserData);
-    //     callback(fundraiserData)
-    // })
+//             }
+//         }
+//     }
+
+//     function logStuff(stuff) {
+//         console.log('stuff here: ', stuff)
+//         return stuff;
+//     }
+
+//     function getSellerDetails(sellerIDs) {
+//         return getData('Sellers', sellerIDs, 'recordID').all()
+//     }
+
+//     async function addSellerDetailsToGuardian (guardian) {
+//         const { 
+//             id,
+//             role,
+//             fields,
+//             fields: {
+//                 sellerIDs
+//             }
+//         } = guardian;
+        
+//         if (sellerIDs) {
+//             const resolvedSellerDetails = await getSellerDetails(sellerIDs)
+//             // console.log("getSellerDetails(sellerIDs): ", getSellerDetails(sellerIDs));
+//             return {
+//                 id,
+//                 role,
+//                 fields: {
+//                     ...fields,
+//                     Sellers: resolvedSellerDetails
+//                 }
+//             }
+//         } else {
+//             return guardian
+//         }
+//     }
+
+
+//     async function getSellerRecords(fundraiserWithGuardians) {
+//         console.log("fundraiserWithGuardians: ", fundraiserWithGuardians)
+//         if(fundraiserWithGuardians) {
+//             const { 
+//                 id,
+//                 role,
+//                 fields,
+//                 fields: {
+//                     sellerGuardians
+//                 }
+//             } = fundraiserWithGuardians;
+//             console.log('fundraiserWithGuardians: ', fundraiserWithGuardians)
+
+//             const resolvedGuardians = await sellerGuardians;
+            
+//             return {
+//                 id,
+//                 role,
+//                 fields: {
+//                     ...fields,
+//                     sellerGuardians: resolvedGuardians.map((guardian) => {
+//                         return addSellerDetailsToGuardian(guardian);
+//                     })
+//                 }
+//             }
+//         }
+//     }
+
+//     function getOrderDetails(orderIDs) {
+//         return getData('Orders', orderIDs, 'Order ID').all()
+//     }
+
+//     async function addOrdersToSellers(sellers) {
+//         const resolvedSellers = await sellers;
+//         if (resolvedSellers) {
+//             return resolvedSellers.map((seller) => {
+//                 const {
+//                     id,
+//                     fields,
+//                     fields: {
+//                         orderIDs
+//                     }
+//                 } = seller;
+
+//                 return {
+//                     id,
+//                     fields: {
+//                         ...fields,
+//                         Orders: getOrderDetails(orderIDs)
+//                     }
+//                 }
+//             })
+//         }
+//     }
+
+//     async function addOrdersToGuardian(guardian) {
+//         let resolvedGuardian = await guardian
+//         if (resolvedGuardian) {
+//             const {
+//                 id,
+//                 fields,
+//                 fields: {
+//                     Sellers
+//                 }
+//             } = resolvedGuardian;
+
+//             return {
+//                 id,
+//                 fields: {
+//                     ...fields,
+//                     Sellers: addOrdersToSellers(Sellers)
+//                 }
+//             }
+//         }
+//     }
+
+        
+
+//     async function getOrderRecords (fundraiserWithSellers) {
+//         if (fundraiserWithSellers) {
+//             const {
+//                 id, role, fields,
+//                 fields: {
+//                     sellerGuardians
+//                 }
+//             } = fundraiserWithSellers;
+
+//             const resolvedGuardians = await sellerGuardians;
+
+//             return new Promise((resolve, reject) => {
+//                 resolve({
+//                     id,
+//                     role,
+//                     fields: {
+//                         ...fields,
+//                         sellerGuardians: resolvedGuardians.map((guardian) => {
+//                             return addOrdersToGuardian(guardian)
+//                         })
+//                     }
+//                 })
+//             })
+//         }
+//     }
+
+
+
+//     let allFundraiserData = fundraiserIDsToGet.map(id => {
+//         try {
+//             return getFundraiserDetailsByID(id)
+//         } catch(err) {
+//             console.error(err);
+//         }
+//     });
+
+    
+//     function compactFundraisers(promises) {
+//         Promise.all(promises).then((results) => {
+//             callback(compact(results))
+//         })
+//         // let resolved = await Promise.allSettled(promises);
+//     };
+
+//     compactFundraisers(allFundraiserData);
 }
 

@@ -19,9 +19,11 @@ const OrderDetails = () => {
             focusedRecord,
             fundraiserToDisplay,
             fundraiserToDisplay: {
-                fundraiserName,
-                fields: {
-                    sellerGuardians
+                fundraisers: {
+                    fields: {
+                        fundraiserName,
+                        sellerGuardians
+                    }
                 }
 
             }
@@ -46,10 +48,11 @@ const OrderDetails = () => {
                 } } = guardian;
                 sellers.push(...Sellers);
             });
-            const thisOrdersSeller = find(sellers, matchesProperty('id', focusedRecord.seller[0]))
+            const thisOrdersSeller = find(sellers, matchesProperty('id', focusedRecord.seller[0]));
+            const sellerNickname = thisOrdersSeller.fields.Nickname
             setChosenOrder({
                 ...focusedRecord,
-                sellerRecord: thisOrdersSeller,
+                seller: sellerNickname,
             });
         }
     }, [focusedRecord])
@@ -108,7 +111,7 @@ return (
         <p>Order Status: {chosenOrder.orderStatus}</p>
         <h2>Supporter: {chosenOrder.supporterFullName}</h2>
         <p>Supporter Phone: {chosenOrder.supporterPhone}</p>
-        <p>Supporter Email: {chosenOrder.supporterEmail}</p>
+        <p>Supporter Email: <a href={`mailto:${chosenOrder.supporterEmail}`}>{chosenOrder.supporterEmail}</a></p>
         <p>Order Date: {chosenOrder.date}</p>
         {chosenOrder.buttQty && <p>Butts: {chosenOrder.buttQty}</p>}
         {chosenOrder.hamQty && <p>Hams: {chosenOrder.hamQty}</p>}
