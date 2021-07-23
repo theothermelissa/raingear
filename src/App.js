@@ -62,30 +62,8 @@ function App() {
                 });
             }
             getUser(auth0User.email, callbackForFetch);
-            // base('Users').select({
-            //         filterByFormula: `{Email} = "${
-            //         auth0User.email
-            //     }"`
-            // }).eachPage(function page(records, fetchNextPage) {
-            //     records.forEach(function (record) {
-            //         let workingFundraiserList = record.fields["allFundraisers"]
-            //         let roleInfo = workingFundraiserList.map((id) => {
-            //             return ({
-            //                 "role": "pending",
-            //                 "fundraiserID": id,
-            //             })
-            //         });
-                    
-            //     });
-            //     fetchNextPage();
-            // }, function done(err) {
-            //     if (err) {
-            //         console.error(err);
-            //         return;
-            //     }
-            // })
         }
-    }, [isAuthenticated, user, recordHasChanged])
+    }, [isAuthenticated, user, auth0User, recordHasChanged])
 
     // set fundraiserToDisplay
     useEffect(() => {
@@ -129,13 +107,19 @@ function App() {
 
     // fetch fundraiser data
     useEffect(() => {
-        // const setCompleteFundraisers = async (data) => console.log("data: ", data)
         if (user.Email) {
             const {
                 allFundraisers
             } = user;
-
-           if (recordHasChanged) {
+            if (!fundraisers) {
+                const callbackForFetch = async (result) => {
+                    let completeFundraisers = await result;
+                    if (completeFundraisers) {
+                        setFundraisers(completeFundraisers);
+                    }
+                }
+                getFundraisers(user, allFundraisers, callbackForFetch)
+            } else if (recordsState.recordHasChanged) {
                setLoading(true);
                let fundraiserList = fundraisers;
                const changedFundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordsState.recordToEdit))
@@ -151,16 +135,8 @@ function App() {
                 type: 'doNotUpdate'
                 })
            }
-            const callbackForFetch = async (result) => {
-                let completeFundraisers = await result;
-                if (completeFundraisers) {
-                    setFundraisers(completeFundraisers);
-                }
-            }
-            getFundraisers(user, allFundraisers, callbackForFetch)
-            // .then(results => setCompleteFundraisers(results));
         }
-    }, [user, recordsState.recordHasChanged])
+    }, [user, fundraisers, recordsState.recordHasChanged, recordsState.recordToEdit])
 
     
     
@@ -175,7 +151,6 @@ function App() {
                                 <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
                             </div>}
                         {loading && <LoadingSpinner />}
-                        {/* {!isAuthenticated && <div>Please log in.</div> } */}
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
                         {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
                         <ProtectedRoute path="/profile" component={Profile} />

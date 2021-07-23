@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Layout, Menu, Row, Col } from 'antd/lib';
-import { Avatar, Dropdown, Form, Input, Select } from 'antd';
+import { Dropdown } from 'antd';
 // import { UserOutlined } from '@ant-design/icons';
 import LoginButton from './LoginButton';
 import firehouseLogo from '../images/firehouseLogo.png';
@@ -23,10 +23,6 @@ const NavBar = () => {
       records
     }
   } = useContext(RecordsContext);
-
-  const [form] = Form.useForm();
-
-  const { Option } = Select;
 
   const chooseFundraiser = (record) => {
     recordsDispatch({
@@ -52,22 +48,22 @@ const NavBar = () => {
     </Menu>
   )
 
-  const accountMenu = (
-    <Menu>
-      <Menu.Item key="viewAnotherFundraiser">
-        <Form>
-        <a target="_blank" rel="noopener noreferrer" href="/">
-          View Another Fundraiser
-        </a>
-        </Form> 
-      </Menu.Item>
-      <Menu.Item key="editYourProfile">
-        <a target="_blank" rel="noopener noreferrer" href="/">
-          Edit Your Profile
-        </a>
-      </Menu.Item>
-    </Menu>
-  )
+  // const accountMenu = (
+  //   <Menu>
+  //     <Menu.Item key="viewAnotherFundraiser">
+  //       <Form>
+  //       <a target="_blank" rel="noopener noreferrer" href="/">
+  //         View Another Fundraiser
+  //       </a>
+  //       </Form> 
+  //     </Menu.Item>
+  //     <Menu.Item key="editYourProfile">
+  //       <a target="_blank" rel="noopener noreferrer" href="/">
+  //         Edit Your Profile
+  //       </a>
+  //     </Menu.Item>
+  //   </Menu>
+  // )
 
     return (
         <>
@@ -123,17 +119,17 @@ const NavBar = () => {
                     key="login">
                     <LoginButton />
                   </Menu.Item>
-                  <Menu.Item
+                  {/* <Menu.Item
                     style={{ float: "right" }}
                     key="avatar"
                   >
-                    {/* {picture  
+                    {picture  
                       ? <Dropdown overlay={accountMenu} placement="bottomCenter" >
                           <Avatar src={<img src={picture} />} onClick={() => console.log("clicked")} />
                         </Dropdown>
                       : <Avatar icon={<UserOutlined />} />
-                    } */}
-                  </Menu.Item>
+                    }
+                  </Menu.Item> */}
                 </Menu>
               </Col>
             </Header>

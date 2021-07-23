@@ -15,11 +15,6 @@ const recordsReducer = (state, action) => {
                     ...state,
                     user: action.payload,
                };
-          case 'removeUser': 
-               return {
-                    ...state,
-                    user: '',
-               };
           case 'setFundraiserToDisplay':
                return {
                     ...state,
@@ -28,7 +23,7 @@ const recordsReducer = (state, action) => {
           case 'removeUser': 
                return {
                     ...state,
-                    user: 'removed',
+                    user: '',
                };
           case 'chooseRecord':
                return {

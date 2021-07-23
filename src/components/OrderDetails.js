@@ -1,13 +1,9 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {find, matchesProperty} from 'lodash';
 import {RecordsContext} from '../App';
-import {Card} from 'antd';
-
-const {Meta} = Card;
 
 const OrderDetails = () => {
     const {
-        recordsDispatch,
         recordsState: {
             focusedRecord,
             fundraiserToDisplay: {
@@ -23,13 +19,10 @@ const OrderDetails = () => {
 
     const [chosenOrder, setChosenOrder] = useState('');
 
-    const dismissDetails = () => recordsDispatch({type: 'dismissRecord'})
-
-
     useEffect(() => {
         if (focusedRecord) {
             let sellers = [];
-            sellerGuardians.map((guardian) => {
+            sellerGuardians.forEach((guardian) => {
                 const {fields: {
                         Sellers
                     }} = guardian;
@@ -42,7 +35,7 @@ const OrderDetails = () => {
                 seller: sellerNickname
             });
         }
-    }, [focusedRecord])
+    }, [focusedRecord, sellerGuardians])
 
     return (
         <div>

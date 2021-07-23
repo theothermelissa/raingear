@@ -24,7 +24,6 @@ const GuardianView = () => {
                         contactFirstName,
                         contactLastName,
                         contactPhone,
-                        contactEmail,
                     }
                 }
             }
@@ -75,7 +74,7 @@ const GuardianView = () => {
         result.push(
             <Menu.Item key="allSellers" onClick={() => selectSeller("all")} icon={<TeamOutlined />}>View All Sellers</Menu.Item>
         )
-        sellers.map((seller) => {
+        sellers.forEach((seller) => {
             result.push(
                 <Menu.Item key={seller.id} onClick={() => selectSeller(seller.id)} icon={<UserOutlined />}>
                     {seller.fields.Nickname}

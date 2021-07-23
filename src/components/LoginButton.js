@@ -13,7 +13,7 @@ const LoginButton = () => {
         } else {
             recordsDispatch({type: 'removeUser'})
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, recordsDispatch, user]);
 
     const logOutUser = () => {
         recordsDispatch({type: 'removeUser'})

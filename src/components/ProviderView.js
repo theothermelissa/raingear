@@ -8,7 +8,7 @@ import {RecordsContext} from '../App';
 const {Sider, Content} = Layout;
 
 const ProviderView = () => {
-    const { recordsDispatch, recordsState: {
+    const { recordsState: {
         viewFocusedRecord,
         fundraiserToDisplay: {
             fundraisers

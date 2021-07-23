@@ -37,7 +37,7 @@ const OrganizerView = () => {
             let allOrders = [];
             let allSellers = [];
             if (!sellersToDisplay) {
-                sellerGuardians.map((guardian) => {
+                sellerGuardians.forEach((guardian) => {
                     if (guardian.fields) {
                         const {
                             fields: {
@@ -45,10 +45,10 @@ const OrganizerView = () => {
                             }
                         } = guardian;
                         if (sellers) {
-                            sellers.map((seller) => {
+                            sellers.forEach((seller) => {
                                 allSellers.push(seller)
                                 if (seller.fields.Orders) {
-                                    seller.fields.Orders.map((order) => {
+                                    seller.fields.Orders.forEach((order) => {
                                         allOrders.push(order);
                                     });
                                 }
@@ -60,7 +60,7 @@ const OrganizerView = () => {
                 setOrdersToDisplay(allOrders);
             }
         }
-    },);
+    },[sellersToDisplay, sellerGuardians]);
 
     return (
         <>

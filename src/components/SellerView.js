@@ -29,13 +29,12 @@ const SellerView = ({ sellerIDs }) => {
 
     useEffect(() => {
         if (sellerGuardians) {
-            sellerGuardians.map((guardian) => {
+            sellerGuardians.forEach((guardian) => {
                 const { fields: { Sellers }} = guardian;
                 if (Sellers) {
                     const thisSellersRecord = find(Sellers, matchesProperty('id', anyOfThese(sellerIDs)))
                     const { fields: {
                         Nickname: nickname,
-                        Orders: orders,
                         "Total Orders": totalOrders,
                         "Total Sales Volume": totalSalesVolume,
                         "Link to Order From This Seller": orderLink,
@@ -47,7 +46,7 @@ const SellerView = ({ sellerIDs }) => {
                 }
             })
         }
-    }, [sellerGuardians])
+    }, [sellerGuardians, sellerIDs])
 
     return (
         <Layout>

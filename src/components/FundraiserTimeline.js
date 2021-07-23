@@ -15,7 +15,7 @@ const FundraiserTimeline = ({ setHovered }) => {
 
   useEffect(() => {
     setFundraisersForCards(fundraisers.map((fundraiser) => fundraiser.fields))
-  }, fundraisers)
+  }, [fundraisers])
   
   const chooseRecord = (recordName) => {
     const chosenRecord = find(fundraisersForCards, matchesProperty('organization', recordName));

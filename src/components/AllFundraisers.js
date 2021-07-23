@@ -7,7 +7,6 @@ import {RecordsContext} from '../App';
 
 const AllFundraisers = ({ hoveredFundraiser }) => {
     const {recordsDispatch, recordsState: {
-            hoveredID,
             fundraiserToDisplay: { fundraisers }
         }
     } = useContext(RecordsContext);
@@ -92,7 +91,7 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
     useEffect(() => {
         if (fundraisers) {
             let formattedFundraisers = fundraisers.map(fundraiser => {
-                const { id, fields} = fundraiser;
+                const { fields} = fundraiser;
                 return {
                         ...fields,
                         'deliveryDate': convertedDate(fields['deliveryDate']),

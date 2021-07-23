@@ -3,9 +3,9 @@ import { Spin } from 'antd';
 
 const LoadingSpinner = () => {
     const [message, setMessage] = useState('  ');
+    const [cancelled, setCancelled] = useState(false);
 
     useEffect(() => {
-        let cancelled = false;
         const loadFundraisers = () => setMessage('Loading fundraisers ...')
         const loadSellers = () => setMessage('Loading sellers ...')
         const loadOrders = () => setMessage('Loading orders ...')
@@ -15,8 +15,8 @@ const LoadingSpinner = () => {
         setTimeout(loadSellers, 4000)
         setTimeout(loadOrders, 6000)
 
-        return () => cancelled === true;
-    }, [])
+        return () => setCancelled(true);
+    }, [cancelled])
         
 
 

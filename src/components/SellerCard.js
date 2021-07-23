@@ -4,35 +4,12 @@ import 'antd/dist/antd.css';
 const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
 
     const { 
-        id,
         fields: {
             Nickname: nickname,
-            Email: email,
-            Phone: phone,
-            AddressLine1: addressLine1,
-            AddressLine2: addressLine2,
-            City: city,
-            State: state,
-            Zip: zip,
-            Supporters: supporters,
-            SellerGuardian: guardian,
-            "Email (from SellerGuardian)": guardianEmail,
-            "Phone (from SellerGuardian)": guardianPhone,
-            "AddressLine1 (from SellerGuardian)": guardianAddressLine1,
-            "AddressLine2 (from SellerGuardian)": guardianAddressLine2,
-            "City (from SellerGuardian)": guardianCity,
-            "State (from SellerGuardian)": guardianState,
-            "Zip (from SellerGuardian)": guardianZip,
-            "Link to Order From This Seller": orderFormLink,
             "Total Orders": totalOrders,
             "Total Sales Volume": totalSalesVolume,
             "Contact Email": contactEmail,
             "Contact Phone": contactPhone,
-            "Contact Address": contactAddress,
-            "Contact Address Line 2": contactAddressLine2,
-            "Contact City": contactCity,
-            "Contact State": contactState,
-            "Contact Zip": contactZip,
             "Orders": orders,
         }
     } = seller;
