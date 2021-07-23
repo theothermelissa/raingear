@@ -1,30 +1,48 @@
 const recordsReducer = (state, action) => {
-     // get fundraiser data
-     // get focused fundraiser
-     // get focused fundraiser editor
-     // submit fundraiser edits
      switch (action.type) {
           case 'setRecords':
-               // console.log("records: ", action.payload);
                return {
                     ...state,
-                    allRecords: action.payload,
+                    records: action.payload,
+               };
+          case 'setDataLoaded': 
+               return {
+                    ...state,
+                    whichDataIsLoaded: action.payload,
                }
-          case 'chooseRecord':
-               // console.log("select record: ", action.payload)
+          case 'setUser': 
                return {
                     ...state,
-                    focusedRecordID: action.payload,
+                    user: action.payload,
+               };
+          case 'setFundraiserToDisplay':
+               return {
+                    ...state,
+                    fundraiserToDisplay: {...action.payload},
+               }
+          case 'removeUser': 
+               return {
+                    ...state,
+                    user: '',
+               };
+          case 'chooseRecord':
+               return {
+                    ...state,
+                    focusedRecord: action.payload,
                     viewFocusedRecord: true,
                };
+          case 'dismissRecord':
+               return {
+                    ...state,
+                    viewFocusedRecord: false,
+               }
           case 'updateRecords':
-               console.log("Setting recordHasChanged: true.")
                return {
                     ...state,
                     recordHasChanged: true,
+                    
                };
           case 'doNotUpdate':
-               console.log("Let it be.")
                return {
                     ...state,
                     recordHasChanged: false,
@@ -32,26 +50,34 @@ const recordsReducer = (state, action) => {
           case 'setHovered':
                return {
                     ...state,
-                    hoveredID: action.payload,
+                    hoveredIDs: action.payload,
                };
-          case 'showEditDrawer':
+          case 'showDrawer':
                return {
                     ...state,
-                    editDrawerVisible: true,
+                    drawerVisible: true,
+               };
+          case 'selectDate':
+               return {
+                    ...state,
+                    selectedDate: action.payload,
+               };
+          case 'editRecord':
+               return {
+                    ...state,
                     recordToEdit: action.payload,
-               };
-          case 'closeEditDrawer':
+               }
+          case 'closeDrawer':
                return {
                     ...state,
-                    editDrawerVisible: false,
-                    // recordToEdit: '',
+                    drawerVisible: false,
+                    recordToEdit: '',
                }
-          case 'logSuccess':
+          case 'recordChangeComplete':
                return {
                     ...state,
                     alert: {"type": "success", "message": "Success!"},
-                    // recordToEdit: '',
-//     const alertList = [{type: "success", message: "Success!"},{type: "error", message: "Darn. Something went wrong."},{type: "info", message: "Something you should know ... is that there is a lengthy thing to say about whatever it is we were discussing. Which I'll remember soon. Honestly."}];
+                    recordHasChanged: false,
                }
           case 'logError':
                return {

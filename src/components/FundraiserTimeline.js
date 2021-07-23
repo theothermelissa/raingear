@@ -2,35 +2,31 @@ import  React, { useContext, useEffect, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import { Timeline } from 'antd';
 import selectStatusColor from './selectStatusColor';
-import { find, matchesProperty } from 'lodash';
+import { find, matchesProperty, sortBy } from 'lodash';
 import {RecordsContext} from '../App';
 
 
-const FundraiserTimeline = ({ fundraisers, setHovered }) => {
+const FundraiserTimeline = ({ setHovered }) => {
+  const { recordsDispatch, recordsState: {
+    fundraiserToDisplay: { fundraisers }
+  }} = useContext(RecordsContext)
+
+  const [fundraisersForCards, setFundraisersForCards] = useState('');
+
+  useEffect(() => {
+    setFundraisersForCards(fundraisers.map((fundraiser) => fundraiser.fields))
+  }, [fundraisers])
+  
   const chooseRecord = (recordName) => {
-    const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
+    const chosenRecord = find(fundraisersForCards, matchesProperty('organization', recordName));
     recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
   }
-  const [updatedFundraisers, setUpdatedFundraisers] = useState('');
 
   const prefillStatus = (currentStatus) => {
-    console.log("currentStatus: ", currentStatus);
     return (
         currentStatus ? currentStatus : "Inquiry"
     )
   };
-  
-  // useEffect(()=> {
-  //   setUpdatedFundraisers({
-  //     "status": prefillStatus(fundraisers["status"]),
-  //     ...fundraisers,
-  //   })
-  // }, [])
-  
-
-  const {
-    recordsDispatch
-  } = useContext(RecordsContext);
   
   return (
     <div>
@@ -39,11 +35,11 @@ const FundraiserTimeline = ({ fundraisers, setHovered }) => {
           mode="left"
           style={{
             marginLeft: "20px",
-            padding: "100px 40px 0px 0px",
+            padding: "30px 40px 0px 0px",
             maxWidth: '500px'
           }}
         >
-        {fundraisers.map(fundraiser => (
+        {sortBy(fundraisersForCards, ['deliveryDate']).map(fundraiser => (
             <Timeline.Item 
               onMouseEnter={() => setHovered(fundraiser['recordID'])}
               onMouseLeave={() => setHovered(null)}

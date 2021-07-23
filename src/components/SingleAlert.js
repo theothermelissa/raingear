@@ -3,12 +3,11 @@ import { Alert } from 'antd';
 
 const SingleAlert = ({ message, type }) => {
     const [showAlert, setShowAlert] = useState(true)
-    // console.log("message: ", message)
 
     useEffect(() => {
         
     }, []);
-        
+
     return (
        <>
         {showAlert && <Alert showIcon style={{ width: "95%" }} message={message} closable type={type} /> }

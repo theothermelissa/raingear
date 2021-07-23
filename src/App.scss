@@ -15,13 +15,28 @@
 // .ant-timeline-rtl.ant-timeline.ant-timeline-pending .ant-timeline-item-last .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
 // .ant-timeline-rtl.ant-timeline.ant-timeline-reverse .ant-timeline-item-pending .ant-timeline-item-tail {border-right: 2px dotted #f0f0f0;border-left: none;}
 
+.seller-sider {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+}
+
+.ant-layout-sider-children {
+  min-width: 200px;
+}
+
 .ant-layout-content {
-  margin: 10px 10px 0px 310px;
+  margin: 30px 300px 0px 310px;
+}
+
+.ant-table-wrapper {
+  position: fixed;
+  width: 70vw;
 }
 
 .ant-table-row {
   &.hovered {
-    font-weight: bold;
+    background-color: antiquewhite;
   }
 }
 
@@ -74,14 +89,18 @@
   padding: 10px 0px;
 }
 
+// .ant-avatar {
+//   margin: 3px;
+// }
+
 /* .containerCard .ant-card-body {
   padding: 0px;
 } */
 
 .bigIcons {
   font-size: large;
-  color: lightgray;
-  margin: 0;
+  // color: lightgray;
+  // margin: 0;
 }
 
 .circleBackground {
@@ -97,6 +116,11 @@
   font-size: smaller;
   color: white;
   margin: 3px;
+}
+
+.headerLogo {
+  align-self: center;
+  margin-right: 50px;
 }
 
 .tagContentHolder {
@@ -125,45 +149,10 @@
   padding-bottom: 0px;
 }
 
-/* .ant-descriptions-item-content {
-  padding: 0px 0px 0px 5px;
-} */
-
-/* .App {
-  text-align: center;
-} */
-
-/* .App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.outer {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  height: 100vh;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */

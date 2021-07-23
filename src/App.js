@@ -1,241 +1,163 @@
-import  React, { useState, useEffect, useReducer } from 'react';
-import './App.scss';
-import FundraiserTimeline from './components/FundraiserTimeline';
-import AllFundraisers from './components/AllFundraisers';
-import EditFundraiser from './components/EditFundraiser';
+import React, {useState, useEffect, useReducer} from 'react';
 import Airtable from 'airtable';
-import { Layout, Menu, Drawer } from 'antd';
-import { find, matchesProperty } from 'lodash';
+import {BrowserRouter as Router, Switch, Route, withRouter} from "react-router-dom";
+import './App.scss';
 import recordsReducer from './reducers/recordsReducer';
-import FundraiserDetails from './components/FundraiserDetails';
-import Alerts from './components/Alerts';
-import scrollIntoView from 'scroll-into-view';
+import EditDrawer from './components/EditDrawer';
+import FirehouseCalendar from './components/FirehouseCalendar';
+import NavBar from './components/NavBar';
+import {findIndex, matchesProperty} from 'lodash';
+import Profile from './components/Profile';
+import HomePage from './components/HomePage';
+import LoadingSpinner from './components/LoadingSpinner';
+import { getFundraisers } from './components/fetchFundraiserData';
+import ProtectedRoute from './auth/protected-route';
+import {useAuth0} from '@auth0/auth0-react';
+import { getUser } from './components/fetchUserData';
 
-const { Header, Content, Sider } = Layout;
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
-const initialState = {
-  focusedRecordID: '',
-  viewFocusedRecord: false,
-  editDrawerVisible: false,
-  recordToEdit: '',
-  alert: '',
-  recordHasChanged: false,
-  hoveredID: null,
+const initialRecordsState = {
+    user: '',
+    records: '',
+    fundraiserToDisplay: '',
+    viewFocusedRecord: false,
+    focusedRecord: '',
+    drawerVisible: false,
+    recordToEdit: '',
+    alert: '',
+    recordHasChanged: false,
+    hoveredIDs: null,
 };
 
 function App() {
-  const [fundraisers, setFundraisers] = useState([]);
-  const [showAlert, setShowAlert] = useState(false);
-  const [focusedFundraiser, setFocusedFundraiser] = useState('');
-  const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialState);
-  // const [editDrawerVisible, setEditDrawerVisible] = useState(false);
-
-  useEffect( () => { 
-    // console.log("Hey! The record has changed!")
-    if (recordsState["recordHasChanged"]) {
-      base('Fundraisers').select({
-        view: "All Fields View",
-        }).eachPage(function page(records, fetchNextPage) {
-            setFundraisers(records.map(record => record.fields));
-            fetchNextPage();
-        }, function done(err) {
-            if (err) { console.error(err); return; }
-        });
-        recordsDispatch({
-          type: "logSuccess",
-        });
-        recordsDispatch({
-          type: "doNotUpdate",
-        });
-        setShowAlert(true);
-    } else if (!recordsState["focusedRecordID"]) {
-      base('Fundraisers').select({
-        view: "All Fields View",
-        }).eachPage(function page(records, fetchNextPage) {
-            setFundraisers(records.map(record => record.fields));
-            fetchNextPage();
-        }, function done(err) {
-            if (err) { console.error(err); return; }
-        });
-    } else {
-      return null;
-    }
-  }, [recordsState]);
-  
-  useEffect( () => { 
-    setFocusedFundraiser(
-      find(fundraisers, matchesProperty('recordID', recordsState["focusedRecordID"])))
-  }, [recordsState, fundraisers]);
-
-  // const dispatchFocusedRecord = (record) => recordsDispatch({
-  //   type: 'chooseRecord',
-  //   payload: record,
-  //   }
-  // );
-//   const scrollParentToChild = (parent, child) => {
-//     let parentRect = parent.getBoundingClientRect();
-//       let parentHeight = parent.clientHeight;
-//       let childRect = child.getBoundingClientRect();
-//       let isViewable = (childRect.top >= parentRect.top) && (childRect.bottom <= parentRect.bottom);
-//       console.log("parentHeight: ", parentHeight)
-//       console.log("isViewable: ", isViewable)
-//       if (!isViewable) {
-//         parent.scrollTop = (child.top + parent.scrollTop) - parent.top
-//       };
-//   }
-
-//   const scrollElementWithinPage = (page, element) => {
-//     const pageBounding = page.getBoundingClientRect(),
-//       clientBounding = element.getBoundingClientRect()
-
-//     const pageBottom = pageBounding.bottom,
-//       pageTop = pageBounding.top,
-//       clientBottom = clientBounding.bottom,
-//       clientTop = clientBounding.top;
     
-//     if (pageTop >= clientTop) {
-//       scrollTo(page, -(pageTop - clientTop), 300);
-//     } else if (clientBottom > pageBottom) {
-//       scrollTo(page, clientBottom - pageBottom, 300);
-//     }
-//   };
+    const {user: auth0User, isAuthenticated} = useAuth0();
+    const [loading, setLoading] = useState(false);
+    const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialRecordsState);
+    const [fundraisers, setFundraisers] = useState('');
 
-//   function scrollTo(element, to, duration) {
-//     let start = element.scrollTop,
-//       currentTime = 0,
-//       increment = 20;
-//     let animateScroll = function() {
-//       currentTime += increment;
-//     let val = easeInOutQuad(currentTime, start, to, duration);
-//     element.scrollTop = val;
-//     if (currentTime < duration) {
-//         setTimeout(animateScroll, increment);
-//       }
-//     };
-//     animateScroll();
-//   }
-// // Function for smooth scroll animation with the time duration
-// function easeInOutQuad(time, startPos, endPos, duration) {
-//   time /= duration / 2;
-//   if (time < 1) return (endPos / 2) * time * time + startPos;
-// time--;
-//   return (-endPos / 2) * (time * (time - 2) - 1) + startPos;
-// }
-//   }
-
-    // const scrollToRow = (scrollRow) => {
-    //   scrollIntoView((scrollRow), {
-    //     align: {
-    //       top: 0,
-    //       topOffset: 100,
-    //     },
-    //   });
-    // }
-
-  
-
-
-  const setHovered = (id) => {
-    // let hoveredRecord;
-    // let fundraisersTable;
-    // hoveredRecord = document.getElementById(`row${id}`);
-    // fundraisersTable = document.getElementById("fundraisersTable");
-    // if (hoveredRecord) {
-    //   scrollToRow(hoveredRecord);
-    // };
-    recordsDispatch({
-      type: 'setHovered',
-     payload: id,
-    })
-  };
-
-  const closeEditDrawer = () => recordsDispatch({
-    type: "closeEditDrawer",
-  });
-
-  // function createFundraiserIndex(fundraiser) {
-  //   fundraiser.values()
-  // }
-
-  // function createSearchFilter(fundraisers) {
-  //   const fundraiserValues = values(fundraisers);
-  //   console.log('fundraiserValues:', fundraiserValues);
-  //   console.log(fundraisers)
-  //   return (searchTerm) => {
-  //     // some(fundraisers, searchTerm => includes(fundraisers, searchTerm))
-      
-  //   }
-  // }
-
-  // console.log('What we got from it: ', createSearchFilter(fundraisers));
-
-  // const findMatchingFundraisersFor = createSearchFilter(fundraisers);
-
-  
-  // const selectFundraiser = (fundraiserSearchTerm) => {
-    // const createFilterFor = (searchTerm) => fundraiser => some(fundraiser, searchTerm => includes(fundraiser, searchTerm));
+    const {
+        user,
+        recordHasChanged,
+        drawerVisible,
+    } = recordsState;
     
-    // console.log("fundraisers: ",fundraisers);
-    // console.log("fundraiser: ", fundraiserSearchTerm);
-    // const filteredFundraisers = filter(fundraisers, () => includesValue(fundraiserSearchTerm));
-    // console.log("filteredFundraisers: ", filteredFundraisers);
-    // console.log("includesValue: ", includesValue(fundraiserSearchTerm, fundraisers))
-    // dispatchFocusedRecord(filter(fundraisers, includesValue(fundraiserSearchTerm, fundraisers)));
-    // const selectedFundraiser = _(fundraisers).find(fundraiser);
-  // }
-
-  // console.log("recordsState: ", recordsState);
-
-
-  return (
-    <RecordsContext.Provider
-      value={{
-        recordsState,
-        recordsDispatch,
-      }}
-    >
-      <Layout>
-        <Header style={{ position: "fixed", zIndex: 1000, width: '100%' }}>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[2]}>
-            <Menu.Item key="1">Fundraisers</Menu.Item>
-            <Menu.Item key="2">Customers</Menu.Item>
-            <Menu.Item key="3">Team</Menu.Item>
-          </Menu>
-        {recordsState["alert"] && <Alerts />}
-        </Header>
-        <Layout>
-          <Sider
-            style={{
-              overflow: 'auto',
-              height: '100vh',
-              position: 'fixed',
-              left: 0,
-              backgroundColor: '#d9d9d9',
-            }} 
-            width="auto"
-            className="site-layout-background"
-          >
-            {fundraisers[0] && <FundraiserTimeline setHovered={setHovered} fundraisers={fundraisers} />}
-          </Sider>
-        </Layout>
-        <Layout className="site-layout" style={{ marginLeft: 0 }}>
-            <Header className="site-layout-background" style={{ padding: 0 }} />
-            <Content style={{ overflow: 'initial', minHeight: "100vh" }}>
-              {fundraisers[0] && <AllFundraisers fundraisers={fundraisers} />}
-              {focusedFundraiser && <FundraiserDetails recordToDisplay={focusedFundraiser}/>}
-            </Content>
-            {/* {fundraisers[0] && <Button onClick={() => showEditDrawer(fundraisers[0]['rsecordID'])}>Show Drawer</Button>} */}
-        </Layout>
-      </Layout>
-          {recordsState["editDrawerVisible"] && <Drawer forceRender width={"80vw"} visible={recordsState["editDrawerVisible"]} onClose={closeEditDrawer}>
-            <EditFundraiser />
-          </Drawer>}
-    </RecordsContext.Provider>
+    useEffect(() => {
+        if (recordsState.user === 'removed') {
+            setLoading(false);
+        }
+    }, [recordsState.user])
     
-  );
+    // set user data by email
+    useEffect(() => {
+        if (isAuthenticated && !user) {
+            setLoading(true);
+            const callbackForFetch = (result) => {
+                recordsDispatch({
+                    type: "setUser",
+                    payload: result
+                });
+            }
+            getUser(auth0User.email, callbackForFetch);
+        }
+    }, [isAuthenticated, user, auth0User, recordHasChanged])
+
+    // set fundraiserToDisplay
+    useEffect(() => {
+        if (fundraisers.length) {
+            recordsDispatch({
+                type: 'setRecords',
+                payload: fundraisers
+            })
+            const isProvider = record => record.role === 'provider';
+            const isActive = record => record.fields.status === 'Active';
+            let providerRecords = fundraisers.filter(isProvider);
+            let activeRecords = fundraisers.filter(isActive);
+            if (providerRecords.length) {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: 'provider',
+                        fundraisers: fundraisers
+                    }
+                })
+            } else if (activeRecords.length) {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: activeRecords[0]['role'],
+                        fundraisers: activeRecords[0]
+                    },
+                })
+            } else {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: fundraisers[0]['role'],
+                        fundraisers: fundraisers[0]
+                    },
+                })
+            }
+            setLoading(false);
+        }
+    }, [fundraisers]);
+
+    // fetch fundraiser data
+    useEffect(() => {
+        if (user.Email) {
+            const {
+                allFundraisers
+            } = user;
+            if (!fundraisers) {
+                const callbackForFetch = async (result) => {
+                    let completeFundraisers = await result;
+                    if (completeFundraisers) {
+                        setFundraisers(completeFundraisers);
+                    }
+                }
+                getFundraisers(user, allFundraisers, callbackForFetch)
+            } else if (recordsState.recordHasChanged) {
+               setLoading(true);
+               let fundraiserList = fundraisers;
+               const changedFundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordsState.recordToEdit))
+               const callbackForFetch = async (result) => {
+                    const updatedRecord = await result;
+                    fundraiserList.splice(changedFundraiserIndex, 1, updatedRecord[0])
+                    setFundraisers(fundraiserList);
+                    setLoading(false);
+                    
+               };
+               getFundraisers(user, [fundraisers[changedFundraiserIndex]['id']], callbackForFetch);
+               recordsDispatch({
+                type: 'doNotUpdate'
+                })
+           }
+        }
+    }, [user, fundraisers, recordsState.recordHasChanged, recordsState.recordToEdit])
+
+    
+    
+    return (
+        <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
+                <Router basename={'/'}>
+                    <NavBar /> 
+                    {drawerVisible && <EditDrawer />}
+                    <Switch>
+                        {!isAuthenticated && !loading &&
+                            <div className='outer'>
+                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
+                            </div>}
+                        {loading && <LoadingSpinner />}
+                        {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
+                        {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
+                        <ProtectedRoute path="/profile" component={Profile} />
+                    </Switch>
+                </Router>
+        </RecordsContext.Provider>
+    );
 }
 
-export default App;
+export default withRouter(App);

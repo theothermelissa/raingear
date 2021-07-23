@@ -1,137 +1,39 @@
-import React, { useContext, useState, useEffect } from 'react';
-import {sortBy, find, matchesProperty} from 'lodash';
-import {
-    Table,
-    Tag,
-} from 'antd';
+import React, {useContext, useState, useEffect} from 'react';
+import {sortBy, uniqueId, snakeCase} from 'lodash';
+import {Table, Tag} from 'antd';
 import {format} from 'date-fns';
 import selectStatusColor from './selectStatusColor.js';
 import {RecordsContext} from '../App';
 
-const AllFundraisers = ({fundraisers}) => {
-    const {
-        recordsDispatch,
-        recordsState: {
-            hoveredID
+const AllFundraisers = ({ hoveredFundraiser }) => {
+    const {recordsDispatch, recordsState: {
+            fundraiserToDisplay: { fundraisers }
         }
     } = useContext(RecordsContext);
 
+    const [dataSource, setDataSource] = useState('');
+    
     const convertedDate = (date) => format(new Date(date), 'MMM dd');
-    const [updatedFundraisers, setUpdatedFundraisers] = useState('')
 
-    const chooseRecord = (recordName) => {
-        const chosenRecord = find(fundraisers, matchesProperty('organization', recordName));
-        console.log("This is a new edit!");
-        recordsDispatch({type: 'chooseRecord', payload: chosenRecord["recordID"]})
+    const chooseRecord = (id) => {
+        recordsDispatch({type: 'chooseRecord', payload: id})
     }
 
-    const prefillStatus = (currentStatus) => {
-        return (
-            currentStatus ? currentStatus : "Inquiry"
-        )
+    const isHighlighted = (id) => {
+        if (hoveredFundraiser) {
+            return (hoveredFundraiser === id) 
+        } else return false;
     };
 
-    
-    useEffect(() => {
-        setUpdatedFundraisers(fundraisers.map(record => {
-            return {
-                ...record,
-                'deliveryDate': convertedDate(record['deliveryDate']),
-                'organizationProceeds': `$${
-                    Math.round(record['organizationProceeds'])
-                }`,
-                'totalRevenue': `$${
-                    Math.round(record['totalRevenue'])
-                }`,
-                'firehouseFee': `$${
-                    Math.round(record['firehouseFee'])
-                }`,
-                'isHovered': record['recordID'] === hoveredID,
-                'key': record["recordID"],
-                'status': `${prefillStatus(record["status"])}`
-            }
-        }))
-    }, [fundraisers]);
-
-
-    // const {
-    //   fundraiserName,
-    //   deliveryDate,
-    //   daysUntilDelivery,
-    //   deliveryAddress,
-    //   deliveryCity,
-    //   deliveryState,
-    //   deliveryZip,
-    //   deliveryNotes,
-    //   products,
-    //   customerButtPrice,
-    //   customerHamPrice,
-    //   customerTurkeyPrice,
-    //   customerSaucePrice,
-    //   firehouseButtPrice,
-    //   firehouseHamPrice,
-    //   firehouseTurkeyPrice,
-    //   firehouseSaucePrice,
-    //   buttCount,
-    //   hamCount,
-    //   turkeyCount,
-    //   sauceCount,
-    //   status,
-    //   priority,
-    //   orders,
-    //   orderTotals,
-    //   totalRevenue,
-    //   organization,
-    //   contactFirstName,
-    //   contactLastName,
-    //   contactFullName,
-    //   contactEmail,
-    //   contactPhone,
-    //   contactPreferredMethod,
-    //   contactAddress,
-    //   contactAddressLine2,
-    //   contactCity,
-    //   contactState,
-    //   contactZip,
-    //   contactIsBilling,
-    //   billingContactFullName,
-    //   billingEmail,
-    //   billingPhone,
-    //   recordID,
-    //   sellers,
-    //   allOrders,
-    //   orderCount,
-    //   firehouseFee,
-    //   ccFees,
-    //   organizatinProceeds
-    // } = updatedFundraisers;
-
-    const dataSource = sortBy(updatedFundraisers, ['priority', 'deliveryDate']);
-    // console.log('dataSource: ', dataSource);
-
-    const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
-    const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
-    const isHovered = (id) => id === hoveredID;
-
-    // const getRowHeightAndSetTop = (data, value) => {
-    //     data && data.forEach((item, index) => {
-    //         if (item.id === value) {
-    //             setTableScrollTop(index);
-    //         }
-    //     })
-    // }
-
-    // const setTableScrollTop = (id, index) => {
-    //     if (index != 0 || index != -1){
-    //         let currentPosition = index *40;
-    //         document.getElementById(id).scrollTop(currentPosition);
-    //     }
-    // }
+    const prefillStatus = (currentStatus) => {
+        return(currentStatus ? currentStatus : "Inquiry")
+    };
 
     const chooseProduct = (product) => {
         switch (product) {
             case 'Boston Butts':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#597ef7'}
@@ -143,7 +45,8 @@ const AllFundraisers = ({fundraisers}) => {
                         {product}</div>
                 </div>
             case 'Half Hams':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#7cb305'}
@@ -155,7 +58,8 @@ const AllFundraisers = ({fundraisers}) => {
                         {product}</div>
                 </div>
             case 'Whole Turkeys':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#13c2c2'}
@@ -167,7 +71,8 @@ const AllFundraisers = ({fundraisers}) => {
                         {product}</div>
                 </div>
             case 'BBQ Sauce':
-                return <div key={product} className='tagContentHolder'>
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
                     <div className='circleBackground'
                         style={
                             {backgroundColor: '#9254de'}
@@ -182,6 +87,35 @@ const AllFundraisers = ({fundraisers}) => {
                 return null;
         }
     }
+
+    useEffect(() => {
+        if (fundraisers) {
+            let formattedFundraisers = fundraisers.map(fundraiser => {
+                const { fields} = fundraiser;
+                return {
+                        ...fields,
+                        'deliveryDate': convertedDate(fields['deliveryDate']),
+                        'organizationProceeds': `$${
+                            Math.round(fields['organizationProceeds'])
+                        }`,
+                        'totalRevenue': `$${
+                            Math.round(fields['totalRevenue'])
+                        }`,
+                        'providerFee': `$${
+                            Math.round(fields['providerFee'])
+                        }`,
+                        // 'key': uniqueId(`${id}`),
+                        'status': `${
+                            prefillStatus(fields["status"])
+                        }`
+                }
+            });
+            setDataSource(sortBy(formattedFundraisers, 'priority'))
+        }
+    }, [fundraisers]);
+
+    const createSorter = (field) => (a, b) => a[field] >= b[field] ? -1 : 1;
+    const createFilter = (field) => (value, record) => record[field].indexOf(value) === 0;
 
     const columns = [
         {
@@ -200,15 +134,15 @@ const AllFundraisers = ({fundraisers}) => {
             dataIndex: 'status',
             key: 'status',
             render: status => (
-                <>
-                    {status && <Tag color={
+                <> {
+                    status && <Tag color={
                             selectStatusColor(status)
                         }
-                        key={status}>
+                        key={uniqueId('status_')}>
                         {
                         status.toUpperCase()
-                    } </Tag>}
-                </>
+                    } </Tag>
+                } </>
             ),
             sorter: createSorter('status')
         },
@@ -224,16 +158,16 @@ const AllFundraisers = ({fundraisers}) => {
             )
         },
         {
-            title: 'FH Total',
-            dataIndex: 'firehouseFee',
-            key: 'firehouseFee',
+            title: "We've Made",
+            dataIndex: 'providerFee',
+            key: 'providerFee',
             render: item => (
                 <>
                     <div>{item}</div>
                 </>
             )
         }, {
-            title: 'Org Total',
+            title: "They've Raised",
             dataIndex: 'organizationProceeds',
             key: 'organizationProceeds',
             render: item => (
@@ -271,19 +205,24 @@ const AllFundraisers = ({fundraisers}) => {
             ],
             onFilter: createFilter('products'),
             render: text => {
-                return(text.map((item) => chooseProduct(item)))
+                if (text) {
+                    return(text.map((item) => chooseProduct(item)))
+                }
             }
         },
     ];
 
     return (
-        <>
-            {updatedFundraisers && <div>
-                <Table dataSource={dataSource}
+            <div style={{ width: '70vw' }}>
+        { dataSource && 
+                <Table 
+                    dataSource={dataSource}
                     columns={columns}
                     pagination={false}
                     size='small'
                     id='fundraisersTable'
+                    bordered={true}
+                    rowKey={row => row.key}
                     scroll={
                         {
                             x: 700,
@@ -292,19 +231,20 @@ const AllFundraisers = ({fundraisers}) => {
                     }
                     onRow={
                         (record, rowIndex) => {
+                            const { recordID: id } = record;
                             return {
                                 onClick: event => {
-                                    chooseRecord(record["organization"])
-                                    // console.log("record org ", record["organization"]);
+                                    chooseRecord(id)
                                 },
-                                className: isHovered(record.recordID) ? 'hovered' : '', // click row
-                                id: `row${record.recordID}`,
-                                key: rowIndex,
+                                className: isHighlighted(id) ? 'hovered' : '', 
+                                id: id,
+                                key: uniqueId(`${id}_${rowIndex}`),
                             };
                         }
-                    }/>
-            </div>}
-        </>
+                    }
+                    />
+                } 
+            </div>
     );
 }
 

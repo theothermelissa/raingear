@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { find, matchesProperty } from 'lodash';
 import {RecordsContext} from '../App';
 import {
     Card,
@@ -10,63 +11,75 @@ import {
 
 const {Meta} = Card;
 
-const FundraiserDetails = ({ recordToDisplay }) => {
+const FundraiserDetails = () => {
     const {
         recordsDispatch,
+        recordsState: {
+            recordHasChanged,
+            fundraiserToDisplay: {
+                fundraisers
+            },
+            focusedRecord
+        }
     } = useContext(RecordsContext);
+
+    const [viewThisFundraiser, setViewThisFundraiser] = useState(find(fundraisers, matchesProperty('id', focusedRecord.toString())));
+
+    useEffect(() => {
+        if (fundraisers) {
+            let fullFundraiserRecord = find(fundraisers, matchesProperty('id', focusedRecord));
+            setViewThisFundraiser(fullFundraiserRecord);
+        }
+    }, [fundraisers, focusedRecord, recordHasChanged])
 
 
     const {
-        fundraiserName,
-        organization,
-        products,
-        deliveryCity,
-        deliveryAddress,
-        deliveryState,
-        deliveryZip,
-        deliveryNotes,
-        deliveryDate,
-        daysUntilDelivery,
-        contactFirstName,
-        contactPhone,
-        contactLastName,
-        contactAddress,
-        contactAddressLine2,
-        contactCity,
-        contactState,
-        contactZip,
-        contactPreferredMethod,
-        contactEmail,
-        status,
-        buttCount,
-        hamCount,
-        turkeyCount,
-        sauceCount,
-        customerButtPrice,
-        customerHamPrice,
-        customerTurkeyPrice,
-        customerSaucePrice,
-        firehouseFee,
-        orderTotals,
-        totalRevenue,
-        sellerRecords,
-        organizationProceeds,
-        recordID,
-    } = recordToDisplay;
+        fields: {
+            fundraiserName,
+            deliveryCity,
+            deliveryAddress,
+            deliveryState,
+            deliveryZip,
+            deliveryNotes,
+            daysUntilDelivery,
+            daysUntilCook,
+            contactFirstName,
+            contactPhone,
+            contactLastName,
+            contactAddress,
+            contactAddressLine2,
+            contactCity,
+            contactState,
+            contactZip,
+            contactPreferredMethod,
+            contactEmail,
+            status,
+            buttCount,
+            hamCount,
+            turkeyCount,
+            sauceCount,
+            customerButtPrice,
+            customerHamPrice,
+            customerTurkeyPrice,
+            customerSaucePrice,
+            providerFee,
+            orderTotals,
+            organizationProceeds,
+            recordID,
+        }
+    } = viewThisFundraiser;
 
     let orders = [];
     if (orderTotals) {
         orderTotals.map((total) => orders.push(total));
     }
-    let sellers = 0;
-    if (sellerRecords) {
-        sellers = sellerRecords.length
-    };
 
-    const relativeDeliveryDate = () => {
-        if (daysUntilDelivery > 0) {
-            return `DELIVERY IN ${daysUntilDelivery} DAYS`
-        } return `DELIVERY WAS ${-daysUntilDelivery} DAYS AGO`
+    const relativeDate = (days, event) => {
+        if (days > 0) {
+            return `${event} IN ${days} DAYS`
+        } else if (days === 0) {
+            return `${event} TODAY`
+        } return `${event} WAS ${-days} DAYS AGO`
     }
 
     const totalProducts = buttCount + hamCount + turkeyCount + sauceCount;
@@ -86,20 +99,21 @@ const FundraiserDetails = ({ recordToDisplay }) => {
         )
     };
 
-    const showEditDrawer = () => recordsDispatch({
-        type: "showEditDrawer",
-        payload: recordID,
-    });
-
-    // function copyToClipboard() {
-    //     addressHolder.innerText = copytext.innerText;
-    //     Copied = addressHolder.createTextRange();
-    //     Copied.execCommand("Copy")
-    // };
+    const showDrawer = () => {
+        recordsDispatch({
+            type: "showDrawer",
+        })
+        recordsDispatch({
+            type: "editRecord",
+            payload: recordID,
+        })
+    };
 
     return (
         <div className="site-card-wrapper">
-            <Card title={`${fundraiserName} (${prefillStatus(status)})`}
+            <Card title={ fundraiserName
+                ? `${fundraiserName} (${prefillStatus(status)})`
+                : "No Name Yet"}
                 className={
                     prefillStatus(status).toLowerCase()
                 }
@@ -107,12 +121,13 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                     {
                         margin: "16px 0px",
                         padding: "0px",
-                        backgroundColor: '#fafafa'
+                        backgroundColor: '#fafafa',
+                        minWidth: "70vw",
                     }
                 }
                 extra={
                     <>
-                <Button onClick={() => showEditDrawer()}>Edit</Button></>
+                <Button onClick={() => showDrawer()}>Edit</Button></>
             }>
                 <Row type="flex"
                     gutter={16}>
@@ -130,31 +145,36 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                         </>
                                     ]
                             }>
-                                <Meta title="COOK IN ______"/> {
-                                totalProducts > 0 ? <>
-                                    <div>{
-                                        buttCount > 0 && `${buttCount} Butt${
-                                            buttCount > 1 ? 's' : ''
-                                        }`
-                                    }</div>
-                                    <div>{
-                                        hamCount > 0 && `${hamCount} Ham${
-                                            hamCount > 1 ? 's' : ''
-                                        }`
-                                    }</div>
-                                    <div>{
-                                        turkeyCount > 0 && `${turkeyCount} Turkey${
-                                            turkeyCount > 1 ? 's' : ''
-                                        }`
-                                    }</div>
-                                    <div>{
-                                        sauceCount > 0 && `${sauceCount} Sauce${
-                                            sauceCount > 1 ? 's' : ''
-                                        }`
-                                    }</div>
-                                </> : <div>No sales yet</div>
-                            }
-                                {/* <Button>Download Labels</Button> */} </Card>
+                                <Meta title={relativeDate(daysUntilCook, "COOK")}/> {
+                                    totalProducts > 0 
+                                        ? <>
+                                            <div>{
+                                                buttCount > 0 && `${buttCount} Butt${
+                                                    buttCount > 1 ? 's' : ''
+                                                }`
+                                            }</div>
+                                            <div>{
+                                                hamCount > 0 && `${hamCount} Ham${
+                                                    hamCount > 1 ? 's' : ''
+                                                }`
+                                            }</div>
+                                            <div>{
+                                                turkeyCount > 0 && `${turkeyCount} Turkey${
+                                                    turkeyCount > 1 ? 's' : ''
+                                                }`
+                                            }</div>
+                                            <div>{
+                                                sauceCount > 0 && `${sauceCount} Sauce${
+                                                    sauceCount > 1 ? 's' : ''
+                                                }`
+                                            }</div>
+                                        </>
+                                        : <div>
+                                            No sales yet
+                                        </div>
+                                }
+                                {/* <Button>Download Labels</Button> */} 
+                            </Card>
                             <Card bordered={false}
                                 style={
                                     {height: "100%"}
@@ -179,29 +199,25 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                         style={
                             {height: "100%"}
                     }>
-                        <Card bordered={false}
-                            // actions={
-                            //     [
-                            //         <>
-                            //             <Button onClick={copyToClipboard}>Copy Address</Button>
-                            //         </>
-                            //     ]
-                            // }
-                        >
-                            {/* <textArea id="addresHolder" style={{display: none}}/> */}
-
-                            {/* <Meta title={`DELIVERY SCHEDULED FOR: ${convertedDate(deliveryDate).toUpperCase()}`} /> */}
+                        <Card bordered={false}>
                             <Meta title={
-                                relativeDeliveryDate()
+                                relativeDate(daysUntilDelivery, "DELIVERY")
                             }/>
                             <Descriptions layout={"vertical"}
                                 column={1}>
                                 <Descriptions.Item label="Address">
-                                    {deliveryAddress}<br/>{deliveryCity}, {deliveryState}
-                                    {deliveryZip}</Descriptions.Item>
-                                <Descriptions.Item label="Note">
-                                    {deliveryNotes}</Descriptions.Item>
-                                <Descriptions.Item label=""></Descriptions.Item>
+                                    {
+                                        deliveryAddress
+                                        ? `${deliveryAddress}
+                                        ${deliveryCity}, ${deliveryState} ${deliveryZip}`
+                                        : ""
+                                    }    
+                                </Descriptions.Item>
+                                {deliveryNotes && <Descriptions.Item label="Note">
+                                    {deliveryNotes}
+                                </Descriptions.Item>}
+                                <Descriptions.Item label="">
+                                </Descriptions.Item>
                             </Descriptions>
                         </Card>
                     </Col>
@@ -218,16 +234,16 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                     </>
                                 ]
                         }>
-                            {/* <Meta title={`DELIVERY SCHEDULED FOR: ${convertedDate(deliveryDate).toUpperCase()}`} /> */}
                             <Meta title={
-                                `${
-                                    contactFirstName.toUpperCase()
-                                } ${
-                                    contactLastName.toUpperCase()
-                                }`
+                                (contactFirstName && contactLastName)
+                                    ? `${
+                                        contactFirstName.toUpperCase()
+                                    } ${
+                                        contactLastName.toUpperCase()
+                                    }`
+                                    : "No primary contact yet"
                             }/>
                             <Descriptions 
-                                // layout={"vertical"}
                                 column={1}>
                                 <Descriptions.Item label="Phone">
                                     {
@@ -238,14 +254,18 @@ const FundraiserDetails = ({ recordToDisplay }) => {
                                 <Descriptions.Item label="Prefers">
                                     {contactPreferredMethod}</Descriptions.Item>
                                 <Descriptions.Item label="Address">
-                                    {contactAddress}
-                                    {contactAddressLine2}<br/>{contactCity}, {contactState}
-                                    {contactZip}</Descriptions.Item>
+                                    {
+                                        contactAddress
+                                        ? `${contactAddress} ${contactAddressLine2}
+                                        ${contactCity}, ${contactState} ${contactZip}`
+                                        : ""
+                                    }
+                                </Descriptions.Item>
                             </Descriptions>
                         </Card>
                         <Card bordered={false}>
                             <Meta title={
-                                `FIREHOUSE PROFIT: $${firehouseFee}`
+                                `FIREHOUSE PROFIT: $${providerFee}`
                             }/>
                             <Descriptions column={1}>
                                 <Descriptions.Item label="Their Paid Orders">
