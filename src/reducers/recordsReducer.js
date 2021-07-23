@@ -1,5 +1,10 @@
 const recordsReducer = (state, action) => {
      switch (action.type) {
+          case 'displayError': 
+               return {
+                    ...state,
+                    errorToDisplay: action.payload,
+               }
           case 'setRecords':
                return {
                     ...state,

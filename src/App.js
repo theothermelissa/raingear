@@ -55,7 +55,14 @@ function App() {
     useEffect(() => {
         if (isAuthenticated && !user) {
             setLoading(true);
-            const callbackForFetch = (result) => {
+            const callbackForFetch = (result, err) => {
+                if (err) {
+                    recordsDispatch({
+                        type: 'displayError',
+                        payload: err
+                    })
+                return;
+                }
                 recordsDispatch({
                     type: "setUser",
                     payload: result
@@ -146,11 +153,14 @@ function App() {
                     <NavBar /> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
-                        {!isAuthenticated && !loading &&
-                            <div className='outer'>
-                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
-                            </div>}
                         {loading && <LoadingSpinner />}
+                        {recordsState.errorToDisplay 
+                            ? <div className='outer'>{recordsState.errorToDisplay}</div>
+                            : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
+                                <div className='outer'>
+                                    <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
+                                </div>
+                        }
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
                         {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
                         <ProtectedRoute path="/profile" component={Profile} />

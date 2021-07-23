@@ -7,6 +7,9 @@ export const getUser = (email, callback) => {
     })
     .all()
     .then((users) => {
+        if (!users.length) {
+            callback(null, "Sorry, you're not a user!")
+        }
         const {
             fields,
             fields: {
