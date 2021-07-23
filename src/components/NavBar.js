@@ -112,7 +112,7 @@ const NavBar = () => {
                     }
                     
               </Col>
-              <Col flex={1}>
+              <Col >
                 <Menu theme="dark" mode="horizontal">
                   <Menu.Item 
                     style={{ float: "right" }}

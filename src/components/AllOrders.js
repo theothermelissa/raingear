@@ -99,74 +99,80 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
       }
       allOrders.push(formattedOrder);
     })
+    return allOrders;
   }, [productInFundraiser])
 
+  const createColumns = useCallback(() => {
+    const createEmailLink = (address) => `mailto:${address}`;
+    const createProductColumns = () => {
+      let columnTitles = [];
+      const productDataIndex = (product) => {
+          let result;
+          switch (product) {
+              case "Boston Butts": result = ("buttQty");
+                  break;
+              case "Half Hams": result = ("hamQty");
+                  break;
+              case "Whole Turkeys": result = ("turkeyQty");
+                  break;
+              case "BBQ Sauce": result = ("sauceQty");
+                  break;
+              default: result = "";
+          }
+          return result;
+      }
+      fundraiserToDisplay.fundraisers.fields.products.map((product) => columnTitles.push({
+          title: product,
+          dataIndex: productDataIndex(product),
+          key: (productDataIndex(product)),
+          align: 'center',
+      }));
+      return columnTitles;
+    };
+    return ([
+      {
+        title: 'Supporter',
+        dataIndex: 'supporterFullName',
+        key: 'supporterName',
+      },
+      {
+          title: 'Order Date',
+          dataIndex: 'date',
+          key: 'orderDate',
+      },
+      {
+          title: "Phone",
+          dataIndex: 'supporterPhone',
+          key: 'supporterPhone',
+      },
+      ...createProductColumns(),
+      {
+          title: 'Total',
+          dataIndex: 'totalPrice',
+          key: 'totalPrice'
+      },
+      {
+          title: 'Email',
+          dataIndex: 'supporterEmail',
+          key: 'supporterEmail',
+          render: text => <a href={createEmailLink(text)}>{text}</a>,
+          width: '00px'
+      }
+    ])
+  }, [fundraiserToDisplay])
+  
   useEffect(() => {
     if (orders) {
       setUpdatedOrders(formattedOrders(orders));
-      const createProductColumns = () => {
-        let columnTitles = [];
-        const productDataIndex = (product) => {
-            let result;
-            switch (product) {
-                case "Boston Butts": result = ("buttQty");
-                    break;
-                case "Half Hams": result = ("hamQty");
-                    break;
-                case "Whole Turkeys": result = ("turkeyQty");
-                    break;
-                case "BBQ Sauce": result = ("sauceQty");
-                    break;
-                default: result = "";
-            }
-            return result;
-        }
-        fundraiserToDisplay.fundraisers.fields.products.map((product) => columnTitles.push({
-            title: product,
-            dataIndex: productDataIndex(product),
-            key: (productDataIndex(product)),
-            align: 'center',
-        }));
-        return columnTitles;
-      }
-      const createEmailLink = (address) => `mailto:${address}`;
-      setColumns([
-        {
-          title: 'Supporter',
-          dataIndex: 'supporterFullName',
-          key: 'supporterName',
-        },
-        {
-            title: 'Order Date',
-            dataIndex: 'date',
-            key: 'orderDate',
-        },
-        {
-            title: "Phone",
-            dataIndex: 'supporterPhone',
-            key: 'supporterPhone',
-        },
-        ...createProductColumns(),
-        {
-            title: 'Total',
-            dataIndex: 'totalPrice',
-            key: 'totalPrice'
-        },
-        {
-            title: 'Email',
-            dataIndex: 'supporterEmail',
-            key: 'supporterEmail',
-            render: text => <a href={createEmailLink(text)}>{text}</a>,
-            width: '00px'
-        }
-      ])
+      
+      setColumns(createColumns())
     }
-  }, [orders, fundraiserToDisplay, formattedOrders])
+  }, [orders, fundraiserToDisplay, formattedOrders, createColumns])
   
   return (
     <>
       { 
-      updatedOrders.length
+      updatedOrders && updatedOrders.length
         ? <Table
           columns={columns}
           dataSource={updatedOrders}
