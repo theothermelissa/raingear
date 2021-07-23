@@ -153,14 +153,13 @@ function App() {
                     <NavBar /> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
-                        {loading && <LoadingSpinner />}
                         {recordsState.errorToDisplay 
                             ? <div className='outer'>{recordsState.errorToDisplay}</div>
                             : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
-                                <div className='outer'>
-                                    <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
-                                </div>
-                        }
+                            <div className='outer'>
+                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
+                            </div>}
+                        {loading && <LoadingSpinner />}
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
                         {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
                         <ProtectedRoute path="/profile" component={Profile} />
