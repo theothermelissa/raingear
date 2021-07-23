@@ -22,7 +22,7 @@ const Customers = ({ guardian, sellerToView }) => {
 
     const setFullName = (first, last) => `${first} ${last}`;
     const productInFundraiser = (product) => products.includes(product);
-    const chooseRecord = (id) => recordsDispatch({type: 'chooseRecord', payload: id});
+    const chooseRecord = (record) => recordsDispatch({type: 'chooseRecord', payload: record});
     const formatPhoneNumber= (ph) => {
         var cleaned = ('' + ph).replace(/\D/g, '');
         var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -185,7 +185,7 @@ const Customers = ({ guardian, sellerToView }) => {
                             const { id } = record;
                             return {
                                 onClick: event => {
-                                    chooseRecord(id)
+                                    chooseRecord(record)
                                 },
                                 key: uniqueId(`${id}_${rowIndex}`)
                             }

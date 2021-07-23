@@ -172,7 +172,7 @@ function App() {
                     <Switch>
                         {!isAuthenticated && !loading &&
                             <div className='outer'>
-                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to access fundraiser information</h2>
+                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
                             </div>}
                         {loading && <LoadingSpinner />}
                         {/* {!isAuthenticated && <div>Please log in.</div> } */}
