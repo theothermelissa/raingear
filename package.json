@@ -1,6 +1,6 @@
 {
-  "homepage": "http://selljar.surge.sh",
-  "name": "selljar",
+  "homepage": "http://app.firehousebarbecue.com",
+  "name": "firehouse_app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "predeploy": "yarn run build",
-    "deploy": "yarn run build && mv build/index.html build/200.html && surge build selljar.surge.sh",
+    "deploy": "yarn run build && mv build/index.html build/200.html && surge build app.firehousebarbecue.com",
     "start": "HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -17,7 +17,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
             domain={domain}
             clientId={clientId}
             // redirectUri={window.location.origin}
-            redirectUri={"https://selljar.surge.sh/"}
+            redirectUri={"https://app.firehousebarbecue.com/"}
             onRedirectCallback={onRedirectCallback}
         >
             {children}
