@@ -15,6 +15,8 @@ import ProtectedRoute from './auth/protected-route';
 import {useAuth0} from '@auth0/auth0-react';
 import { getUser } from './components/fetchUserData';
 
+console.log("Airtable API Key: ", process.env.REACT_APP_AIRTABLE_API_KEY);
+
 export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);

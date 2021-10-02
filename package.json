@@ -28,7 +28,7 @@
   },
   "scripts": {
     "predeploy": "yarn run build",
-    "deploy": "yarn run build && mv build/index.html build/200.html && surge build app.firehousebarbecue.com",
+    "deploy": "yarn run build -e prod && mv build/index.html build/200.html && surge build app.firehousebarbecue.com",
     "start": "env-cmd -e dev react-scripts start",
     "start-prod": "env-cmd -e prod react-scripts start",
     "build": "react-scripts build",
