@@ -1,7 +1,11 @@
-import React from 'react';
-import 'antd/dist/antd.css';
+import React, {useState} from 'react';
+// import 'antd/dist/antd.css';
+import {Button} from 'antd';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
+
+    const [copied, setCopied] = useState(false);
 
     const { 
         fields: {
@@ -11,6 +15,7 @@ const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
             "Contact Email": contactEmail,
             "Contact Phone": contactPhone,
             "Orders": orders,
+            "SellerStorefrontURL": sellerLink,
         }
     } = seller;
     
@@ -49,6 +54,9 @@ const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
             <div style={{color: "#595959" }}>{formatPhoneNumber(contactPhone)}</div> 
             <a href={createEmailLink(contactEmail)}>{contactEmail}</a>
             <h4>{totalOrders} Sales | Total raised: {totalSalesVolume}</h4>
+            <CopyToClipboard text={sellerLink}>
+                <Button onClick={() => setCopied(true)}>{copied ? "Copied" : "Copy Link"}</Button>
+            </CopyToClipboard>
             {/* <a href={createEmailLink(contactEmail)}>Email</a>   */}
         </div>
     )

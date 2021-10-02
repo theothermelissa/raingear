@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Button} from 'antd';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const InviteSellersButton = ({ link }) => {
+
+    const [copied, setCopied] = useState(false);
 
     return (
         <div style={{
@@ -11,7 +14,9 @@ const InviteSellersButton = ({ link }) => {
             alignItems: 'center',
             marginTop: '30px'
         }}>
-            <Button type='primary' href={`mailto:?&subject=Please%20Join%20Our%20Fundraiser&body=Hello! Please join our fundraiser by following this link: ${link}.`}>Invite Sellers</Button>
+            <CopyToClipboard text={link}>
+                <Button onClick={() => setCopied(true)} type={copied ? "ghost" : "primary"}>{copied ? "Copied to Clipboard" : "Copy Seller Invite Link"}</Button>
+            </CopyToClipboard>
         </div>
     )
 };

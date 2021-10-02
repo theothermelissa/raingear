@@ -8,17 +8,19 @@ import {anyOfThese} from './getRecordsFunctions';
 const SellerView = ({ sellerIDs }) => {
     const { recordsState: {
         fundraiserToDisplay: {
-            fields: {
+            fundraisers: {fields: {
                 sellerGuardians,
                 deliveryDate,
                 deliveryAddress,
                 deliveryCity,
                 deliveryState,
                 deliveryZip
-            }
+            }}
         }
     } } = useContext(RecordsContext);
     const {Content} = Layout;
+
+    console.log("sellerGuardians: ", sellerGuardians)
 
     const [orderLink, setOrderLink] = useState('');
     const [nickname, setNickname] = useState('');

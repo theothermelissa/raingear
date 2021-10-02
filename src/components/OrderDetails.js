@@ -50,9 +50,9 @@ const OrderDetails = () => {
             <p>Supporter: {
                 chosenOrder.supporterFullName
             }</p>
-            <p>Order Status: {
+            {<p style={chosenOrder.orderStatus === 'paid' ? {color: "#389e0d"} : {color: "#ad8b00"}}>Order Status: {
                 chosenOrder.orderStatus
-            }</p>
+            }</p>}
             <p>{
                 chosenOrder.supporterPhone
             }</p>
