@@ -1,0 +1,43 @@
+<!DOCTYPE html> 
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Help Me Reach My Fundraiser Goals</title>
+        </head>
+        <body style='font-family: Arial, Helvetica, sans-serif;
+        text-align: center;'>
+            <h1>Help me reach my fundraiser goals!</h1>
+            <script>
+                let products = [
+                    {name: 'potato',
+                    image: 'https://solidstarts.com/wp-content/uploads/Potato-for-Babies-scaled.jpg'},
+                    {name: 'orange',
+                    image: 'https://m.media-amazon.com/images/I/918YNa3bAaL._SL1500_.jpg'},
+                    {name: 'glob',
+                    image: 'https://cdn.shopify.com/s/files/1/0099/5868/6777/products/dd-manba-spicy-peanut-butter-dd-manba-16490144792633_2048x.jpg?v=1627694136'},
+                    ]
+
+                    let productCard = ({ name, image }) => `<div class='products' style='display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 5px;
+  background-color: whitesmoke;
+  filter: drop-shadow(7px 7px 10px darkgray);
+  min-width: 300px;
+  border-radius: 13px;'>
+                    <img src=${image} alt=${name} style=' max-width: 300px;
+  margin-bottom: 10px;' />
+                    <h3>${name}</h3>
+                        </div>`
+
+                    let productsToDisplay = (productList) => {
+                    let individualProducts = () => productList.map((product) => productCard(product)).join('');
+                    return `<div class='product-holder' style='display: flex;
+  justify-content: center;
+  flex-flow: row wrap;'>${individualProducts()}</div>`
+                    }
+
+                    document.getElementById("products").innerHTML = productsToDisplay(products)
+            </script>
+        </body>
+    </html>
