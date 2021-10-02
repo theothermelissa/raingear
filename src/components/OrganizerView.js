@@ -62,6 +62,8 @@ const OrganizerView = () => {
         }
     },[sellersToDisplay, sellerGuardians]);
 
+  console.log('ordersToDisplay in OrganizerView: ', ordersToDisplay);
+
     return (
         <>
             <Layout>

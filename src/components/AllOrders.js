@@ -52,9 +52,13 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         "Supporter Email": supporterEmail,
         "Supporter Phone": supporterPhone,
         ButtQty: buttQty,
+        StandardQty: standardQty,
+        PremiumQty: premiumQty,
         HamQty: hamQty,
         TurkeyQty: turkeyQty,
         SauceQty: sauceQty,
+        StandardPrice: standardPrice,
+        PremiumPrice: premiumPrice,
         "ButtPrice (from Fundraiser)": buttPrice,
         "HamPrice (from Fundraiser)": hamPrice,
         "TurkeyPrice (from Fundraiser)": turkeyPrice,
@@ -80,10 +84,14 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         supporterEmail: supporterEmail,
         supporterPhone: formatPhoneNumber(supporterPhone),
         buttQty: productInFundraiser("Boston Butts") ? buttQty : '',
+        standardQty: productInFundraiser("Standard Butcher Crate") ? standardQty : '',
+        premiumQty: productInFundraiser("Premium Butcher Crate") ? premiumQty : '',
         hamQty: productInFundraiser("Half Hams") ? hamQty : '',
         turkeyQty: productInFundraiser("Whole Turkeys") ? turkeyQty : '',
         sauceQty: productInFundraiser("BBQ Sauce") ? sauceQty : '',
         buttPrice: productInFundraiser("Boston Butts") ? buttPrice : '',
+        standardPrice: productInFundraiser("Standard Butcher Crate") ? standardPrice : '',
+        premiumPrice: productInFundraiser("Premium Butcher Crate") ? premiumPrice : '',
         hamPrice: productInFundraiser("Half Hams") ? hamPrice : '',
         turkeyPrice: productInFundraiser("Whole Turkeys") ? turkeyPrice : '',
         saucePrice: productInFundraiser("BBQ Sauce") ? saucePrice : '',
@@ -109,6 +117,10 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
       const productDataIndex = (product) => {
           let result;
           switch (product) {
+              case "Standard Butcher Crate": result = ("standardQty");
+                  break;
+              case "Premium Butcher Crate": result = ("premiumQty");
+                  break;
               case "Boston Butts": result = ("buttQty");
                   break;
               case "Half Hams": result = ("hamQty");

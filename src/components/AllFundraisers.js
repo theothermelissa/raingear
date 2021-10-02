@@ -31,6 +31,32 @@ const AllFundraisers = ({ hoveredFundraiser }) => {
 
     const chooseProduct = (product) => {
         switch (product) {
+            case 'Standard Butcher Crate':
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
+                    <div className='circleBackground'
+                        style={
+                            {backgroundColor: '#eb2f96'}
+                    }>C</div>
+                    <div className='productTagName'
+                        style={
+                            {color: '#eb2f96'}
+                    }>
+                        {product.split(' ')[0]}</div>
+                </div>
+            case 'Premium Butcher Crate':
+                return <div key={uniqueId(`${snakeCase(product)}`)}
+                    className='tagContentHolder'>
+                    <div className='circleBackground'
+                        style={
+                            {backgroundColor: '#fa8c16'}
+                    }>C</div>
+                    <div className='productTagName'
+                        style={
+                            {color: '#fa8c16'}
+                    }>
+                        {product.split(' ')[0]}</div>
+                </div>
             case 'Boston Butts':
                 return <div key={uniqueId(`${snakeCase(product)}`)}
                     className='tagContentHolder'>

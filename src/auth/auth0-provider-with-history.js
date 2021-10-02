@@ -17,7 +17,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
             domain={domain}
             clientId={clientId}
             // redirectUri={window.location.origin}
-            redirectUri={"https://app.firehousebarbecue.com/"}
+            redirectUri={process.env.REACT_APP_AUTH0_REDIRECT_URI}
             onRedirectCallback={onRedirectCallback}
         >
             {children}
