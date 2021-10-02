@@ -79,7 +79,7 @@ const FundraiserDetails = () => {
     }
 
     const relativeDate = (days, event) => {
-        console.log("Days to cook: ", days);
+        // console.log("Days to cook: ", days);
         if (isObjectLike(days)) {
             return `NO ${event} DATE YET`
         }

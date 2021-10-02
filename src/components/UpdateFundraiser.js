@@ -45,7 +45,7 @@ const UpdateFundraiser = ({ fundraisers }) => {
             }
         ], function(err, records) {
             if (err) {
-                console.log("Error: ", err);
+                console.warn("Error: ", err);
                 return;
             }
         });

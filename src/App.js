@@ -19,6 +19,7 @@ export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
+
 const initialRecordsState = {
     user: '',
     records: '',
@@ -44,6 +45,8 @@ function App() {
         recordHasChanged,
         drawerVisible,
     } = recordsState;
+
+    // console.log('user in App.js: ', user)
     
     useEffect(() => {
         if (recordsState.user === 'removed') {
@@ -75,6 +78,7 @@ function App() {
     // set fundraiserToDisplay
     useEffect(() => {
         if (fundraisers.length) {
+            // console.log("fundraisers in App.js: ", fundraisers)
             recordsDispatch({
                 type: 'setRecords',
                 payload: fundraisers

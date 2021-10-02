@@ -13,14 +13,14 @@ import {
 const FundraiserForm = ({initialValues, onFinish, defaultDate}) => {
     const [form] = Form.useForm();
 
-    function onChange(value, dateString) {
-        console.log('Selected Time: ', value);
-        console.log('Formatted Selected Time: ', dateString);
-    }
+    // function onChange(value, dateString) {
+    //     console.log('Selected Time: ', value);
+    //     console.log('Formatted Selected Time: ', dateString);
+    // }
 
-    function onOk(value) {
-        console.log('onOk: ', value);
-    }
+    // function onOk(value) {
+    //     console.log('onOk: ', value);
+    // }
 
     const {Option} = Select;
     const layout = {
@@ -83,8 +83,8 @@ const FundraiserForm = ({initialValues, onFinish, defaultDate}) => {
                         size={12}>
                         <DatePicker showTime
                             format={selectedDateTimeFormat}
-                            onChange={onChange}
-                            onOk={onOk}
+                            // onChange={onChange}
+                            // onOk={onOk}
                             disabledHours={disabledHours}
                             value={defaultDate}/>
                     </Space>

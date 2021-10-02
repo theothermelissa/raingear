@@ -81,6 +81,7 @@ export const getFundraisers = async (user, ids, callback) => {
                             sellerIDs
                         }
                     } = guardian;
+                    // console.log('guardian in fetchFundraiserData: ', guardian)
                     if (sellerIDs) {
                         for (let k = 0; k < arrayify(sellerIDs).length; k++) {
                             let sellerData = await getData('Sellers', sellerIDs[k], 'recordID').all();

@@ -37,6 +37,8 @@ const OrderDetails = () => {
         }
     }, [focusedRecord, sellerGuardians])
 
+    // console.log("chosenOrder: ", chosenOrder);
+
     return (
         <div>
             <p>Sold by: {
@@ -68,10 +70,10 @@ const OrderDetails = () => {
                 chosenOrder.date
             }</p>
             {
-            chosenOrder.premiumQty && <p>{`${chosenOrder.premiumQty} Butt${chosenOrder.premiumQty > 1 ? `s`: ``} 🥩`}</p>
+            chosenOrder.premiumQty && <p>{`${chosenOrder.premiumQty} Premium Crate${chosenOrder.premiumQty > 1 ? `s`: ``} 🥩`}</p>
             }
             {
-            chosenOrder.standardQty && <p>{`${chosenOrder.standardQty} Butt${chosenOrder.standardQty > 1 ? `s`: ``} 🍖`}</p>
+            chosenOrder.standardQty && <p>{`${chosenOrder.standardQty} Standard Crate${chosenOrder.standardQty > 1 ? `s`: ``} 🍖`}</p>
             }
             {
             chosenOrder.buttQty && <p>{`${chosenOrder.buttQty} Butt${chosenOrder.buttQty > 1 ? `s`: ``} 🐖`}</p>
