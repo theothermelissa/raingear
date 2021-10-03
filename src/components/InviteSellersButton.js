@@ -6,6 +6,11 @@ const InviteSellersButton = ({ link }) => {
 
     const [copied, setCopied] = useState(false);
 
+    const notifyCopied = () => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000);
+    }
+
     return (
         <div style={{
             width: '100%',
@@ -15,7 +20,7 @@ const InviteSellersButton = ({ link }) => {
             marginTop: '30px'
         }}>
             <CopyToClipboard text={link}>
-                <Button onClick={() => setCopied(true)} type={copied ? "ghost" : "primary"}>{copied ? "Copied to Clipboard" : "Copy Seller Invite Link"}</Button>
+                <Button onClick={notifyCopied} type={copied ? "ghost" : "primary"}>{copied ? "Copied to Clipboard" : "Copy Seller Invite Link"}</Button>
             </CopyToClipboard>
         </div>
     )

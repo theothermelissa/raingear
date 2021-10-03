@@ -36,6 +36,11 @@ const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
 
     const createEmailLink = (email) => `mailto:${email}`;
 
+    const notifyCopied = () => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500);
+    }
+
     return (
         <div 
             onMouseEnter={() => setHighlight(createOrderList(orders))} 
@@ -55,7 +60,7 @@ const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
             <a href={createEmailLink(contactEmail)}>{contactEmail}</a>
             <h4>{totalOrders} Sales | Total raised: {totalSalesVolume}</h4>
             <CopyToClipboard text={sellerLink}>
-                <Button onClick={() => setCopied(true)}>{copied ? "Copied" : "Copy Link"}</Button>
+                <Button onClick={notifyCopied}>{copied ? "Copied" : "Copy Link"}</Button>
             </CopyToClipboard>
             {/* <a href={createEmailLink(contactEmail)}>Email</a>   */}
         </div>
