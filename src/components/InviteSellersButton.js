@@ -2,13 +2,16 @@ import React, {useState} from 'react';
 import {Button} from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-const InviteSellersButton = ({ link }) => {
+const InviteSellersButton = ({ link, promptSuccess, dismissPrompt }) => {
 
     const [copied, setCopied] = useState(false);
 
     const notifyCopied = () => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000);
+        setCopied(true);
+        promptSuccess();
+        setTimeout(() => {
+            setCopied(false);
+        }, 5000);
     }
 
     return (

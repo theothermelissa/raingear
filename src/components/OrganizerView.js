@@ -5,6 +5,7 @@ import AllOrders from './AllOrders';
 import OrderDetails from './OrderDetails';
 import Sellers from './Sellers';
 import InviteSellersButton from './InviteSellersButton';
+import sketchyRedArrow from '../images/sketchyRedArrow.png';
 
 const OrganizerView = () => {
     const {
@@ -27,10 +28,13 @@ const OrganizerView = () => {
     const [sellersToDisplay, setSellersToDisplay] = useState('');
     const [ordersToDisplay, setOrdersToDisplay] = useState('');
     const [recordsToHighlight, setRecordsToHighlight] = useState('');
+    const [prompt, setPrompt] = useState('arrow');
 
     const setHighlight = (ids) => setRecordsToHighlight(ids);
     const removeHighlight = () => setRecordsToHighlight(null);
-    const dismissModal = () => recordsDispatch({type: 'dismissRecord'})
+    const dismissModal = () => recordsDispatch({type: 'dismissRecord'});
+    const promptSuccess = () => setPrompt("success");
+    const dismissPrompt = () => setPrompt('hidden');
 
     useEffect(() => {
         if (sellerGuardians) {
@@ -60,10 +64,62 @@ const OrganizerView = () => {
                 setOrdersToDisplay(allOrders);
             }
         }
-    },[sellersToDisplay, sellerGuardians]);
+    }, [sellersToDisplay, sellerGuardians]);
 
-//   console.log('ordersToDisplay in OrganizerView: ', ordersToDisplay);
-
+    const ArrowPrompt = () => {return (
+        <div style={
+            {padding: "20px"}
+        }>
+            <img src={sketchyRedArrow}
+                style={
+                    {
+                        maxWidth: "50px",
+                        position: "relative",
+                        top: "-105px",
+                        left: "7px",
+                        transform: "rotate(34deg)"
+                    }
+                }
+                alt="arrow"/>
+            <p style={
+                {
+                    display: 'inline-block',
+                    position: "relative",
+                    left: "5px",
+                    maxWidth: "80px"
+                }
+            }>Click the blue button to copy the Seller Invite Link to your clipboard.</p>
+        </div>
+    )}
+    const SuccessPrompt = (prompt) => {return (
+        <div style={
+            {padding: "20px"}
+        }>
+            <p style={
+                {
+                    display: 'inline-block',
+                    position: "relative",
+                    left: "10px",
+                    maxWidth: "150px"
+                }
+            }>Link copied! Now you can paste it into a message to all your sellers.</p>
+        </div>
+    )}
+    
+    const ActionPrompt = () => {
+        if (sellersToDisplay.length) return null;
+        switch(prompt) {
+            case "hidden" :
+                return null;
+            case "arrow" : 
+                return <ArrowPrompt />;
+            case "success" :
+                return <SuccessPrompt />;
+            default:
+                return null;
+        };
+    }
+    
     return (
         <>
             <Layout>
@@ -80,8 +136,11 @@ const OrganizerView = () => {
                     <Sellers sellers={sellersToDisplay}
                         setHighlight={setHighlight}
                         removeHighlight={removeHighlight}/>
-                    <InviteSellersButton link={inviteSellersURL}/>
-                </Sider>
+                    <InviteSellersButton promptSuccess={promptSuccess}
+                        dismissPrompt={dismissPrompt}
+                        link={inviteSellersURL}/> {
+                    <ActionPrompt />
+                } </Sider>
             </Layout>
             <Layout>
                 <Content style={
@@ -96,13 +155,10 @@ const OrganizerView = () => {
                         visible={viewFocusedRecord}
                         onOK={dismissModal}
                         onCancel={dismissModal}
-                        footer={null}
-                    >
-                        <OrderDetails 
-                            style={{
-                                paddingLeft: '100px'
-                            }}
-                        />
+                        footer={null}>
+                        <OrderDetails style={
+                            {paddingLeft: '100px'}
+                        }/>
                     </Modal>
                 </Content>
             </Layout>
