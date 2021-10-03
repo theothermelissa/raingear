@@ -176,6 +176,22 @@ const FundraiserForm = ({initialValues, onFinish, defaultDate}) => {
                             value => value.replace(/\$\s?|(,*)/g, '')
                         }/>
                 </Form.Item>
+                <Form.Item name="customerStandardPrice" label="Customer Standard Price">
+                    <InputNumber formatter={
+                            value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        }
+                        parser={
+                            value => value.replace(/\$\s?|(,*)/g, '')
+                        }/>
+                </Form.Item>
+                <Form.Item name="customerPremiumPrice" label="Customer Premium Price">
+                    <InputNumber formatter={
+                            value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        }
+                        parser={
+                            value => value.replace(/\$\s?|(,*)/g, '')
+                        }/>
+                </Form.Item>
                 <Form.Item name="customerButtPrice" label="Customer Butt Price">
                     <InputNumber formatter={
                             value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
