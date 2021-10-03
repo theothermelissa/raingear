@@ -16,7 +16,7 @@ const OrganizerView = () => {
                 fundraisers: {
                     fields: {
                         sellerGuardians,
-                        inviteSellersURL,
+                        inviteSellersURL
                     }
                 }
             }

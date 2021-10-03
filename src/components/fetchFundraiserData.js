@@ -84,10 +84,11 @@ export const getFundraisers = async (user, ids, callback) => {
                     if (sellerIDs) {
                         for (let k = 0; k < arrayify(sellerIDs).length; k++) {
                             let sellerData = await getData('Sellers', sellerIDs[k], 'recordID').all();
-                            if (sellerData.length) {
+                            const { fields, fields: { Fundraiser } } = sellerData[0];
+                            if (sellerData.length && id === Fundraiser[0]) {
                                 sellers.push({
                                     id: sellerData[0]['id'],
-                                    fields: sellerData[0]['fields']
+                                    fields: fields,
                                 })
                             }
                         };
