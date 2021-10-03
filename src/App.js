@@ -35,7 +35,7 @@ const initialRecordsState = {
 
 function App() {
     
-    const {user: auth0User, isAuthenticated} = useAuth0();
+    const { loginWithRedirect, user: auth0User, isAuthenticated} = useAuth0();
     const [loading, setLoading] = useState(false);
     const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialRecordsState);
     const [fundraisers, setFundraisers] = useState('');
@@ -46,8 +46,6 @@ function App() {
         drawerVisible,
     } = recordsState;
 
-    // console.log('user in App.js: ', user)
-    
     useEffect(() => {
         if (recordsState.user === 'removed') {
             setLoading(false);
@@ -149,7 +147,29 @@ function App() {
         }
     }, [user, fundraisers, recordsState.recordHasChanged, recordsState.recordToEdit])
 
-    
+    const Login = ({ location }) => {
+        
+        const queryParams = () => {
+            const params = new URLSearchParams(location.search);
+            return {
+                email: params.get("email"),
+                mode: params.get('mode')
+            }
+        }
+
+        const {
+            email,
+            mode
+        } = queryParams()
+
+        loginWithRedirect({ 
+            login_hint: email,
+            screen_hint: mode,
+            // appState: {
+            //     targetUrl: "/"
+            // }
+        })
+    };
     
     return (
         <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
@@ -157,6 +177,7 @@ function App() {
                     <NavBar /> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
+                        <Login exact path="/login" component={props => <Login {...props}/>} />
                         {recordsState.errorToDisplay 
                             ? <div className='outer'>{recordsState.errorToDisplay}</div>
                             : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
@@ -165,8 +186,8 @@ function App() {
                             </div>}
                         {loading && <LoadingSpinner />}
                         {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
-                        {!loading && <Route path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
-                        <ProtectedRoute path="/profile" component={Profile} />
+                        {!loading && <ProtectedRoute path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
+                        {/* <ProtectedRoute path="/profile" component={Profile} /> */}
                     </Switch>
                 </Router>
         </RecordsContext.Provider>
