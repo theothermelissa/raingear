@@ -41,6 +41,9 @@ const OrderDetails = () => {
 
     return (
         <div>
+            <p>Status: {
+                chosenOrder.orderStatus
+            }</p>
             <p>Sold by: {
                 chosenOrder.seller
             }</p>

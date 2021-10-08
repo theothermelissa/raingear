@@ -5,6 +5,7 @@ import AllOrders from './AllOrders';
 import OrderDetails from './OrderDetails';
 import Sellers from './Sellers';
 import InviteSellersButton from './InviteSellersButton';
+import TotalRaisedCard from './TotalRaisedCard';
 import sketchyRedArrow from '../images/sketchyRedArrow.png';
 
 const OrganizerView = () => {
@@ -16,7 +17,8 @@ const OrganizerView = () => {
                 fundraisers: {
                     fields: {
                         sellerGuardians,
-                        inviteSellersURL
+                        inviteSellersURL,
+                        organizationProceeds
                     }
                 }
             }
@@ -133,6 +135,7 @@ const OrganizerView = () => {
                             backgroundColor: '#d9d9d9'
                         }
                 }>
+                    <TotalRaisedCard amount={organizationProceeds} />
                     <Sellers sellers={sellersToDisplay}
                         setHighlight={setHighlight}
                         removeHighlight={removeHighlight}/>
