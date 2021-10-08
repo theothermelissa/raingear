@@ -1,7 +1,9 @@
 import  React, { useContext, useState, useEffect, useCallback } from 'react';
-import {Table} from 'antd';
+import {Table, Tag} from 'antd';
+import {orderBy, uniqueId} from 'lodash';
 import {format} from 'date-fns';
 import {RecordsContext} from '../App';
+import selectStatusColor from './selectStatusColor.js';
 
 
 const AllOrders = ({ orders, recordsToHighlight }) => {
@@ -11,6 +13,9 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
     }
   } = useContext(RecordsContext);
 
+  const prefillStatus = (currentStatus) => {
+    return(currentStatus === "paid" ? currentStatus : "unpaid")
+  };
 
   const [updatedOrders, setUpdatedOrders] = useState('');
   const [columns, setColumns] = useState('');
@@ -96,7 +101,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         turkeyPrice: productInFundraiser("Whole Turkeys") ? turkeyPrice : '',
         saucePrice: productInFundraiser("BBQ Sauce") ? saucePrice : '',
         totalPrice: `$${totalPrice}`,
-        orderStatus: orderStatus,
+        orderStatus: prefillStatus(orderStatus),
         placeAnOrderURL: placeAnOrderURL,
         supporterAddress: supporterAddress,
         supporterAddressLine2: supporterAddressLine2,
@@ -105,6 +110,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         supporterZip: supporterZip,
         supporterOptIn: supporterOptIn,
       }
+      console.log(formattedOrder.orderStatus)
       allOrders.push(formattedOrder);
     })
     return allOrders;
@@ -141,13 +147,31 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
       }));
       return columnTitles;
     };
+
     return ([
       {
         title: 'Supporter',
         dataIndex: 'supporterFullName',
         key: 'supporterName',
-        width: '200px'
+        width: '150px'
       },
+      {
+        title: 'Status',
+        dataIndex: 'orderStatus',
+        key: 'status',
+        render: orderStatus => {
+          return (
+            <> {
+              orderStatus && <Tag color={
+                        selectStatusColor(orderStatus)
+                    }
+                    key={uniqueId('status_')}>
+                    {
+                    orderStatus.toUpperCase()
+                } </Tag>
+            } </>
+        )},
+    },
       {
           title: 'Order Date',
           dataIndex: 'date',
@@ -157,7 +181,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
           title: "Phone",
           dataIndex: 'supporterPhone',
           key: 'supporterPhone',
-          width: '200px'
+          width: '150px'
       },
       ...createProductColumns(),
       {
@@ -177,7 +201,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
   
   useEffect(() => {
     if (orders) {
-      setUpdatedOrders(formattedOrders(orders));
+      setUpdatedOrders(orderBy(formattedOrders(orders), 'orderStatus', ['desc']));
       
       setColumns(createColumns())
     }

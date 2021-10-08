@@ -55,10 +55,11 @@ const SellerCard = ({ seller, setHighlight, removeHighlight }) => {
             }}
         >
             {/* <h2 style={{ color: selectStatusColor(status), margin: 0}}>{convertedDate(deliveryDate)}</h2> */}
-            <h3 style={{ color: "darkred", margin: 0}}><b>{nickname}</b></h3>
-            <div style={{color: "#595959" }}>{formatPhoneNumber(contactPhone)}</div> 
+            <h2 style={{ color: "darkred", margin: 0}}><b>{nickname}</b></h2>
+            <h3 style={{color: "#595959" }}>{formatPhoneNumber(contactPhone)}</h3> 
             <a href={createEmailLink(contactEmail)}>{contactEmail}</a>
-            <h4>{totalOrders} Sales | Total raised: {totalSalesVolume}</h4>
+            <h3 style={{ marginTop: "3px" }}>{totalOrders} Sales</h3>
+            <h4>Total Sold Volume: ${totalSalesVolume}</h4>
             <CopyToClipboard text={sellerLink}>
                 <Button onClick={notifyCopied}>{copied ? "Copied" : "Copy Link"}</Button>
             </CopyToClipboard>

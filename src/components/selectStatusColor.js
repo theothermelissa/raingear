@@ -10,6 +10,10 @@ const selectStatusColor = (status) => {
             return '#597ef7';
         case 'Cancelled':
             return '#bfbfbf';
+        case 'paid':
+            return '#7cb305';
+        case 'unpaid':
+            return '#f50';
         default:
             return '#bfbfbf';
     }
