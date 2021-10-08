@@ -146,6 +146,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         title: 'Supporter',
         dataIndex: 'supporterFullName',
         key: 'supporterName',
+        width: '200px'
       },
       {
           title: 'Order Date',
@@ -156,6 +157,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
           title: "Phone",
           dataIndex: 'supporterPhone',
           key: 'supporterPhone',
+          width: '200px'
       },
       ...createProductColumns(),
       {
@@ -168,7 +170,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
           dataIndex: 'supporterEmail',
           key: 'supporterEmail',
           render: text => <a href={createEmailLink(text)}>{text}</a>,
-          width: '00px'
+          width: '200px'
       }
     ])
   }, [fundraiserToDisplay])
@@ -189,6 +191,7 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
           columns={columns}
           dataSource={updatedOrders}
           pagination={false}
+          scroll={{ y: 450 }}
           id='ordersTable'
           onRow={
             (record, rowIndex) => {
