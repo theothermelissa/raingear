@@ -225,7 +225,6 @@ export const saveRecordInArray = (record, list, index) => {
 };
 
 export const arrayify = (input) => {
-    // console.log("input: ", JSON.stringify(input))
     if (input) {
         if (Array.isArray(input)) {
             return input
@@ -234,12 +233,6 @@ export const arrayify = (input) => {
         }
     } else return [];
 }
-
-// export const arrayify = (string) => {
-//     let first = string.split(', ');
-//     let result = first.filter((element) => element !== null && element !== '');
-//     return result;
-// };
 
 export const getRecordType = (id, data) => {
     let result;

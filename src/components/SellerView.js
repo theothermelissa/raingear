@@ -20,8 +20,6 @@ const SellerView = ({ sellerIDs }) => {
     } } = useContext(RecordsContext);
     const {Content} = Layout;
 
-    console.log("sellerGuardians: ", sellerGuardians)
-
     const [orderLink, setOrderLink] = useState('');
     const [nickname, setNickname] = useState('');
     const [totalOrders, setTotalOrders] = useState('');

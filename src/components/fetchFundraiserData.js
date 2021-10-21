@@ -45,7 +45,7 @@ export const getFundraisers = async (user, ids, callback) => {
                     guardianIDs
                 }} = fundraiser;
             const allGuardians = [[...arrayify(guardianIDs)], defaultGuardianRecord]
-            const guardiansToGet = uniq(allGuardians);
+            const guardiansToGet = uniq(...allGuardians);
             return {
                 role,
                 id,

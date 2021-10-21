@@ -1,9 +1,6 @@
 import react from 'react';
 
 const TotalRaisedCard = ({ amount }) => {
-
-    console.log("amount: ", amount)
-
     return (
     <div 
         style={{

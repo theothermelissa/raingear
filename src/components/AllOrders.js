@@ -110,7 +110,6 @@ const AllOrders = ({ orders, recordsToHighlight }) => {
         supporterZip: supporterZip,
         supporterOptIn: supporterOptIn,
       }
-      console.log(formattedOrder.orderStatus)
       allOrders.push(formattedOrder);
     })
     return allOrders;

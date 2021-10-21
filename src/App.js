@@ -76,7 +76,6 @@ function App() {
     // set fundraiserToDisplay
     useEffect(() => {
         if (fundraisers.length) {
-            // console.log("fundraisers in App.js: ", fundraisers)
             recordsDispatch({
                 type: 'setRecords',
                 payload: fundraisers

@@ -37,7 +37,6 @@ const NavBar = () => {
   const fundraiserMenu = (
     <Menu>
       {records && records.map((fundraiser, fundraiserIndex) => {
-        // console.log("fundraiser in NavBar: ", fundraiser)
         return (
           <Menu.Item key={`${fundraiser.id}${fundraiserIndex}`}>
             <div key={fundraiser.fundraiserName} onClick={() => chooseFundraiser(fundraiser)}>{fundraiser.fields.fundraiserName}</div>

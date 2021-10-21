@@ -37,8 +37,6 @@ const OrderDetails = () => {
         }
     }, [focusedRecord, sellerGuardians])
 
-    // console.log("chosenOrder: ", chosenOrder);
-
     return (
         <div>
             <p>Status: {

@@ -12,16 +12,6 @@ import {
 
 const FundraiserForm = ({initialValues, onFinish, defaultDate}) => {
     const [form] = Form.useForm();
-
-    // function onChange(value, dateString) {
-    //     console.log('Selected Time: ', value);
-    //     console.log('Formatted Selected Time: ', dateString);
-    // }
-
-    // function onOk(value) {
-    //     console.log('onOk: ', value);
-    // }
-
     const {Option} = Select;
     const layout = {
         labelCol: {
