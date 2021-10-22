@@ -3,7 +3,7 @@ import { createFilterFormula, arrayify } from './getRecordsFunctions';
 
 export const getUser = (email, callback) => {
     base('Users').select({
-        filterByFormula: createFilterFormula([email], 'Email')
+        filterByFormula: createFilterFormula([email], 'emailToLowerCase')
     })
     .all()
     .then((users) => {

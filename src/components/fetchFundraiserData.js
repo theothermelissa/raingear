@@ -5,20 +5,22 @@ import { uniq } from 'lodash';
 
 export const getFundraisers = async (user, ids, callback) => {
     
-    const fundraiserIDsToGet = arrayify(ids);
-    const fundraiserRecords = await createFundraiserList(fundraiserIDsToGet);
-    const fundraisersWithGuardianIDs = getGuardianIDs(fundraiserRecords);
-    const fundraisersWithGuardianData = await getGuardianData(fundraisersWithGuardianIDs);
-    const fundraisersWithSellerData = await getSellerData(fundraisersWithGuardianData)
-    const fundraisersWithOrderData = await getOrderData(fundraisersWithSellerData)
-
-    await callback(fundraisersWithOrderData)
-    
-    function getData(table, filterValue, filterField) {
+    // get data from a table in Airtable, filtered using a programatically created formula
+    function getData(table, filterValue, filterField, fields) {
         return base(table).select({
             filterByFormula: createFilterFormula(filterValue, filterField)
         })
     };
+    
+    const fundraiserIDsToGet = arrayify(ids);
+    const fundraiserRecords = await createFundraiserList(fundraiserIDsToGet);
+    const fundraisersWithGuardianIDs = getGuardianIDs(fundraiserRecords);
+    const fundraisersWithGuardianData = await getGuardianData(fundraisersWithGuardianIDs);
+    const fundraisersWithSellerData = await getSellerData(fundraisersWithGuardianData);
+    const fundraisersWithOrderData = await getOrderData(fundraisersWithSellerData);
+
+    //where the magic happens, i.e. how the completed fundraiser data is delivered to the RecordsContext
+    await callback(fundraisersWithOrderData);
 
     async function createFundraiserList(ids) {
         let fundraisers = [];
