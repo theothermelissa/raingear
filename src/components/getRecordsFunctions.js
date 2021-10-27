@@ -237,6 +237,7 @@ export const arrayify = (input) => {
 export const getRecordType = (id, data) => {
     let result;
     const {
+        "admin fundraiserIDs": adminFundraiserRecords,
         organizerRecords,
         sellerRecords,
         "Fundraiser (from sellerRecords)": sellerFundraiserRecords,
@@ -244,6 +245,9 @@ export const getRecordType = (id, data) => {
         "Fundraisers (from Providers)": providerRecords,
     } = data;
     
+    if (adminFundraiserRecords && adminFundraiserRecords.includes(id)) {
+        result = "admin";
+    }
     if (organizerRecords && organizerRecords.includes(id)) {
         result = "organizer";
     }

@@ -104,9 +104,11 @@ function App() {
     // fetch fundraiser data
     useEffect(() => {
         if (user.Email) {
+            
             const {
                 allFundraisers
             } = user;
+
             if (!fundraisers) {
                 //get dem fundraisers
                 const callbackForFetch = async (result) => {
@@ -201,16 +203,40 @@ function App() {
                     <NavBar /> 
                     {drawerVisible && <EditDrawer />}
                     <Switch>
-                        <Login exact path="/login" component={props => <Login {...props}/>} />
+                        <Login 
+                            exact
+                            path="/login"
+                            component={
+                                props => <Login {...props}/>
+                            } 
+                        />
                         {recordsState.errorToDisplay 
-                            ? <div className='outer'>{recordsState.errorToDisplay}</div>
+                            ? <div className='outer'>
+                                {recordsState.errorToDisplay}
+                            </div>
                             : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
                             <div className='outer'>
-                                <h2 style={{ color: 'rgb(191, 191, 191)'}}>Login to see fundraiser information</h2>
+                                <h2
+                                    style={{ 
+                                        color: 'rgb(191, 191, 191)'
+                                    }}>
+                                        Login to see fundraiser information
+                                </h2>
                             </div>}
                         {loading && <LoadingSpinner />}
-                        {!loading && <ProtectedRoute exact path="/" component={props => <HomePage {...props}/>} />}
-                        {!loading && <ProtectedRoute path="/calendar" render={props => fundraisers && <FirehouseCalendar {...props} />}/>}
+                        {!loading && <ProtectedRoute 
+                            exact
+                            path="/"
+                            component={
+                                props => <HomePage {...props}/>
+                            } 
+                        />}
+                        {!loading && <ProtectedRoute
+                            path="/calendar"
+                            render={
+                                props => fundraisers && <FirehouseCalendar {...props} />
+                            }
+                        />}
                         {/* <ProtectedRoute path="/profile" component={Profile} /> */}
                     </Switch>
                 </Router>

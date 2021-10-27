@@ -1,10 +1,16 @@
+//this is how changes are made to the RecordsContext
+
 const recordsReducer = (state, action) => {
      switch (action.type) {
+          
+          // handling errors
           case 'displayError': 
                return {
                     ...state,
                     errorToDisplay: action.payload,
                }
+          
+          //se
           case 'setRecords':
                return {
                     ...state,

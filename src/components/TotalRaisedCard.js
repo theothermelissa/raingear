@@ -1,5 +1,3 @@
-import react from 'react';
-
 const TotalRaisedCard = ({ amount }) => {
     return (
     <div 
@@ -8,9 +6,11 @@ const TotalRaisedCard = ({ amount }) => {
             width: "250px",
         }}
     >
-        <h2 style={{ fontSize: "2em"}}>{`Total Raised: $${amount.toFixed(2)}`}</h2>
+      <h2 style={{ fontSize: "2em" }}>
+        {amount ? `Total Raised: $${amount.toFixed(2)}` : `No proceeds yet`}
+      </h2>
     </div>
-    )
+  );
 };
 
 export default TotalRaisedCard;

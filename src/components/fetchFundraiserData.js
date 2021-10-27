@@ -2,13 +2,15 @@ import { createFilterFormula, getRecordType } from './getRecordsFunctions';
 import {base} from '../App';
 import {defaultGuardianRecord, arrayify} from './getRecordsFunctions';
 import { uniq } from 'lodash';
+import { fundraiserFields, guardianFields, sellerFields, orderFields } from './CurrentFields';
 
 export const getFundraisers = async (user, ids, callback) => {
     
     // get data from a table in Airtable, filtered using a programatically created formula
-    function getData(table, filterValue, filterField, fields) {
+    function getData(table, filterValue, filterField, fieldsToGet) {
         return base(table).select({
-            filterByFormula: createFilterFormula(filterValue, filterField)
+            filterByFormula: createFilterFormula(filterValue, filterField),
+            fields: fieldsToGet,
         })
     };
     
@@ -25,7 +27,8 @@ export const getFundraisers = async (user, ids, callback) => {
     async function createFundraiserList(ids) {
         let fundraisers = [];
         for (let i = 0; i < ids.length; i++) {
-            let fundraiserData = await getData('Fundraisers', ids[i], 'recordID').all();
+            // console.log('fundraiserFields: ', fundraiserFields);
+            let fundraiserData = await getData('Fundraisers', ids[i], 'recordID', fundraiserFields).all();
             if (fundraiserData.length) {
                 fundraisers.push({
                     fields: fundraiserData[0].fields,
@@ -85,7 +88,7 @@ export const getFundraisers = async (user, ids, callback) => {
                     } = guardian;
                     if (sellerIDs) {
                         for (let k = 0; k < arrayify(sellerIDs).length; k++) {
-                            let sellerData = await getData('Sellers', sellerIDs[k], 'recordID').all();
+                            let sellerData = await getData('Sellers', sellerIDs[k], 'recordID', sellerFields).all();
                             const { fields, fields: { Fundraiser } } = sellerData[0];
                             if (sellerData.length && id === Fundraiser[0]) {
                                 sellers.push({
@@ -154,7 +157,7 @@ export const getFundraisers = async (user, ids, callback) => {
                             } = seller;
                             if (orderIDs) {
                                 for (let l = 0; l < arrayify(orderIDs).length; l++) {
-                                    let orderData = await getData('Orders', orderIDs[l], 'Order ID').all();
+                                    let orderData = await getData('Orders', orderIDs[l], 'Order ID', orderFields).all();
                                     if (orderData.length) {
                                         orders.push({
                                             id: orderData[0]['id'],
@@ -212,7 +215,7 @@ export const getFundraisers = async (user, ids, callback) => {
             if (sellerGuardians) {
                 for (let j = 0; j < sellerGuardians.length; j++) {
                     const guardianID = sellerGuardians[j];
-                    let guardianData = await getData('SellerGuardians', guardianID, 'GuardianID').all()
+                    let guardianData = await getData('SellerGuardians', guardianID, 'GuardianID', guardianFields).all()
                     if (guardianData.length) {
                         guardians.push({
                             id: guardianData[0]['id'],

@@ -1,10 +1,10 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {Layout, Menu, Modal} from 'antd';
 import {UserOutlined, TeamOutlined} from '@ant-design/icons';
-import {RecordsContext} from '../App';
-import Customers from './Customers';
+import {RecordsContext} from '../../App';
+import Customers from '../Customers';
 import {format} from 'date-fns';
-import OrderDetails from './OrderDetails';
+import OrderDetails from '../OrderDetails';
 
 const GuardianView = () => {
     const {

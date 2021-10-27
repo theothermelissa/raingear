@@ -39,9 +39,9 @@ const OrderDetails = () => {
 
     return (
         <div>
-            <p>Status: {
+            {<p style={chosenOrder.orderStatus === 'paid' ? {color: "#389e0d"} : {color: "#ad8b00"}}>Order Status: {
                 chosenOrder.orderStatus
-            }</p>
+            }</p>}
             <p>Sold by: {
                 chosenOrder.seller
             }</p>
@@ -51,9 +51,6 @@ const OrderDetails = () => {
             <p>Supporter: {
                 chosenOrder.supporterFullName
             }</p>
-            {<p style={chosenOrder.orderStatus === 'paid' ? {color: "#389e0d"} : {color: "#ad8b00"}}>Order Status: {
-                chosenOrder.orderStatus
-            }</p>}
             <p>{
                 chosenOrder.supporterPhone
             }</p>
@@ -71,22 +68,22 @@ const OrderDetails = () => {
                 chosenOrder.date
             }</p>
             {
-            chosenOrder.premiumQty && <p>{`${chosenOrder.premiumQty} Premium Crate${chosenOrder.premiumQty > 1 ? `s`: ``} 🥩`}</p>
+            chosenOrder.premiumQty > 0 && <p>{`${chosenOrder.premiumQty} Premium Crate${chosenOrder.premiumQty > 1 ? `s`: ``} 🥩`}</p>
             }
             {
-            chosenOrder.standardQty && <p>{`${chosenOrder.standardQty} Standard Crate${chosenOrder.standardQty > 1 ? `s`: ``} 🍖`}</p>
+            chosenOrder.standardQty > 0 && <p>{`${chosenOrder.standardQty} Standard Crate${chosenOrder.standardQty > 1 ? `s`: ``} 🍖`}</p>
             }
             {
-            chosenOrder.buttQty && <p>{`${chosenOrder.buttQty} Butt${chosenOrder.buttQty > 1 ? `s`: ``} 🐖`}</p>
+            chosenOrder.buttQty > 0 && <p>{`${chosenOrder.buttQty} Butt${chosenOrder.buttQty > 1 ? `s`: ``} 🐖`}</p>
             }
             {
-            chosenOrder.hamQty && <p>{`${chosenOrder.hamQty} Ham${chosenOrder.hamQty > 1 ? `s`: ``} 🐷`}</p>
+            chosenOrder.hamQty > 0 && <p>{`${chosenOrder.hamQty} Ham${chosenOrder.hamQty > 1 ? `s`: ``} 🐷`}</p>
             }
             {
-            chosenOrder.turkeyQty && <p>{`${chosenOrder.turkeyQty} Turkey${chosenOrder.turkeyQty > 1 ? `s`: ``} 🦃`}</p>
+            chosenOrder.turkeyQty > 0 && <p>{`${chosenOrder.turkeyQty} Turkey${chosenOrder.turkeyQty > 1 ? `s`: ``} 🦃`}</p>
             }
             {
-            chosenOrder.sauceQty && <p>{`${chosenOrder.sauceQty} Sauce${chosenOrder.sauceQty > 1 ? `s`: ``} 🥫`}</p>
+            chosenOrder.sauceQty > 0 && <p>{`${chosenOrder.sauceQty} Sauce${chosenOrder.sauceQty > 1 ? `s`: ``} 🥫`}</p>
             }
         </div>
     )

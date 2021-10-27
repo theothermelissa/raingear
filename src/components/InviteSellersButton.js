@@ -20,7 +20,7 @@ const InviteSellersButton = ({ link, promptSuccess, dismissPrompt }) => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            marginTop: '30px'
+            margin: '30px 0px'
         }}>
             <CopyToClipboard text={link}>
                 <Button onClick={notifyCopied} type={copied ? "ghost" : "primary"}>{copied ? "Copied to Clipboard" : "Copy Seller Invite Link"}</Button>

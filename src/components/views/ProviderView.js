@@ -1,9 +1,9 @@
 import React, {useContext, useState} from 'react';
 import {Layout} from 'antd';
-import FundraiserTimeline from './FundraiserTimeline';
-import AllFundraisers from './AllFundraisers';
-import FundraiserDetails from './FundraiserDetails';
-import {RecordsContext} from '../App';
+import FundraiserTimeline from '../FundraiserTimeline';
+import AllFundraisers from '../AllFundraisers';
+import FundraiserDetails from '../FundraiserDetails';
+import {RecordsContext} from '../../App';
 
 const {Sider, Content} = Layout;
 

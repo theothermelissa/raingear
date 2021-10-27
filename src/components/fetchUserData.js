@@ -1,9 +1,11 @@
 import {base} from '../App';
 import { createFilterFormula, arrayify } from './getRecordsFunctions';
+import { userFields } from './CurrentFields';
 
 export const getUser = (email, callback) => {
     base('Users').select({
-        filterByFormula: createFilterFormula([email], 'emailToLowerCase')
+        filterByFormula: createFilterFormula([email], 'emailToLowerCase'),
+        fields: userFields,
     })
     .all()
     .then((users) => {

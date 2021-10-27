@@ -86,6 +86,7 @@ const NavBar = () => {
                   }}
               />
               <Col flex={6} >
+                    
                     { (role === "provider") ?
                     <Menu theme="dark" mode="horizontal">
                       <Menu.Item style={{ float: "left" }} key="fundraiser">
@@ -109,7 +110,6 @@ const NavBar = () => {
                       </Menu.Item> 
                     </Menu>
                     }
-                    
               </Col>
               <Col >
                 <Menu theme="dark" mode="horizontal">

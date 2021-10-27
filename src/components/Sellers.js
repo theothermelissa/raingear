@@ -4,7 +4,7 @@ import SellerCard from './SellerCard';
 
 
 const Sellers = ({ sellers, setHighlight, removeHighlight }) => {
-  const [sortedSellers, setSortedSellers] = useState('');
+  const [sortedSellers, setSortedSellers] = useState(false);
 
   useEffect(() => {
     if (sellers) {
@@ -15,7 +15,7 @@ const Sellers = ({ sellers, setHighlight, removeHighlight }) => {
 
   return (
     <div>
-      {sortedSellers && sortedSellers.map((seller) => <SellerCard seller={seller} key={seller.id} setHighlight={setHighlight} removeHighlight={removeHighlight} />)}
+      {sellers.length && sortedSellers ? sortedSellers.map((seller) => <SellerCard seller={seller} key={seller.id} setHighlight={setHighlight} removeHighlight={removeHighlight} />) : <h3>No sellers yet</h3>}
     </div>
   );
 }

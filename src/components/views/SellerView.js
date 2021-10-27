@@ -1,9 +1,9 @@
 import React, {useState, useContext, useEffect} from 'react';
-import { RecordsContext } from '../App';
+import { RecordsContext } from '../../App';
 import {find, matchesProperty} from 'lodash';
 import { Layout,Button } from 'antd';
 import {format} from 'date-fns';
-import {anyOfThese} from './getRecordsFunctions';
+import {anyOfThese} from '../getRecordsFunctions';
 
 const SellerView = ({ sellerIDs }) => {
     const { recordsState: {

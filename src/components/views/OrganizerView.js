@@ -1,12 +1,13 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {Layout, Modal} from 'antd';
-import {RecordsContext} from '../App';
-import AllOrders from './AllOrders';
-import OrderDetails from './OrderDetails';
-import Sellers from './Sellers';
-import InviteSellersButton from './InviteSellersButton';
-import TotalRaisedCard from './TotalRaisedCard';
-import sketchyRedArrow from '../images/sketchyRedArrow.png';
+import {RecordsContext} from '../../App';
+import AllOrders from '../AllOrders';
+import OrderDetails from '../OrderDetails';
+import Sellers from '../Sellers';
+import InviteSellersButton from '../InviteSellersButton';
+import TotalRaisedCard from '../TotalRaisedCard';
+import sketchyRedArrow from '../../images/sketchyRedArrow.png';
+import OrganizerOverview from '../OrganizerOverview';
 
 const OrganizerView = () => {
     const {
@@ -125,7 +126,7 @@ const OrganizerView = () => {
     return (
         <>
             <Layout>
-                <Sider width="auto" className="site-layout-background"
+                <Sider width="295px" className="site-layout-background"
                     style={
                         {
                             overflow: 'auto',
@@ -135,15 +136,20 @@ const OrganizerView = () => {
                             backgroundColor: '#d9d9d9'
                         }
                 }>
-                    <TotalRaisedCard amount={organizationProceeds} />
-                    <Sellers sellers={sellersToDisplay}
-                        setHighlight={setHighlight}
-                        removeHighlight={removeHighlight}/>
                     <InviteSellersButton promptSuccess={promptSuccess}
                         dismissPrompt={dismissPrompt}
-                        link={inviteSellersURL}/> {
-                    <ActionPrompt />
-                } </Sider>
+                        link={inviteSellersURL}
+                    /> 
+                    {
+                        <ActionPrompt />
+                    } 
+                    <OrganizerOverview 
+                        totalRaised={organizationProceeds}
+                        sellers={sellersToDisplay}
+                        setHighlight={setHighlight}
+                        removeHighlight={removeHighlight}
+                    />
+                </Sider>
             </Layout>
             <Layout>
                 <Content style={
