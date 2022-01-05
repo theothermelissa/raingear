@@ -65,7 +65,14 @@ const AdminView = () => {
                 user
             } = currentView
             {const fullFundraiserRecord = fundraisers[findIndex(fundraisers, matchesProperty('id', currentView.fundraiser))];
+            role === "provider" ? 
             recordsDispatch({
+                type: "setFundraiserToDisplay",
+                payload: {
+                    role,
+                    fundraisers: fundraisers
+                },
+            }) : recordsDispatch({
                 type: "setFundraiserToDisplay",
                 payload: {
                     role,

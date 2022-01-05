@@ -17,7 +17,6 @@ const FirehouseCalendar = () => {
         }
     } = useContext(RecordsContext);
 
-      
     useEffect(() => {
         setFundraiserData(fundraisers.map(record => {
             return {
@@ -116,12 +115,14 @@ const FirehouseCalendar = () => {
     return (
         <div>
             {
-                fundraisers[0] && 
-                <Calendar
-                    onSelect={showDrawer}
-                    dateCellRender={dateCellRender}
-                    monthCellRender={monthCellRender}
-                />
+                fundraisers[0] ? 
+                    <Calendar
+                        onSelect={showDrawer}
+                        dateCellRender={dateCellRender}
+                        monthCellRender={monthCellRender}
+                    />
+                :
+                    <div>Loading calendar ...</div>
             }
         </div>
     );

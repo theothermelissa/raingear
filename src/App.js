@@ -138,62 +138,64 @@ function App() {
         }
     }, [user, fundraisers, recordsState.recordHasChanged, recordsState.recordToEdit])
 
-        // set fundraiserToDisplay
-        useEffect(() => {
-            if (fundraisers.length) {
+    // set fundraiserToDisplay
+    useEffect(() => {
+        if (fundraisers.length) {
+            recordsDispatch({
+                type: 'setRecords',
+                payload: fundraisers
+            })
+            const isAdmin = record => record.role === 'admin';
+            const isProvider = record => record.role === 'provider';
+            const isActive = record => record.fields.status === 'Active';
+            let adminRecords = fundraisers.filter(isAdmin);
+            let providerRecords = fundraisers.filter(isProvider);
+            let activeRecords = fundraisers.filter(isActive);
+            if (adminRecords.length) {
                 recordsDispatch({
-                    type: 'setRecords',
-                    payload: fundraisers
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: 'admin',
+                        fundraisers: fundraisers
+                    }
                 })
-                const isAdmin = record => record.role === 'admin';
-                const isProvider = record => record.role === 'provider';
-                const isActive = record => record.fields.status === 'Active';
-                let adminRecords = fundraisers.filter(isAdmin);
-                let providerRecords = fundraisers.filter(isProvider);
-                let activeRecords = fundraisers.filter(isActive);
-                if (adminRecords.length) {
-                    recordsDispatch({
-                        type: 'setFundraiserToDisplay',
-                        payload: {
-                            role: 'admin',
-                            fundraisers: fundraisers
-                        }
-                    })
-                    setLoading(false);
-                    return;
-                }else if (providerRecords.length) {
-                    recordsDispatch({
-                        type: 'setFundraiserToDisplay',
-                        payload: {
-                            role: 'provider',
-                            fundraisers: fundraisers
-                        }
-                    })
-                    setLoading(false);
-                    return;
-                } else if (activeRecords.length) {
-                    recordsDispatch({
-                        type: 'setFundraiserToDisplay',
-                        payload: {
-                            role: activeRecords[0]['role'],
-                            fundraisers: activeRecords[0]
-                        },
-                    })
-                    setLoading(false);
-                    return;
-                } else {
-                    recordsDispatch({
-                        type: 'setFundraiserToDisplay',
-                        payload: {
-                            role: fundraisers[0]['role'],
-                            fundraisers: fundraisers[0]
-                        },
-                    })
-                    setLoading(false);
-                }
+                setLoading(false);
+                return;
+            }else if (providerRecords.length) {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: 'provider',
+                        fundraisers: fundraisers
+                    }
+                })
+                setLoading(false);
+                return;
+            } else if (activeRecords.length) {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: activeRecords[0]['role'],
+                        fundraisers: activeRecords[0]
+                    },
+                })
+                setLoading(false);
+                return;
+            } else {
+                recordsDispatch({
+                    type: 'setFundraiserToDisplay',
+                    payload: {
+                        role: fundraisers[0]['role'],
+                        fundraisers: fundraisers[0]
+                    },
+                })
                 setLoading(false);
             }
-        }, [fundraisers]);
+            setLoading(false);
+        }
+    }, [fundraisers]);
+
+        
 
 
     
@@ -233,9 +235,10 @@ function App() {
                         />}
                         {!loading && <ProtectedRoute
                             path="/calendar"
-                            render={
-                                props => fundraisers && <FirehouseCalendar {...props} />
-                            }
+                            component={props => <FirehouseCalendar {...props}/>}
+                            // render={
+                            //     props => fundraisers && <FirehouseCalendar {...props} />
+                            // }
                         />}
                         {/* <ProtectedRoute path="/profile" component={Profile} /> */}
                     </Switch>

@@ -27,7 +27,6 @@ export const getFundraisers = async (user, ids, callback) => {
     async function createFundraiserList(ids) {
         let fundraisers = [];
         for (let i = 0; i < ids.length; i++) {
-            // console.log('fundraiserFields: ', fundraiserFields);
             let fundraiserData = await getData('Fundraisers', ids[i], 'recordID', fundraiserFields).all();
             if (fundraiserData.length) {
                 fundraisers.push({
@@ -90,7 +89,7 @@ export const getFundraisers = async (user, ids, callback) => {
                         for (let k = 0; k < arrayify(sellerIDs).length; k++) {
                             let sellerData = await getData('Sellers', sellerIDs[k], 'recordID', sellerFields).all();
                             const { fields, fields: { Fundraiser } } = sellerData[0];
-                            if (sellerData.length && id === Fundraiser[0]) {
+                            if (sellerData.length && Fundraiser && id === Fundraiser[0]) {
                                 sellers.push({
                                     id: sellerData[0]['id'],
                                     fields: fields,
