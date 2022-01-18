@@ -5,7 +5,7 @@ import { uniq } from 'lodash';
 import { fundraiserFields, guardianFields, sellerFields, orderFields } from './CurrentFields';
 
 export const getFundraisers = async (user, ids, callback) => {
-    
+
     // get data from a table in Airtable, filtered using a programatically created formula
     function getData(table, filterValue, filterField, fieldsToGet) {
         return base(table).select({

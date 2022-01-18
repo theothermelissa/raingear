@@ -16,6 +16,7 @@ const OrganizerView = () => {
             viewFocusedRecord,
             fundraiserToDisplay: {
                 fundraisers: {
+                    fields,
                     fields: {
                         sellerGuardians,
                         inviteSellersURL,
@@ -25,6 +26,8 @@ const OrganizerView = () => {
             }
         }
     } = useContext(RecordsContext);
+
+    console.log("fields in OrganizerView: ", fields);
 
     const {Sider, Content} = Layout;
 

@@ -13,6 +13,9 @@ const Sellers = ({ sellers, setHighlight, removeHighlight }) => {
     }
   }, [sellers])
 
+  console.log("sellers: ", sellers);
+  console.log("sortedSellers: ", sortedSellers);
+
   return (
     <div>
       {sellers.length && sortedSellers ? sortedSellers.map((seller) => <SellerCard seller={seller} key={seller.id} setHighlight={setHighlight} removeHighlight={removeHighlight} />) : <h3>No sellers yet</h3>}

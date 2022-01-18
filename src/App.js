@@ -6,7 +6,7 @@ import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
-import {findIndex, matchesProperty} from 'lodash';
+import {findIndex, matchesProperty, uniq} from 'lodash';
 // import Profile from './components/Profile';
 import HomePage from './components/HomePage';
 import LoadingSpinner from './components/LoadingSpinner';
