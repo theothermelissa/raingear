@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const helmet = requre ('helmet');
-const authConfig = require ('./src/auth_config.json')
+const helmet = requre('helmet');
+const authConfig = require('./src/auth_config.json')
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 
@@ -27,7 +27,7 @@ const authorizaeAccessToken = jwt({
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri:   `https://${domain}/.well-known/jwks.json`
+        jwksUri: `https://${domain}/.well-known/jwks.json`
     }),
     audience: audience,
     issuer: `https://${domain}/`,
