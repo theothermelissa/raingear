@@ -1,21 +1,21 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import Airtable from 'airtable';
-import {BrowserRouter as Router, Switch, withRouter} from "react-router-dom";
+import { BrowserRouter as Router, Switch, withRouter } from "react-router-dom";
 import './App.scss';
 import recordsReducer from './reducers/recordsReducer';
 import EditDrawer from './components/EditDrawer';
 import FirehouseCalendar from './components/FirehouseCalendar';
 import NavBar from './components/NavBar';
-import {findIndex, matchesProperty, uniq} from 'lodash';
+import { findIndex, matchesProperty, uniq } from 'lodash';
 // import Profile from './components/Profile';
 import HomePage from './components/HomePage';
 import LoadingSpinner from './components/LoadingSpinner';
 import { getFundraisers } from './components/fetchFundraiserData';
 import ProtectedRoute from './auth/protected-route';
-import {useAuth0} from '@auth0/auth0-react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { getUser } from './components/fetchUserData';
 
-export const base = new Airtable({apiKey: process.env.REACT_APP_AIRTABLE_API_KEY}).base('appWga5gfjEZX4q7X');
+export const base = new Airtable({ apiKey: process.env.REACT_APP_AIRTABLE_API_KEY }).base('appWga5gfjEZX4q7X');
 export const RecordsContext = React.createContext(null);
 export const RecordsDispatch = React.createContext(null);
 
@@ -34,11 +34,13 @@ const initialRecordsState = {
 };
 
 function App() {
-    
-    const { loginWithRedirect, user: auth0User, isAuthenticated} = useAuth0();
+
+    const { loginWithRedirect, user: auth0User, isAuthenticated, getAccessTokenSilently } = useAuth0();
     const [loading, setLoading] = useState(false);
     const [recordsState, recordsDispatch] = useReducer(recordsReducer, initialRecordsState);
     const [fundraisers, setFundraisers] = useState('');
+    const [accessToken, setAccessToken] = useState('');
+
 
     const {
         user,
@@ -46,9 +48,12 @@ function App() {
         drawerVisible,
     } = recordsState;
 
+
+
+
     // handle logging in
     const Login = ({ location }) => {
-        
+
         const queryParams = () => {
             const params = new URLSearchParams(location.search);
             return {
@@ -62,7 +67,7 @@ function App() {
             mode
         } = queryParams()
 
-        loginWithRedirect({ 
+        loginWithRedirect({
             login_hint: email,
             screen_hint: mode,
             // appState: {
@@ -70,7 +75,7 @@ function App() {
             // }
         })
     };
-    
+
     // handle logging out
     useEffect(() => {
 
@@ -79,7 +84,28 @@ function App() {
         }
 
     }, [recordsState.user])
-    
+
+
+    useEffect(() => {
+        const getUserMetadata = async () => {
+
+            if (!isAuthenticated) {
+                return
+            }
+
+            try {
+                const accessToken = await getAccessTokenSilently();
+
+                setAccessToken(accessToken);
+
+            } catch (e) {
+                console.log(e.message);
+            }
+        };
+
+        getUserMetadata();
+    }, [getAccessTokenSilently, isAuthenticated]);
+
     // set user data using email
     useEffect(() => {
         if (isAuthenticated && !user) {
@@ -90,7 +116,7 @@ function App() {
                         type: 'displayError',
                         payload: err
                     })
-                return;
+                    return;
                 }
                 recordsDispatch({
                     type: "setUser",
@@ -104,7 +130,7 @@ function App() {
     // fetch fundraiser data
     useEffect(() => {
         if (user.Email) {
-            
+
             const {
                 allFundraisers
             } = user;
@@ -120,21 +146,21 @@ function App() {
                 getFundraisers(user, allFundraisers, callbackForFetch)
             } else if (recordsState.recordHasChanged) {
                 //get dat fundraisers
-               setLoading(true);
-               let fundraiserList = fundraisers;
-               const changedFundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordsState.recordToEdit))
-               const callbackForFetch = async (result) => {
+                setLoading(true);
+                let fundraiserList = fundraisers;
+                const changedFundraiserIndex = findIndex(fundraisers, matchesProperty('id', recordsState.recordToEdit))
+                const callbackForFetch = async (result) => {
                     const updatedRecord = await result;
                     fundraiserList.splice(changedFundraiserIndex, 1, updatedRecord[0])
                     setFundraisers(fundraiserList);
                     setLoading(false);
-                    
-               };
-               getFundraisers(user, [fundraisers[changedFundraiserIndex]['id']], callbackForFetch);
-               recordsDispatch({
-                type: 'doNotUpdate'
+
+                };
+                getFundraisers(user, [fundraisers[changedFundraiserIndex]['id']], callbackForFetch);
+                recordsDispatch({
+                    type: 'doNotUpdate'
                 })
-           }
+            }
         }
     }, [user, fundraisers, recordsState.recordHasChanged, recordsState.recordToEdit])
 
@@ -161,7 +187,7 @@ function App() {
                 })
                 setLoading(false);
                 return;
-            }else if (providerRecords.length) {
+            } else if (providerRecords.length) {
                 recordsDispatch({
                     type: 'setFundraiserToDisplay',
                     payload: {
@@ -195,54 +221,52 @@ function App() {
         }
     }, [fundraisers]);
 
-        
-
-
-    
     return (
-        <RecordsContext.Provider value={{recordsState, recordsDispatch}}>
-                <Router basename={'/'}>
-                    <NavBar /> 
-                    {drawerVisible && <EditDrawer />}
-                    <Switch>
-                        <Login 
-                            exact
-                            path="/login"
-                            component={
-                                props => <Login {...props}/>
-                            } 
-                        />
-                        {recordsState.errorToDisplay 
-                            ? <div className='outer'>
-                                {recordsState.errorToDisplay}
-                            </div>
-                            : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
-                            <div className='outer'>
-                                <h2
-                                    style={{ 
-                                        color: 'rgb(191, 191, 191)'
-                                    }}>
-                                        Login to see fundraiser information
-                                </h2>
-                            </div>}
-                        {loading && <LoadingSpinner />}
-                        {!loading && <ProtectedRoute 
-                            exact
-                            path="/"
-                            component={
-                                props => <HomePage {...props}/>
-                            } 
-                        />}
-                        {!loading && <ProtectedRoute
-                            path="/calendar"
-                            component={props => <FirehouseCalendar {...props}/>}
-                            // render={
-                            //     props => fundraisers && <FirehouseCalendar {...props} />
-                            // }
-                        />}
-                        {/* <ProtectedRoute path="/profile" component={Profile} /> */}
-                    </Switch>
-                </Router>
+        <RecordsContext.Provider value={{ recordsState, recordsDispatch }}>
+            <Router basename={'/'}>
+                <NavBar />
+                {drawerVisible && <EditDrawer />}
+                <Switch>
+                    <Login
+                        exact
+                        path="/login"
+                        component={
+                            props => <Login {...props} />
+                        }
+                    />
+                    {recordsState.errorToDisplay
+                        ? <div className='outer'>
+                            {recordsState.errorToDisplay}
+                        </div>
+                        : !isAuthenticated && !loading && !recordsState.errorToDisplay &&
+                        <div className='outer'>
+                            <h2
+                                style={{
+                                    color: 'rgb(191, 191, 191)'
+                                }}>
+                                Login to see fundraiser information
+                            </h2>
+                        </div>
+                    }
+                    {loading && <LoadingSpinner />}
+                    {!loading && <ProtectedRoute
+                        exact
+                        path="/"
+                        component={
+                            props => <HomePage {...props} />
+                        }
+                    />}
+                    {!loading && <ProtectedRoute
+                        path="/calendar"
+                        component={props => <FirehouseCalendar {...props} />
+                        }
+                    // render={
+                    //     props => fundraisers && <FirehouseCalendar {...props} />
+                    // }
+                    />}
+                    {/* <ProtectedRoute path="/profile" component={Profile} /> */}
+                </Switch>
+            </Router>
         </RecordsContext.Provider>
     );
 }
