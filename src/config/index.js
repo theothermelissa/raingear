@@ -1,3 +1,3 @@
 module.exports = {
-    baseUrl: 'http://localhost:4000'
+    baseUrl: 'https://selljar-backend.herokuapp.com'
 }
